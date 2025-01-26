@@ -1,0 +1,56 @@
+
+siteid =	
+companyid = 
+dpsid = 
+password_encrypted =	
+
+dsshost = localhost
+dssport = 22925
+
+hardware[1] = SYSTEM
+model[1] = AUDITD
+localid[1] = system
+library[1] = /bunnymech/lib/libdsssystem.so
+maker[1] = makeSystem
+
+hardware[2] = SYSTEM
+model[2] = NETLINK
+localid[2] = system
+library[2] = /bunnymech/lib/libdsssystem.so
+maker[2] = makeSystem
+
+hardware[3] = SYSTEM
+model[3] = SYSHOST
+localid[3] = system
+library[3] = /bunnymech/lib/libdsssystem.so
+maker[3] = makeSystem
+directories[3] = / 
+warn_percent[3] = 90.0
+loop_interval[3] = 100
+processes[3] = /usr/bin/httpd
+scripts[3] = "php-cgi test.php"
+
+# remove # to enable these
+
+#hardware[4] = LABJACK
+#model[4] = T4
+#localid[4] = t4_1
+#library[4] = /bunnymech/lib/libdsslj.so
+#maker[4] = makeLJT4
+#ipaddress[4] = 
+
+#localid[5] = ushare
+#library[5] = /bunnymech/lib/libdssushare.so
+#maker[5] = makeUpnp_ushare
+
+
+database = 
+database_user = 
+database_password = 
+database_host = 
+
+certfile = /bunnymech/ssl/dss.pem
+certpass = 
+
+use_cache = yes
+loglevel = 0

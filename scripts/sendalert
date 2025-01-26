@@ -1,0 +1,24 @@
+outfile=/tmp/email.$$
+
+#update and then remove the exit
+exit
+
+if [ $# -lt 1 ]
+then
+     echo bad args
+     exit 99
+fi
+msg=$1
+
+rm -f $outfile
+
+echo "From:  you@company.com" >> $outfile
+echo "To:  someone@elsewhere.com" >> $outfile
+echo "Subject:  alert" >> $outfile
+echo "" >> $outfile
+echo $msg >> $outfile
+
+/usr/bin/mail -r you@company.com -t < $outfile > /dev/null
+
+rm $outfile
+exit

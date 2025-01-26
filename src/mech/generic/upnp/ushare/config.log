@@ -1,0 +1,394 @@
+# configure 
+BASH=/bin/sh
+BASH_ARGC=()
+BASH_ARGV=()
+BASH_LINENO=([0]="0")
+BASH_SOURCE=([0]="configure")
+BASH_VERSINFO=([0]="3" [1]="2" [2]="57" [3]="1" [4]="release" [5]="arm64-apple-darwin24")
+BASH_VERSION='3.2.57(1)-release'
+CONFIGFILE=config.mak
+CONFIG_H=config.h
+DIRSTACK=()
+DISPLAY=/private/tmp/com.apple.launchd.MnNzQwVOKl/org.xquartz:0
+EUID=501
+GROUPS=()
+HOME=/Users/johns
+HOSTNAME=Johns-MacBook-Pro.local
+HOSTTYPE=arm64
+IFS=' 	
+'
+INSTALL='/usr/bin/install -c'
+LANG=en_US.UTF-8
+LOGNAME=johns
+LaunchInstanceID=BC8C729C-8D88-4A73-9F58-4EDDB3B1AE3B
+MACHTYPE=arm64-apple-darwin24
+OPTERR=1
+OPTIND=1
+OSTYPE=darwin24
+PATH=/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/X11/bin
+PIPESTATUS=([0]="0")
+POSIXLY_CORRECT=y
+PPID=7522
+PREFIX=/usr/local
+PS4='+ '
+PWD=/Users/johns/dssclient/src/dssClient/generic/upnp/ushare
+RANDOM=12430
+SECURITYSESSIONID=186a4
+SHELL=/bin/zsh
+SHELLOPTS=braceexpand:hashall:interactive-comments:posix
+SHLVL=2
+SSH_AUTH_SOCK=/private/tmp/com.apple.launchd.FYh1TRFsU6/Listeners
+TERM=xterm-256color
+TERM_PROGRAM=Apple_Terminal
+TERM_PROGRAM_VERSION=455
+TERM_SESSION_ID=51C6CC02-A07F-4D1F-87B5-2FA25A589C92
+TMPC=/var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+TMPDIR=/var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T/
+TMPDIR1=/var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T/
+TMPE=/var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-22606-7867-590
+TMPO=/var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o
+TMPS=/var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-27752-7867-12430.S
+UID=501
+USER=johns
+VERSION=1.1a
+XPC_FLAGS=0x0
+XPC_SERVICE_NAME=0
+_='# configure '
+__CFBundleIdentifier=com.apple.Terminal
+bindir='${PREFIX}/bin'
+cc=gcc
+cpu=unknown
+cross_compile=no
+debug=no
+dlna=no
+dostrip=yes
+extralibs=
+installstrip=-s
+localedir='${PREFIX}/share/locale'
+logfile=config.log
+logging=yes
+make=make
+nls=yes
+optimize=yes
+strip=strip
+sysconfdir='${PREFIX}/etc'
+system_name=Darwin
+Checking for compiler available...
+check_ld
+check_cc
+BEGIN /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+     1	int main(){
+     2	    return 0;
+     3	}
+END /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -c -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-22606-7867-590 /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o
+check_header altivec.h
+check_cpp
+BEGIN /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+     1	#include <altivec.h>
+     2	int x;
+END /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -E -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+In file included from /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c:1:
+/Library/Developer/CommandLineTools/usr/lib/clang/16/include/altivec.h:13:2: error: "AltiVec support not enabled"
+   13 | #error "AltiVec support not enabled"
+      |  ^
+1 error generated.
+check_cc -msse
+BEGIN /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+     1	#include <xmmintrin.h>
+     2	int main(void) {
+     3	#if __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 2)
+     4	return 0;
+     5	#else
+     6	#error no vector builtins
+     7	#endif
+     8	}
+END /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -msse -c -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+clang: warning: argument unused during compilation: '-msse' [-Wunused-command-line-argument]
+In file included from /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c:1:
+/Library/Developer/CommandLineTools/usr/lib/clang/16/include/xmmintrin.h:14:2: error: "This header is only meant to be used on x86 and x64 architecture"
+   14 | #error "This header is only meant to be used on x86 and x64 architecture"
+      |  ^
+In file included from /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c:1:
+In file included from /Library/Developer/CommandLineTools/usr/lib/clang/16/include/xmmintrin.h:17:
+/Library/Developer/CommandLineTools/usr/lib/clang/16/include/mmintrin.h:14:2: error: "This header is only meant to be used on x86 and x64 architecture"
+   14 | #error "This header is only meant to be used on x86 and x64 architecture"
+      |  ^
+/Library/Developer/CommandLineTools/usr/lib/clang/16/include/mmintrin.h:54:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+   54 |     return (__m64)__builtin_ia32_vec_init_v2si(__i, 0);
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Developer/CommandLineTools/usr/lib/clang/16/include/mmintrin.h:133:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+  133 |     return (__m64)__builtin_ia32_packsswb((__v4hi)__m1, (__v4hi)__m2);
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Developer/CommandLineTools/usr/lib/clang/16/include/mmintrin.h:163:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+  163 |     return (__m64)__builtin_ia32_packssdw((__v2si)__m1, (__v2si)__m2);
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Developer/CommandLineTools/usr/lib/clang/16/include/mmintrin.h:193:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+  193 |     return (__m64)__builtin_ia32_packuswb((__v4hi)__m1, (__v4hi)__m2);
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Developer/CommandLineTools/usr/lib/clang/16/include/mmintrin.h:220:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+  220 |     return (__m64)__builtin_ia32_punpckhbw((__v8qi)__m1, (__v8qi)__m2);
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Developer/CommandLineTools/usr/lib/clang/16/include/mmintrin.h:243:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+  243 |     return (__m64)__builtin_ia32_punpckhwd((__v4hi)__m1, (__v4hi)__m2);
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Developer/CommandLineTools/usr/lib/clang/16/include/mmintrin.h:264:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+  264 |     return (__m64)__builtin_ia32_punpckhdq((__v2si)__m1, (__v2si)__m2);
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Developer/CommandLineTools/usr/lib/clang/16/include/mmintrin.h:291:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+  291 |     return (__m64)__builtin_ia32_punpcklbw((__v8qi)__m1, (__v8qi)__m2);
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Developer/CommandLineTools/usr/lib/clang/16/include/mmintrin.h:314:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+  314 |     return (__m64)__builtin_ia32_punpcklwd((__v4hi)__m1, (__v4hi)__m2);
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Developer/CommandLineTools/usr/lib/clang/16/include/mmintrin.h:335:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+  335 |     return (__m64)__builtin_ia32_punpckldq((__v2si)__m1, (__v2si)__m2);
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Developer/CommandLineTools/usr/lib/clang/16/include/mmintrin.h:356:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+  356 |     return (__m64)__builtin_ia32_paddb((__v8qi)__m1, (__v8qi)__m2);
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Developer/CommandLineTools/usr/lib/clang/16/include/mmintrin.h:377:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+  377 |     return (__m64)__builtin_ia32_paddw((__v4hi)__m1, (__v4hi)__m2);
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Developer/CommandLineTools/usr/lib/clang/16/include/mmintrin.h:398:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+  398 |     return (__m64)__builtin_ia32_paddd((__v2si)__m1, (__v2si)__m2);
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Developer/CommandLineTools/usr/lib/clang/16/include/mmintrin.h:420:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+  420 |     return (__m64)__builtin_ia32_paddsb((__v8qi)__m1, (__v8qi)__m2);
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Developer/CommandLineTools/usr/lib/clang/16/include/mmintrin.h:443:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+  443 |     return (__m64)__builtin_ia32_paddsw((__v4hi)__m1, (__v4hi)__m2);
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Developer/CommandLineTools/usr/lib/clang/16/include/mmintrin.h:465:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+  465 |     return (__m64)__builtin_ia32_paddusb((__v8qi)__m1, (__v8qi)__m2);
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Developer/CommandLineTools/usr/lib/clang/16/include/mmintrin.h:487:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+  487 |     return (__m64)__builtin_ia32_paddusw((__v4hi)__m1, (__v4hi)__m2);
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+check_cc -march=athlon
+BEGIN /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+     1	#include <mm3dnow.h>
+     2	int main(void) {
+     3	__m64 b1;
+     4	b1 = _m_pswapd(b1);
+     5	_m_femms();
+     6	return 0;
+     7	}
+END /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -march=athlon -c -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+clang: error: unsupported argument 'athlon' to option '-march='
+check_ld
+check_cc
+BEGIN /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+     1	#include <inttypes.h>
+     2	int main(int argc, char ** argv){
+     3	        volatile uint32_t i=0x01234567;
+     4	        return (*((uint8_t*)(&i))) == 0x67;
+     5	}
+END /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -c -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-22606-7867-590 /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o
+check_cflags -W
+check_cc -W
+BEGIN /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+     1	int x;
+END /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -I.. -W -c -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+check_cflags -Wall
+check_cc -Wall
+BEGIN /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+     1	int x;
+END /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -I.. -W -Wall -c -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+check_cflags -D_LARGEFILE_SOURCE
+check_cc -D_LARGEFILE_SOURCE
+BEGIN /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+     1	int x;
+END /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -I.. -W -Wall -D_LARGEFILE_SOURCE -c -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+check_cflags -D_FILE_OFFSET_BITS=64
+check_cc -D_FILE_OFFSET_BITS=64
+BEGIN /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+     1	int x;
+END /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -I.. -W -Wall -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -c -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+check_cflags -D_REENTRANT
+check_cc -D_REENTRANT
+BEGIN /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+     1	int x;
+END /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -I.. -W -Wall -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_REENTRANT -c -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+Checking for locales ...
+check_header locale.h
+check_cpp
+BEGIN /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+     1	#include <locale.h>
+     2	int x;
+END /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -I.. -W -Wall -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_REENTRANT -O3 -E -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+check_lib locale.h setlocale 
+check_header locale.h
+check_cpp
+BEGIN /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+     1	#include <locale.h>
+     2	int x;
+END /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -I.. -W -Wall -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_REENTRANT -O3 -DHAVE_LOCALE_H -E -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+check_func setlocale
+check_ld
+check_cc
+BEGIN /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+     1	extern int setlocale();
+     2	int main(){
+     3	    setlocale();
+     4	    return 0;
+     5	}
+END /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -I.. -W -Wall -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_REENTRANT -O3 -DHAVE_LOCALE_H -c -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-22606-7867-590 /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o
+Checking for ifaddrs ...
+check_lib ifaddrs.h getifaddrs 
+check_header ifaddrs.h
+check_cpp
+BEGIN /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+     1	#include <ifaddrs.h>
+     2	int x;
+END /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -I.. -W -Wall -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_REENTRANT -O3 -DHAVE_LOCALE_H -DHAVE_SETLOCALE -E -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+check_func getifaddrs
+check_ld
+check_cc
+BEGIN /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+     1	extern int getifaddrs();
+     2	int main(){
+     3	    getifaddrs();
+     4	    return 0;
+     5	}
+END /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -I.. -W -Wall -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_REENTRANT -O3 -DHAVE_LOCALE_H -DHAVE_SETLOCALE -c -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-22606-7867-590 /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o
+Checking for langinfo ...
+check_header langinfo.h
+check_cpp
+BEGIN /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+     1	#include <langinfo.h>
+     2	int x;
+END /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -I.. -W -Wall -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_REENTRANT -O3 -DHAVE_LOCALE_H -DHAVE_SETLOCALE -DHAVE_IFADDRS_H -E -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+check_lib langinfo.h nl_langinfo 
+check_header langinfo.h
+check_cpp
+BEGIN /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+     1	#include <langinfo.h>
+     2	int x;
+END /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -I.. -W -Wall -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_REENTRANT -O3 -DHAVE_LOCALE_H -DHAVE_SETLOCALE -DHAVE_IFADDRS_H -DHAVE_LANGINFO_H -E -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+check_func nl_langinfo
+check_ld
+check_cc
+BEGIN /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+     1	extern int nl_langinfo();
+     2	int main(){
+     3	    nl_langinfo();
+     4	    return 0;
+     5	}
+END /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -I.. -W -Wall -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_REENTRANT -O3 -DHAVE_LOCALE_H -DHAVE_SETLOCALE -DHAVE_IFADDRS_H -DHAVE_LANGINFO_H -c -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-22606-7867-590 /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o
+Checking for iconv ...
+check_lib iconv.h iconv 
+check_header iconv.h
+check_cpp
+BEGIN /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+     1	#include <iconv.h>
+     2	int x;
+END /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -I.. -W -Wall -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_REENTRANT -O3 -DHAVE_LOCALE_H -DHAVE_SETLOCALE -DHAVE_IFADDRS_H -DHAVE_LANGINFO_H -DHAVE_LANGINFO_CODESET -E -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+check_func iconv
+check_ld
+check_cc
+BEGIN /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+     1	extern int iconv();
+     2	int main(){
+     3	    iconv();
+     4	    return 0;
+     5	}
+END /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -I.. -W -Wall -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_REENTRANT -O3 -DHAVE_LOCALE_H -DHAVE_SETLOCALE -DHAVE_IFADDRS_H -DHAVE_LANGINFO_H -DHAVE_LANGINFO_CODESET -c -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-22606-7867-590 /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o
+Undefined symbols for architecture arm64:
+  "_iconv", referenced from:
+      _main in ushare-17834-7867-2471.o
+ld: symbol(s) not found for architecture arm64
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+Checking for libixml ...
+check_lib upnp/ixml.h ixmlRelaxParser -lixml
+check_header upnp/ixml.h
+check_cpp
+BEGIN /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+     1	#include <upnp/ixml.h>
+     2	int x;
+END /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -I.. -W -Wall -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_REENTRANT -O3 -DHAVE_LOCALE_H -DHAVE_SETLOCALE -DHAVE_IFADDRS_H -DHAVE_LANGINFO_H -DHAVE_LANGINFO_CODESET -E -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+check_func ixmlRelaxParser
+check_ld
+check_cc
+BEGIN /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+     1	extern int ixmlRelaxParser();
+     2	int main(){
+     3	    ixmlRelaxParser();
+     4	    return 0;
+     5	}
+END /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -I.. -W -Wall -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_REENTRANT -O3 -DHAVE_LOCALE_H -DHAVE_SETLOCALE -DHAVE_IFADDRS_H -DHAVE_LANGINFO_H -DHAVE_LANGINFO_CODESET -c -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-22606-7867-590 /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o -lixml
+Checking for libupnp >= 1.4.2 ...
+check_lib upnp/upnp.h UpnpSetMaxContentLength -lupnp
+check_header upnp/upnp.h
+check_cpp
+BEGIN /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+     1	#include <upnp/upnp.h>
+     2	int x;
+END /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -I.. -W -Wall -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_REENTRANT -O3 -DHAVE_LOCALE_H -DHAVE_SETLOCALE -DHAVE_IFADDRS_H -DHAVE_LANGINFO_H -DHAVE_LANGINFO_CODESET -E -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+check_func UpnpSetMaxContentLength
+check_ld
+check_cc
+BEGIN /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+     1	extern int UpnpSetMaxContentLength();
+     2	int main(){
+     3	    UpnpSetMaxContentLength();
+     4	    return 0;
+     5	}
+END /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -I.. -W -Wall -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_REENTRANT -O3 -DHAVE_LOCALE_H -DHAVE_SETLOCALE -DHAVE_IFADDRS_H -DHAVE_LANGINFO_H -DHAVE_LANGINFO_CODESET -c -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-14864-7867-17022.c
+gcc -o /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-22606-7867-590 /var/folders/dv/14p3yy4n05x2072clh__8lxh0000gn/T//ushare-17834-7867-2471.o -lixml -lpthread -lupnp
+
+uShare: configure is OK
+  version            1.1a
+  using libupnp      
+configuration:
+  install prefix     /usr/local
+  configuration dir  ${PREFIX}/etc
+  locales dir        ${PREFIX}/share/locale
+  NLS support        yes
+  DLNA support       no
+  C compiler         gcc
+  STRIP              strip
+  make               make
+  CPU                unknown ()
+  debug symbols      no
+  strip symbols      yes
+  optimize           yes
+
+  CFLAGS              -I.. -W -Wall -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_REENTRANT -O3 -DHAVE_LOCALE_H -DHAVE_SETLOCALE -DHAVE_IFADDRS_H -DHAVE_LANGINFO_H -DHAVE_LANGINFO_CODESET
+  LDFLAGS            
+  extralibs           -lixml -lpthread -lupnp
+
+Creating config.mak ...
+Creating config.h ...

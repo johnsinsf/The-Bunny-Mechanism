@@ -1,0 +1,59 @@
+This is the top level directory.
+
+To build the system:
+
+cd src
+
+"vi make.inc" to make any need changes for your system 
+
+sh makeall
+
+be sure to update ld.so.conf and run ldconfig!
+
+
+Requirements:
+
+-lcrypto -lssl -lcrypt -lmysqlclient_r -lxml2 -lxml++-3.0 -lglibmm-2.4 -lpthread  -lLabJackM -llog4cpp  -llabjackusb
+
+other XML library versions should work too, or you can remove the dependencies by changing the file "make.inc".
+
+
+Build the database if you require one:
+
+mysql -u youruser -p -D yourDB < scripts/sql.sh
+
+
+Create the Channel Types for the DIO system if needed:
+
+This is used to auto load the channels for a new interface and translating fio/name for the U3.
+
+mysql -u youruser -p -D yourDB
+load data local infile "scripts/channel_types" into table channel_types;
+
+
+Update the config file:
+cd conf
+cd conf
+vi dss.conf and edit database entries and interface entries
+
+If you want to use the Host System, signon to dwanta.com and get the siteID, companyID, dpsID, and password_encrypted and update dss.conf.
+
+After downloading the site certificate, you'll need to store in PEM format:
+
+Get the passphrase from the devices screen where the file was downloaded, you'll need to type that in and then you can
+select a new passsphrase for the PEM or you can use the same one. Whichever passphrase you use goes into dss.conf with 
+the file name.
+
+openssl pkcs12 -in sitecert.pkcs12 -out dss.pem // get the passphrase from the devices screen where the file was downloaded.
+
+In dss.conf, put dss.pem as the certificate file name and add the passphrase as certpass too.
+
+
+Run the system:
+
+cd bin
+./bunnymech &
+
+The logs should be in /var/logs/user.log or whatever is configured in the log4cpp.properties file in bin.
+
+If everything is set up correctly the interfaces will auto load the channels into the database on the initial run and it will monitor all channels.

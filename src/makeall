@@ -1,0 +1,29 @@
+cd baseServer
+make
+make install
+cd ../dpsio
+make
+make install
+cd ../icomm
+make
+make install
+cd ../classes
+make
+make install
+cd ../mech
+make
+make install
+cd ../mech/labjack
+make
+make install
+cd ../generic/system
+make
+make install
+cd ../upnp/ushare/src
+make
+make install
+cd ../..
+make
+make install
+
+echo "done!"

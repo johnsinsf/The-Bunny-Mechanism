@@ -1,0 +1,176 @@
+cds.o: cds.cc ushare.h content.h buffer.h redblack.h \
+ /dssclient/src/mech/Mech.h /dssclient/src/include/dpsframework.h \
+ /dssclient/src/include/Log4.h /dssclient/src/baseServer/BaseServer.h \
+ /dssclient/src/icomm/Icomm.h /dssclient/src/dpsio/SocketIO.h \
+ /dssclient/src/dpsio/DssSems.h /dssclient/src/classes/Logs.h \
+ /dssclient/src/classes/SBase.h /dssclient/src/classes/SBase_files.h \
+ /dssclient/src/dpsio/DssSaxParser.h /dssclient/src/classes/Channels.h \
+ /dssclient/src/classes/Interfaces.h \
+ /dssclient/src/classes/Channels_digital.h \
+ /dssclient/src/classes/Channels.h \
+ /dssclient/src/classes/Channels_analog.h /dssclient/src/classes/Hosts.h \
+ /dssclient/src/classes/Interfaces.h /dssclient/src/classes/Locations.h \
+ services.h metadata.h http.h mime.h minmax.h
+cms.o: cms.cc ushare.h content.h buffer.h redblack.h \
+ /dssclient/src/mech/Mech.h /dssclient/src/include/dpsframework.h \
+ /dssclient/src/include/Log4.h /dssclient/src/baseServer/BaseServer.h \
+ /dssclient/src/icomm/Icomm.h /dssclient/src/dpsio/SocketIO.h \
+ /dssclient/src/dpsio/DssSems.h /dssclient/src/classes/Logs.h \
+ /dssclient/src/classes/SBase.h /dssclient/src/classes/SBase_files.h \
+ /dssclient/src/dpsio/DssSaxParser.h /dssclient/src/classes/Channels.h \
+ /dssclient/src/classes/Interfaces.h \
+ /dssclient/src/classes/Channels_digital.h \
+ /dssclient/src/classes/Channels.h \
+ /dssclient/src/classes/Channels_analog.h /dssclient/src/classes/Hosts.h \
+ /dssclient/src/classes/Interfaces.h /dssclient/src/classes/Locations.h \
+ services.h mime.h
+msr.o: msr.cc ushare.h content.h buffer.h redblack.h \
+ /dssclient/src/mech/Mech.h /dssclient/src/include/dpsframework.h \
+ /dssclient/src/include/Log4.h /dssclient/src/baseServer/BaseServer.h \
+ /dssclient/src/icomm/Icomm.h /dssclient/src/dpsio/SocketIO.h \
+ /dssclient/src/dpsio/DssSems.h /dssclient/src/classes/Logs.h \
+ /dssclient/src/classes/SBase.h /dssclient/src/classes/SBase_files.h \
+ /dssclient/src/dpsio/DssSaxParser.h /dssclient/src/classes/Channels.h \
+ /dssclient/src/classes/Interfaces.h \
+ /dssclient/src/classes/Channels_digital.h \
+ /dssclient/src/classes/Channels.h \
+ /dssclient/src/classes/Channels_analog.h /dssclient/src/classes/Hosts.h \
+ /dssclient/src/classes/Interfaces.h /dssclient/src/classes/Locations.h \
+ services.h
+http.o: http.cc services.h ushare.h content.h buffer.h redblack.h \
+ /dssclient/src/mech/Mech.h /dssclient/src/include/dpsframework.h \
+ /dssclient/src/include/Log4.h /dssclient/src/baseServer/BaseServer.h \
+ /dssclient/src/icomm/Icomm.h /dssclient/src/dpsio/SocketIO.h \
+ /dssclient/src/dpsio/DssSems.h /dssclient/src/classes/Logs.h \
+ /dssclient/src/classes/SBase.h /dssclient/src/classes/SBase_files.h \
+ /dssclient/src/dpsio/DssSaxParser.h /dssclient/src/classes/Channels.h \
+ /dssclient/src/classes/Interfaces.h \
+ /dssclient/src/classes/Channels_digital.h \
+ /dssclient/src/classes/Channels.h \
+ /dssclient/src/classes/Channels_analog.h /dssclient/src/classes/Hosts.h \
+ /dssclient/src/classes/Interfaces.h /dssclient/src/classes/Locations.h \
+ cds.h cms.h msr.h metadata.h http.h minmax.h trace.h presentation.h \
+ osdep.h mime.h
+bunny.o: bunny.cc services.h ushare.h content.h buffer.h redblack.h \
+ /dssclient/src/mech/Mech.h /dssclient/src/include/dpsframework.h \
+ /dssclient/src/include/Log4.h /dssclient/src/baseServer/BaseServer.h \
+ /dssclient/src/icomm/Icomm.h /dssclient/src/dpsio/SocketIO.h \
+ /dssclient/src/dpsio/DssSems.h /dssclient/src/classes/Logs.h \
+ /dssclient/src/classes/SBase.h /dssclient/src/classes/SBase_files.h \
+ /dssclient/src/dpsio/DssSaxParser.h /dssclient/src/classes/Channels.h \
+ /dssclient/src/classes/Interfaces.h \
+ /dssclient/src/classes/Channels_digital.h \
+ /dssclient/src/classes/Channels.h \
+ /dssclient/src/classes/Channels_analog.h /dssclient/src/classes/Hosts.h \
+ /dssclient/src/classes/Interfaces.h /dssclient/src/classes/Locations.h \
+ cds.h cms.h msr.h metadata.h http.h bunny_meta.h bunny.h LObj.h minmax.h \
+ trace.h presentation.h osdep.h mime.h /dssclient/src/dpsio/SocketIO.h
+bunny_meta.o: bunny_meta.cc mime.h metadata.h ushare.h content.h buffer.h \
+ redblack.h /dssclient/src/mech/Mech.h \
+ /dssclient/src/include/dpsframework.h /dssclient/src/include/Log4.h \
+ /dssclient/src/baseServer/BaseServer.h /dssclient/src/icomm/Icomm.h \
+ /dssclient/src/dpsio/SocketIO.h /dssclient/src/dpsio/DssSems.h \
+ /dssclient/src/classes/Logs.h /dssclient/src/classes/SBase.h \
+ /dssclient/src/classes/SBase_files.h /dssclient/src/dpsio/DssSaxParser.h \
+ /dssclient/src/classes/Channels.h /dssclient/src/classes/Interfaces.h \
+ /dssclient/src/classes/Channels_digital.h \
+ /dssclient/src/classes/Channels.h \
+ /dssclient/src/classes/Channels_analog.h /dssclient/src/classes/Hosts.h \
+ /dssclient/src/classes/Interfaces.h /dssclient/src/classes/Locations.h \
+ http.h bunny_meta.h util_iconv.h gettext.h trace.h LObj.h
+presentation.o: presentation.cc ../config.h metadata.h ushare.h content.h \
+ buffer.h redblack.h /dssclient/src/mech/Mech.h \
+ /dssclient/src/include/dpsframework.h /dssclient/src/include/Log4.h \
+ /dssclient/src/baseServer/BaseServer.h /dssclient/src/icomm/Icomm.h \
+ /dssclient/src/dpsio/SocketIO.h /dssclient/src/dpsio/DssSems.h \
+ /dssclient/src/classes/Logs.h /dssclient/src/classes/SBase.h \
+ /dssclient/src/classes/SBase_files.h /dssclient/src/dpsio/DssSaxParser.h \
+ /dssclient/src/classes/Channels.h /dssclient/src/classes/Interfaces.h \
+ /dssclient/src/classes/Channels_digital.h \
+ /dssclient/src/classes/Channels.h \
+ /dssclient/src/classes/Channels_analog.h /dssclient/src/classes/Hosts.h \
+ /dssclient/src/classes/Interfaces.h /dssclient/src/classes/Locations.h \
+ http.h presentation.h gettext.h util_iconv.h
+metadata.o: metadata.cc mime.h metadata.h ushare.h content.h buffer.h \
+ redblack.h /dssclient/src/mech/Mech.h \
+ /dssclient/src/include/dpsframework.h /dssclient/src/include/Log4.h \
+ /dssclient/src/baseServer/BaseServer.h /dssclient/src/icomm/Icomm.h \
+ /dssclient/src/dpsio/SocketIO.h /dssclient/src/dpsio/DssSems.h \
+ /dssclient/src/classes/Logs.h /dssclient/src/classes/SBase.h \
+ /dssclient/src/classes/SBase_files.h /dssclient/src/dpsio/DssSaxParser.h \
+ /dssclient/src/classes/Channels.h /dssclient/src/classes/Interfaces.h \
+ /dssclient/src/classes/Channels_digital.h \
+ /dssclient/src/classes/Channels.h \
+ /dssclient/src/classes/Channels_analog.h /dssclient/src/classes/Hosts.h \
+ /dssclient/src/classes/Interfaces.h /dssclient/src/classes/Locations.h \
+ http.h bunny_meta.h util_iconv.h gettext.h trace.h
+mime.o: mime.cc mime.h ushare.h content.h buffer.h redblack.h \
+ /dssclient/src/mech/Mech.h /dssclient/src/include/dpsframework.h \
+ /dssclient/src/include/Log4.h /dssclient/src/baseServer/BaseServer.h \
+ /dssclient/src/icomm/Icomm.h /dssclient/src/dpsio/SocketIO.h \
+ /dssclient/src/dpsio/DssSems.h /dssclient/src/classes/Logs.h \
+ /dssclient/src/classes/SBase.h /dssclient/src/classes/SBase_files.h \
+ /dssclient/src/dpsio/DssSaxParser.h /dssclient/src/classes/Channels.h \
+ /dssclient/src/classes/Interfaces.h \
+ /dssclient/src/classes/Channels_digital.h \
+ /dssclient/src/classes/Channels.h \
+ /dssclient/src/classes/Channels_analog.h /dssclient/src/classes/Hosts.h \
+ /dssclient/src/classes/Interfaces.h /dssclient/src/classes/Locations.h
+services.o: services.cc ushare.h content.h buffer.h redblack.h \
+ /dssclient/src/mech/Mech.h /dssclient/src/include/dpsframework.h \
+ /dssclient/src/include/Log4.h /dssclient/src/baseServer/BaseServer.h \
+ /dssclient/src/icomm/Icomm.h /dssclient/src/dpsio/SocketIO.h \
+ /dssclient/src/dpsio/DssSems.h /dssclient/src/classes/Logs.h \
+ /dssclient/src/classes/SBase.h /dssclient/src/classes/SBase_files.h \
+ /dssclient/src/dpsio/DssSaxParser.h /dssclient/src/classes/Channels.h \
+ /dssclient/src/classes/Interfaces.h \
+ /dssclient/src/classes/Channels_digital.h \
+ /dssclient/src/classes/Channels.h \
+ /dssclient/src/classes/Channels_analog.h /dssclient/src/classes/Hosts.h \
+ /dssclient/src/classes/Interfaces.h /dssclient/src/classes/Locations.h \
+ services.h cms.h cds.h msr.h trace.h
+buffer.o: buffer.cc buffer.h minmax.h
+util_iconv.o: util_iconv.cc util_iconv.h
+content.o: content.cc content.h
+cfgparser.o: cfgparser.cc ../config.h gettext.h cfgparser.h ushare.h \
+ content.h buffer.h redblack.h /dssclient/src/mech/Mech.h \
+ /dssclient/src/include/dpsframework.h /dssclient/src/include/Log4.h \
+ /dssclient/src/baseServer/BaseServer.h /dssclient/src/icomm/Icomm.h \
+ /dssclient/src/dpsio/SocketIO.h /dssclient/src/dpsio/DssSems.h \
+ /dssclient/src/classes/Logs.h /dssclient/src/classes/SBase.h \
+ /dssclient/src/classes/SBase_files.h /dssclient/src/dpsio/DssSaxParser.h \
+ /dssclient/src/classes/Channels.h /dssclient/src/classes/Interfaces.h \
+ /dssclient/src/classes/Channels_digital.h \
+ /dssclient/src/classes/Channels.h \
+ /dssclient/src/classes/Channels_analog.h /dssclient/src/classes/Hosts.h \
+ /dssclient/src/classes/Interfaces.h /dssclient/src/classes/Locations.h \
+ trace.h osdep.h
+trace.o: trace.cc ../config.h trace.h ushare.h content.h buffer.h \
+ redblack.h /dssclient/src/mech/Mech.h \
+ /dssclient/src/include/dpsframework.h /dssclient/src/include/Log4.h \
+ /dssclient/src/baseServer/BaseServer.h /dssclient/src/icomm/Icomm.h \
+ /dssclient/src/dpsio/SocketIO.h /dssclient/src/dpsio/DssSems.h \
+ /dssclient/src/classes/Logs.h /dssclient/src/classes/SBase.h \
+ /dssclient/src/classes/SBase_files.h /dssclient/src/dpsio/DssSaxParser.h \
+ /dssclient/src/classes/Channels.h /dssclient/src/classes/Interfaces.h \
+ /dssclient/src/classes/Channels_digital.h \
+ /dssclient/src/classes/Channels.h \
+ /dssclient/src/classes/Channels_analog.h /dssclient/src/classes/Hosts.h \
+ /dssclient/src/classes/Interfaces.h /dssclient/src/classes/Locations.h
+redblack.o: redblack.cc redblack.h
+osdep.o: osdep.cc osdep.h
+ctrl_telnet.o: ctrl_telnet.cc ../config.h ctrl_telnet.h minmax.h trace.h
+ushare.o: ushare.cc ../config.h ushare.h content.h buffer.h redblack.h \
+ /dssclient/src/mech/Mech.h /dssclient/src/include/dpsframework.h \
+ /dssclient/src/include/Log4.h /dssclient/src/baseServer/BaseServer.h \
+ /dssclient/src/icomm/Icomm.h /dssclient/src/dpsio/SocketIO.h \
+ /dssclient/src/dpsio/DssSems.h /dssclient/src/classes/Logs.h \
+ /dssclient/src/classes/SBase.h /dssclient/src/classes/SBase_files.h \
+ /dssclient/src/dpsio/DssSaxParser.h /dssclient/src/classes/Channels.h \
+ /dssclient/src/classes/Interfaces.h \
+ /dssclient/src/classes/Channels_digital.h \
+ /dssclient/src/classes/Channels.h \
+ /dssclient/src/classes/Channels_analog.h /dssclient/src/classes/Hosts.h \
+ /dssclient/src/classes/Interfaces.h /dssclient/src/classes/Locations.h \
+ services.h http.h bunny.h LObj.h bunny_meta.h metadata.h util_iconv.h \
+ cfgparser.h gettext.h trace.h ctrl_telnet.h

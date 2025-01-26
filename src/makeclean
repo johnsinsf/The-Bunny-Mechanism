@@ -1,0 +1,10 @@
+cd dpsio
+make clean
+cd ../baseServer
+make clean
+cd ../icomm
+make clean
+cd ../classes
+make clean
+cd ../mech
+make clean
