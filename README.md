@@ -49,9 +49,6 @@ On the Mac, first enable auditd. (more directions coming)
 
 Then edit /etc/security/audit_user and put in the settings you want. I use these:
 
-#
-# $P4: //depot/projects/trustedbsd/openbsm/etc/audit_user#3 $
-#
 #root:lo,nt,ex:no
 root:lo,ex:no
 johns:lo,cl,nt,ex:no
@@ -62,7 +59,7 @@ I'm currently using MacOS Sequoia 15.2. When I wrote this software 5 years ago t
 
 To know if Apple is scanning all your files, first enable auditd and make the changes to the control files and reboot. Then use:
 
-praudit /var/audit/control | grep mediaanalysisd
+praudit /var/audit/current | grep mediaanalysisd
 
 If you see a lot of files being scanned, then I'm not the only one. They have something called the SensitiveContentAnalysisML that looks for nudity.
 
@@ -291,6 +288,8 @@ main( int argc, char *argv[] ) {
   std::string initFileName = "log4cpp.properties";
 
 to change the initFileName to include the directory location. 
+
+The bunnymech program can run directly connected to the bunny host, or if you have many servers, use the "local" option and have all the local clients connect to the single node that has a connection to the bunny host.
 
 
 Stopping
