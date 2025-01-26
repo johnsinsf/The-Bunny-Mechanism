@@ -300,3 +300,16 @@ Stopping
 Use ps -ef | grep bunnymech and then use kill.
 
 
+Root User
+
+Although I did build in GUID functions, I don't use them. Instead, I run two instances of bunnymech, one as a normal user and one as root running the system modules.
+
+Like this:
+
+    0 48211  2111   0 Wed01PM ttys002  303:06.15 ./bunnymech
+  501 59386 43050   0 Sat01AM ttys034    4:52.15 ./bunnymech -s1 -f ../conf/dss.conf.user
+
+
+Compiling Issues
+
+If you have any issues compiling, let me know! I remember that I had to modify one of the system header files for the netlink to compile, for instance. I may be the only use using that header.
