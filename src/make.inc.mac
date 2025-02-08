@@ -12,8 +12,8 @@ DIR = /Users/johns/bunnymech
 #
 #labjacku3 = yes
 #labjackt4 = yes
-system_netlink = yes
-system_auditd = yes
+#system_netlink = yes
+#system_auditd = yes
 system_macos  = yes
 system_host = yes
 

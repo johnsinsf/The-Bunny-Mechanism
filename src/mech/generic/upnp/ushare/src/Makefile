@@ -69,7 +69,7 @@ $(PROG): $(OBJS)
 else
 
 .cc.o:
-	g++ -c $(CFLAGS) -I$(SRC)/ -I$(SRC)/classes -I$(SRC)/icomm -I$(SRC)/dpsio -I$(SRC)/baseServer -I$(SRC)/include -I$(SRC)/mech $(OPTFLAGS) -DUSE_BUNNY -D_HAVEMACOS -D_USEFILES -DINSTALLSRC=\"$(SRC)\" -fPIC -shared  -o $@ $<
+	g++ -c $(CFLAGS) -I$(SRC)/ -I$(SRC)/classes -I$(SRC)/icomm -I$(SRC)/dpsio -I$(SRC)/baseServer -I$(SRC)/include -I$(SRC)/mech $(OPTFLAGS) -DUSE_BUNNY -D_HAVEMACOS -D_USEFILES -DINSTALLSRC=\"$(SRC)\" -DINSTALLDIR=\"$(DIR)\" -fPIC -shared  -o $@ $<
 
 $(PROG): $(OBJS)
 	g++ $(OBJS) $(LDFLAGS) -I$(SRC)/ -I$(SRC)/classes -I$(SRC)/icomm -I$(SRC)/dpsio -I$(SRC)/baseServer -I$(SRC)/include -I$(SRC)/mech $(EXTRALIBS) -DUSE_BUNNY -D_HAVEMACOS -D_USEFILES -fPIC -shared  -dynamic -o $@.so -Wl, -undefined suppress

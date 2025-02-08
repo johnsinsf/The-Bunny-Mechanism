@@ -380,8 +380,9 @@ SocketIO::openServer( int port, int euid, int egid ) {
     int rc = fchmod( _fd, S_IWOTH | S_IXOTH | S_IROTH );
     logger.error("chmod results " + itoa(rc) + " err: " + itoa(errno));
   }
-
-  if( bind( _fd, (struct sockaddr *)&addr, sizeof(addr) ) < 0 ) {
+  int rc = 0;
+  rc = ::bind( _fd, (struct sockaddr *)&addr, sizeof(addr) );
+  if( rc < 0 ) {
     logger.error( "bind failed err: " + itoa(errno) );
     return -1;
   }
@@ -575,7 +576,7 @@ SocketIO::openClient( string serverName, string af_socket ) {
     addr.sun_family = AF_UNIX;
     strncpy(addr.sun_path, af_socket.c_str(), sizeof(addr.sun_path) -1);
 
-    if (bind(fd, (struct sockaddr *) &addr, sizeof(struct sockaddr_un)) == -1) {
+    if (::bind(fd, (struct sockaddr *) &addr, sizeof(struct sockaddr_un)) == -1) {
       logger.error( "socket failed" );
       return -1;
     } else {
