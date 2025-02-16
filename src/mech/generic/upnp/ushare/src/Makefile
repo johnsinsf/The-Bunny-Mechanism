@@ -3,7 +3,6 @@ $(error "../config.mak is not present, run configure !")
 endif
 include ../config.mak
 
-#dssclient
 include ../../../../../make.inc
 
 PROG = ushare
@@ -61,10 +60,10 @@ all: depend $(PROG)
 
 ifndef system_macos
 .cc.o:
-	g++ -c $(CFLAGS) -I/dssclient/src -I/dssclient/src/classes -I/dssclient/src/icomm -I/dssclient/src/dpsio -I/dssclient/src/baseServer -I/dssclient/src/include -I/dssclient/src/mech $(OPTFLAGS) -DUSE_BUNNY -D_USEFILES -DINSTALLDIR=\"$(DIR)\" -fPIC -shared  -o $@ $<
+	g++ -c $(CFLAGS) -I$(SRC) -I$(SRC)/classes -I/$(SRC)/icomm -I/$(SRC)/dpsio -I/$(SRC)/baseServer -I/$(SRC)/include -I/$(SRC)/mech $(OPTFLAGS) -DUSE_BUNNY -D_USEFILES -DINSTALLDIR=\"$(DIR)\" -fPIC -shared  -o $@ $<
 
 $(PROG): $(OBJS)
-	g++ $(OBJS) $(LDFLAGS) -I/dssclient/src -I/dssclient/src/classes -I/dssclient/src/icomm -I/dssclient/src/dpsio -I/dssclient/src/baseServer -I/dssclient/src/include -I/dssclient/src/mech $(EXTRALIBS) -DUSE_BUNNY -D_USEFILES -DINSTALLDIR=\"$(DIR)\" -fPIC -shared  -dynamic -o $@.so
+	g++ $(OBJS) $(LDFLAGS) -I/$(SRC)/ -I/$(SRC)/classes -I/$(SRC)/icomm -I/$(SRC)/dpsio -I/$(SRC)/baseServer -I/$(SRC)/include -I/$(SRC)/mech $(EXTRALIBS) -DUSE_BUNNY -D_USEFILES -DINSTALLDIR=\"$(DIR)\" -fPIC -shared  -dynamic -o $@.so
 
 else
 

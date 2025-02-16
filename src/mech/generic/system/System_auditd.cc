@@ -8,17 +8,8 @@
 */
 
 #include "System_auditd.h"
-/*
-#include <sys/time.h>
-#include <sys/socket.h>
-#include <signal.h>
-#include <errno.h>
-#include <stdbool.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-*/
+
+#define MY_SOCK_PATH "/run/audispd_events"
 
 int 
 System_auditd::main( DssObject& o ) {
@@ -45,7 +36,6 @@ System_auditd::main( DssObject& o ) {
 
 int 
 System_auditd::audisp_connect() {
-  #define MY_SOCK_PATH "/var/run/audispd_events"
 
   int sfd;
   struct sockaddr_un my_addr;
@@ -282,8 +272,8 @@ System_auditd::parse_msgid( string buf, DssObject& o, int& msgid, bool& eoeFound
     int e = buf.find(" ", i + 1);
     if( e > 0 ) {
       type = buf.substr( i + 6, e - i - 6);
-      //if( type == "EOE" || type == "PROCTITLE" || type == "KERNEL" )
-      if( type == "EOE" )
+      if( type == "EOE" || type == "PROCTITLE" || type == "KERNEL" )
+      //if( type == "EOE" )
         eoeFound = true;
     }
   }
