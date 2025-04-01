@@ -209,6 +209,15 @@ Mech::doWork( int& threadID, SocketIO* socket ) {
   i = configMap.find("localcerts");
   i != configMap.end() ? localcerts = i->second : localcerts = "";
 
+  i = configMap.find("audit_mode");
+  if( i != configMap.end() ) {
+    if( i->second == "1" )
+      o.audit_mode = F_STRING;
+    else
+    if( i->second == "2" )
+      o.audit_mode = F_BINARY;
+  }
+
   i = configMap.find("dpsid");
   if( i != configMap.end() ) {
     dpsid = o.dpsid = i->second;
@@ -1626,7 +1635,8 @@ Mech::doWorker2( int& threadID ) {
       logger.error("starting SSL");
       socket->startUpSSL();
     }
-    logger.error("created new socket " + itoa(clientFD));
+    string s = socket->initPeerName();
+    logger.error("created new socket " + itoa(clientFD) + " for " + s);
   } else {
     logger.error("no client fds, exiting");
     return -1;
@@ -1745,7 +1755,7 @@ Mech::processLocalMsg( Icomm& localIn, DssObject& o ) {
       if( rc > 0 ) {
         add_client_data( o, string(o.databuf) );
       } else {
-        logger.error("bad read in process local msg");
+        logger.error("bad read in process local msg for: " + o.socket->getIpAddress());
   
         //return ATEND;
         return SENDACK;

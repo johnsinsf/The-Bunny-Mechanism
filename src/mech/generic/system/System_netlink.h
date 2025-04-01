@@ -41,7 +41,7 @@ class System_netlink : public System {
 
     int    msgid;
     map<int, procvaltype> procvals;
-    //__u32 seq;
-    __uint32_t seq;
+    __u32 seq;
+    //__uint32_t seq2;
 };
 #endif

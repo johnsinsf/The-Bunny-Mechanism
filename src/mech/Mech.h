@@ -41,6 +41,8 @@
 #define _SIZELIMIT2 64000
 //#define _SIZELIMIT1 64000
 #define _MAXDATASIZE 256000
+#define F_STRING 1
+#define F_BINARY 2
 
 typedef struct {
   int    structtype;
@@ -105,6 +107,7 @@ class DssObject {
       databasesync = false;
       send_data_alerts = false;
       localstorage = true;
+      audit_mode = F_BINARY;
       memset(databuf,0,sizeof(databuf));
     }
     void setLocalId  ( string s ) { localID = s; }
@@ -156,6 +159,7 @@ class DssObject {
     bool   localstorage;
     pid_t  threadID;
     int    localidsem;
+    int    audit_mode;
     string motor_channela;
     string motor_channelb;
     string motor_channelc;

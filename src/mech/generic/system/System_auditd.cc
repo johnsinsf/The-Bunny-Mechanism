@@ -8,8 +8,17 @@
 */
 
 #include "System_auditd.h"
-
-#define MY_SOCK_PATH "/run/audispd_events"
+/*
+#include <sys/time.h>
+#include <sys/socket.h>
+#include <signal.h>
+#include <errno.h>
+#include <stdbool.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+*/
 
 int 
 System_auditd::main( DssObject& o ) {
@@ -36,6 +45,9 @@ System_auditd::main( DssObject& o ) {
 
 int 
 System_auditd::audisp_connect() {
+  #define MY_SOCK_PATH "/run/audispd_events"
+  //#define MY_SOCK_PATH "/run/audispd_events"
+  //#define MY_SOCK_PATH "/usr/local/run/audispd_events"
 
   int sfd;
   struct sockaddr_un my_addr;
@@ -65,7 +77,12 @@ System_auditd::run( int nl_sock, DssObject& o ) {
   bool done = false;
 
   #define BUFSIZE 16384
-  char buf[BUFSIZE];
+
+  int size = BUFSIZE;
+  if( o.audit_mode == F_BINARY )
+    size = 8986;
+
+  char buf[size];
   string out;
 
   logger.error("System_auditd running");
@@ -78,12 +95,25 @@ System_auditd::run( int nl_sock, DssObject& o ) {
     if( g_logLevel > 2 )
       logger.error("System_auditd recv " + itoa(rc));
     if( rc > 0 ) {
-      if( rc != BUFSIZE ) {
-        out += buf;
-        parse_buf( out, o );
+      if( rc != size ) {
+        out += string(buf,rc);
+        if( o.audit_mode == F_BINARY )  {
+          if( g_logLevel > 20 )
+            logger.error("have size " + to_string(out.size()) );
+          parse_buf_binary( out, o );
+        } else {
+          parse_buf( out, o );
+        }
         out = "";
       } else {
-        out += buf;
+        if( o.audit_mode == F_BINARY )  {
+          out = string(buf,size);
+          if( g_logLevel > 20 )
+            logger.error("have size " + to_string(out.size()) );
+          parse_buf_binary( out, o );
+        } else {
+          out += string(buf,rc);
+        }
       }
     }
     else
@@ -199,6 +229,81 @@ System_auditd::send_data( DssObject& o, int msgid ) {
 }
 
 void 
+System_auditd::parse_buf_binary( string buf, DssObject& o ) {
+  if( g_logLevel > 20 )
+    logger.error("parse binary size2 " + to_string(buf.size())  );
+  string msg;
+/*
+  for( int x = 0; x < 1000; x+=80 ) {
+    for( int i = x; i < 80 + x; i++ ) {
+      msg +=   to_string(buf[i]) + ":";
+      if( buf[i] == 0 )  {
+        i = 1001; x = 1001;
+      }
+    }
+  }
+*/
+  if( g_logLevel > 20 ) {
+    for( int i = 0; i < 80; i++ ) {
+      msg +=   to_string(buf[i]) + ":";
+    }
+    logger.error("msg " + msg);
+
+    unsigned int i1;
+
+    memcpy(&i1, (char*)(buf.substr(0, 4).c_str()), 4 );
+    logger.error("have i0 " + itoa(i1));
+
+    memcpy(&i1, buf.substr(4, 4).c_str(), 4 );
+    logger.error("have i1 " + itoa(i1));
+
+    memcpy(&i1, buf.substr(8, 4).c_str(), 4 );
+    logger.error("have i2 " + itoa(i1));
+
+    memcpy(&i1, buf.substr(12, 4).c_str(), 4 );
+    logger.error("have i3 " + itoa(i1));
+  }
+
+  bool done = false;
+  int x = 16;
+  string t1, buf2;
+
+  while( ! done && x < 200 ) {
+    char a;
+    memcpy( &a, (char*)(buf.substr(x, 1).c_str()), 1 );
+    //logger.error("have a " + to_string(a));
+    if( a == 32 ) {
+      if( g_logLevel > 20 )
+        logger.error("have cr string " + t1);
+      if( buf2.size() ) {
+        buf2 += " ";
+      }
+      if( t1.substr(0,4) == "msg=" ) {
+        if( t1.substr(t1.size() - 1, 1) == ":" ) {
+          t1 = t1.substr(0, (t1.size() - 1) )  + " ";
+        }
+      }
+      buf2 += t1;
+      t1 = "";
+    }
+    else
+    if( a == 0 ) {
+      t1 = "";
+      done = true;
+    } else {
+      t1 += buf.substr(x,1);
+    }
+    x++;
+  }
+  if( buf2.size() ) {
+    if( g_logLevel > 20 )
+      logger.error("have buf " + buf2);
+    return parse_buf( buf2, o );
+  }
+  return;
+}
+
+void 
 System_auditd::parse_buf( string buf, DssObject& o ) {
   int k = 0;
   int i = buf.find("\n");
@@ -246,8 +351,10 @@ System_auditd::parse_msgid( string buf, DssObject& o, int& msgid, bool& eoeFound
       string msg = buf.substr( i + 4, e - i - 4);
       if( msg.substr(0,6) == "audit(" ) {
         int i = msg.find(":",6);
+        //logger.error("have i " + to_string(i));
         if( i > 0 ) {
           int j = msg.find(")",i);
+          //logger.error("have j " + to_string(j));
           if( j > 0 ) {
             rc = atoi( msg.substr(i+1,j-i-1).c_str() );
             msgid = rc;
@@ -287,7 +394,7 @@ System_auditd::parse_buf2( string buf, int msgid ) {
   int i = buf.find("node=");
 
   if( g_logLevel > 0 )
-    logger.error("System_auditd parse " + buf + " curr " + itoa(msgid));
+    logger.error("System_auditd parse2 " + buf + " curr " + itoa(msgid));
 
   if( i >= 0 ) {
     e = buf.find(" ", i + 1);

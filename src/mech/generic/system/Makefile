@@ -14,7 +14,7 @@ endif
 
 DSS_OBJ=$(DSS_SRC:.cc=.o)
 
-CXX = g++ $(CCFLAGS) -I ../../ -I../../../include  -I../../../icomm -I../../../baseServer -I ../../../classes  -I ../../../dpsio $(XMLINC) 
+CXX = g++ -std=c11 $(CCFLAGS) -I ../../ -I../../../include  -I../../../icomm -I../../../baseServer -I ../../../classes  -I ../../../dpsio $(XMLINC) 
 
 OBJ :	libdsssystem.so
 

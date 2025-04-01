@@ -54,3 +54,5 @@ certpass =
 
 use_cache = yes
 loglevel = 0
+; auditd.conf format mode = 1 ENRICHED 2 = RAW
+audit_mode = 2

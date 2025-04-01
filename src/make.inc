@@ -7,7 +7,7 @@
 # set SRC to the source directory
 #
 DIR = /bunnymech
-SRC = /dssclient/src
+SRC = /home/johns/bunnymech/src
 
 #
 # uncomment each interface type you want to build
