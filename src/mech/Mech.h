@@ -78,6 +78,11 @@ typedef struct {
       string channelc;
       string channeld;
       string channeltrig;
+      string strval;
+      string resp;
+      string yxc_cmd;
+      int    status;
+      int    stan;
 } commType;
 
 class Mech;
@@ -95,6 +100,7 @@ class DssObject {
       semInitID = 0;
       semDataID = 0;
       semRunID = 0;
+      semRespID = 0;
       threadID  = 0;
       localidsem = 0;
       motor_running = 0;
@@ -134,8 +140,15 @@ class DssObject {
     time_t timestamp;
     string pass, siteid, companyid, dpsid, uid, gid;
     int semInitID;
-    int semDataID;
     int semRunID;
+#ifndef _HAVEMACOS
+    int semRespID;
+    int semDataID;
+#else
+    dispatch_semaphore_t semRespID;
+    dispatch_semaphore_t semDataID;
+#endif
+
     int semNum;
     int offset;
     int clientDataTS;
@@ -207,9 +220,9 @@ class Mech : public BaseServer {
     virtual int  createSignonAckMsg( Icomm& msg, DssObject& o );
     virtual int  createTestMsg   ( Icomm& msg, DssObject& o );
     virtual int  processHostMsg  ( Icomm& msg, DssObject& o );
-    virtual int  processHostData ( string& s );
+    virtual int  processHostData ( string& s, DssObject& o );
     virtual int  importHostData  ( string& xml );
-    virtual int  processHostCommand( string& json );
+    virtual int  processHostCommand( string& json, DssObject& o );
     virtual int  processClient   ( int infile, time_t wakeup, Icomm& comm, DssObject& o );
     virtual int  processLocalMsg ( Icomm& localIn, DssObject& o );
     virtual int  reconnectHost   ( SocketIO*& socket, string& authHost, int authPort );
@@ -236,16 +249,19 @@ class Mech : public BaseServer {
     int localrecid;
     string dpsid;
 
+    static pthread_mutex_t controlMutex;
+    map<string, int> localidSems;  // localid, semid
+
   protected:
     int    clientDataIndex;
 
-    map<string, int> localidSems;  // localid, semid
     static const  key_t  INITKEY;
     static const  key_t  DATAKEY;
     static const  key_t  RUNKEY;
-    static pthread_mutex_t controlMutex;
+    static const  key_t  RESPKEY;
 #ifdef _HAVEMACOS
     static dispatch_semaphore_t dispatch_sem;
+    static dispatch_semaphore_t dispatch_sem2;
 #endif
 };
 

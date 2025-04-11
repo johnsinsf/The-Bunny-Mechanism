@@ -16,10 +16,12 @@ BaseServer *SBase::_dpsServer = NULL;
 const key_t Mech::INITKEY = 0x15060001;
 const key_t Mech::RUNKEY  = 0x15060012;
 const key_t Mech::DATAKEY = 0x15060023;
+const key_t Mech::RESPKEY = 0x15060024;
 pthread_mutex_t Mech::controlMutex = PTHREAD_MUTEX_INITIALIZER;
 
 #ifdef _HAVEMACOS
 dispatch_semaphore_t Mech::dispatch_sem = 0;
+dispatch_semaphore_t Mech::dispatch_sem2 = 0;
 #endif
 
 // main loop for a "worker thread", reads the interface and signals main thread when a change occurs
@@ -54,6 +56,10 @@ Mech::doWork( int& threadID ) {
     return -1;
   }
   string idx = key.substr(k, m-k+1);
+
+  configMap["configidx"] = idx;
+  logger.error("configidx set " + idx);
+
   I2 i = configMap.find("hardware" + idx);
   if( i != configMap.end() ) {
     hardware = i->second;
@@ -113,6 +119,7 @@ Mech::doWork( int& threadID ) {
   int semInitID = semget(INITKEY + _DpsServerNumber, 0, 0);
   int semDataID = semget(DATAKEY + _DpsServerNumber, 0, 0);
   int semRunID  = semget(RUNKEY + _DpsServerNumber, 0, 0);
+  int semRespID  = semget(RESPKEY + _DpsServerNumber, 0, 0);
 
   if( _localID.size() == 0 ) {
     logger.error("localid not found in config file, exiting worker thread");
@@ -144,8 +151,14 @@ Mech::doWork( int& threadID ) {
     o.idx       = idx;
     o.threadID  = threadID;
     o.semInitID = semInitID;
-    o.semDataID = semDataID;
     o.semRunID  = semRunID;
+#ifndef _HAVEMACOS
+    o.semDataID = semDataID;
+    o.semRespID  = semRespID;
+#else
+    o.semDataID = dispatch_sem;
+    o.semRespID  = dispatch_sem2;
+#endif
     o.ipaddress = ipaddress;
     o.model     = model;
     o.hardware  = hardware;
@@ -207,6 +220,7 @@ Mech::doWork( int& threadID, SocketIO* socket ) {
   i != configMap.end() ? localssl = i->second : localssl = "";
 
   i = configMap.find("localcerts");
+
   i != configMap.end() ? localcerts = i->second : localcerts = "";
 
   i = configMap.find("audit_mode");
@@ -257,7 +271,7 @@ Mech::doWork( int& threadID, SocketIO* socket ) {
 
   _MainThread = threadID;
 
-  logger.error("starting worker");
+  logger.error("START: starting worker");
 
   int numThreads = 0;
 
@@ -265,7 +279,7 @@ Mech::doWork( int& threadID, SocketIO* socket ) {
     if( i->first.substr(0,7) == "localid" ) 
       numThreads++;
   }
-  logger.error("will launch " + itoa(numThreads) + " clients " + o.certPass + " " + o.certFile + " " + o.hostname + ".");
+  logger.error("START: will launch " + itoa(numThreads) + " clients " + o.certPass + " " + o.certFile + " " + o.hostname + ".");
 
   o.semInitID = semget( INITKEY + _DpsServerNumber, 1, S_IRWXU );
   if( o.semInitID )
@@ -283,6 +297,7 @@ Mech::doWork( int& threadID, SocketIO* socket ) {
   o.semRunID = semget( RUNKEY + _DpsServerNumber, 1, S_IRWXU );
   if( o.semRunID )
     semctl( o.semRunID, 0, IPC_RMID, 0 );
+
   o.semRunID = semget( RUNKEY + _DpsServerNumber, 1, S_IRWXU | IPC_CREAT );
   
   if( o.semRunID == -1 ) {
@@ -293,8 +308,11 @@ Mech::doWork( int& threadID, SocketIO* socket ) {
     semctl( o.semRunID, 0, SETVAL, 0 );
 
 #ifdef _HAVEMACOS
+
   dispatch_sem = dispatch_semaphore_create(0);
-#endif
+  dispatch_sem2 = dispatch_semaphore_create(0);
+
+#else
 
   o.semDataID = semget( DATAKEY + _DpsServerNumber, 1, S_IRWXU );
   if( o.semDataID )
@@ -309,7 +327,20 @@ Mech::doWork( int& threadID, SocketIO* socket ) {
   else
     semctl( o.semDataID, 0, SETVAL, 0 );
 
-  logger.error("have semDataID " + itoa(o.semDataID));
+
+  o.semRespID = semget( RESPKEY + _DpsServerNumber, 1, S_IRWXU );
+  if( o.semRespID )
+    semctl( o.semRespID, 0, IPC_RMID, 0 );
+
+  o.semRespID = semget( RESPKEY + _DpsServerNumber, 1, S_IRWXU | IPC_CREAT );
+  
+  if( o.semRespID == -1 ) {
+    logger.error( "ERROR: error: semget respID" );
+    return -1; 
+  }
+  else
+    semctl( o.semRespID, 0, SETVAL, 0 );
+#endif
 
   _threadID = 0;
   int j = 0;
@@ -339,13 +370,14 @@ Mech::doWork( int& threadID, SocketIO* socket ) {
       arg.buf = &ds;
       semctl( o.semInitID, 1, IPC_SET, arg );
       semctl( o.semRunID, 1, IPC_SET, arg );
-      semctl( o.semDataID, 1, IPC_SET, arg );
 #ifndef _HAVEMACOS
       //seteuid( atoi(o.uid.c_str()) );
       //setegid( atoi(o.gid.c_str()) );
       setresuid( atoi(o.uid.c_str()), atoi(o.uid.c_str()), 0 );
       setresgid( atoi(o.gid.c_str()), atoi(o.gid.c_str()), 0 );
       logger.error("uid set to " + o.uid + " gid set to " + o.gid + " euid " + itoa(geteuid()));
+      semctl( o.semDataID, 1, IPC_SET, arg );
+      semctl( o.semRespID, 1, IPC_SET, arg );
 #endif
     }
   }
@@ -361,7 +393,6 @@ Mech::doWork( int& threadID, SocketIO* socket ) {
   i = configMap.find("startcontrolport");
   logger.error("checking for controlport");
   if( i != configMap.end() && i->second == "on" ) {
-    logger.error("controlport found");
     startThread(true, 2);
     semGet( o.semInitID );
   }
@@ -668,6 +699,10 @@ Mech::doControl( int& threadID ) {
   int  port = -1;
   DssObject  o;
 
+  if( configMap.size() == 0 ) {
+    logger.error("doControl no config, exiting");
+    return 0;
+  }
   typedef map<string,string>::const_iterator I;
   I i = configMap.find("certfile");
   i != configMap.end() ? o.certFile = i->second : o.certFile = "dss.pem";
@@ -676,7 +711,13 @@ Mech::doControl( int& threadID ) {
   i = configMap.find("dssmode");
   i != configMap.end() ? o.runMode = i->second : o.runMode = "remote";
   i = configMap.find("dsshost");
-  i != configMap.end() ? host = i->second : host = "localhost";
+  if( i != configMap.end() ) {
+     logger.error("have host " + host);
+     host = i->second;
+  } else {
+     host = "localhost";
+     logger.error("default host " + host);
+  }
   i = configMap.find("connectport");
   i != configMap.end() ? port = atoi(i->second.c_str()) : port = 22925;
 
@@ -714,7 +755,10 @@ Mech::doControl( int& threadID ) {
   }
 
   o.semInitID = semget( INITKEY + _DpsServerNumber, 0, 0);
-
+#ifndef _HAVEMACOS
+  o.semRespID = semget( RESPKEY + _DpsServerNumber, 0, 0);
+#endif
+    
   // signal main thread that we're running
 
   semRelease(o.semInitID);
@@ -765,6 +809,19 @@ Mech::doControl( int& threadID ) {
         logger.error("control reconnect failed");
         headerDone = false;
         step = reconnectHost(socket, host, port);
+        break;
+
+      case SENDCLIENTDATA:  
+        logger.error("SENDCLIENTDATA sending resp " + o.dataout);
+        rc = socket->write( STX );
+        rc = socket->write( o.dataout.c_str(), o.dataout.size()  );
+        rc = socket->write( ETX );
+        if( ! rc ) {
+          step = reconnectHost(socket, host, port);
+        } else {
+          step  = READCLIENT;
+        }
+        logger.error("step after sendclientdata " + itoa(step));
         break;
 
       case READCLIENT:
@@ -868,7 +925,7 @@ Mech::doControl( int& threadID ) {
 }
 
 int
-Mech::processHostCommand(string& json) {
+Mech::processHostCommand(string& json, DssObject& o) {
 #ifdef _USEJSON
   char* endptr = NULL;
   JsonValue value;
@@ -885,6 +942,10 @@ Mech::processHostCommand(string& json) {
   string type; //op, which, localid;
   int tag = 0;
   commType c;
+  c.strval = json;
+  c.status = 0;
+  c.stan = 0;
+  o.dataout = "";
 
   while( i.p != j.p ) {
     tag  = i.p->value.getTag();
@@ -911,6 +972,9 @@ Mech::processHostCommand(string& json) {
           else
           if( type == "localid" )
             c.localid = itoa(n);
+          else
+          if( type == "stan" )
+            c.stan = n;
         }
         else
         if( tag == JSON_STRING ) {
@@ -954,17 +1018,78 @@ Mech::processHostCommand(string& json) {
           else
           if( type == "duration" )
             c.duration = n;
+          else
+          if( type == "yxc_cmd" )
+            c.yxc_cmd = n;
         }
         i2.p = i2.p->next;
       }
     } 
     // now do commands
-    logger.error("op " + c.op + " which " + c.which + " val " + c.val + " localid " + c.localid + " chan " + c.channel);
+    logger.error("op " + c.op + " which " + c.which + " val " + c.val + " localid " + c.localid + " chan " + c.channel + " stan " + itoa(c.stan));
     doCommand(c);
     i.p = i.p->next;
   }
+
+  // wait for RESPKEY semaphore 2 seconds
+  
+  bool semReceived = false;
+#ifndef _HAVEMACOS
+  rc = semGet( o.semRespID, 0, 2 );
+  rc == 0 ? semReceived = true : semReceived = false;
+#else
+  dispatch_time_t dt = dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC);
+  //if( g_logLevel > 2 )
+    logger.error("waiting on dispatch_sem2"); 
+  rc = dispatch_semaphore_wait( dispatch_sem2, dt );
+  if( g_logLevel > 2 ) 
+    logger.error("response pinged");
+  if( rc < 0 ) 
+    logger.error("dispatch error " + itoa(rc));
+  rc == 0 ? semReceived = true : semReceived = false;
 #endif
-  return SENDACK;
+
+  logger.error("semGet rc = " + to_string(semReceived));
+
+  if( pthread_mutex_lock( &controlMutex ) != 0 ) {
+    logger.error( "ERROR: failed to lock mutex" );
+    g_quit = true;
+    return -1;
+  }
+  string resp;
+  map<string, commType>::iterator I = localidComm.find(c.localid);
+  bool done = false;
+  while( ! done && I != localidComm.end() ) {
+    logger.error("resp check " + I->second.resp + " stan " + to_string(I->second.stan) + " " + itoa(c.stan) + " " + itoa(I->second.status));
+    if( I->second.stan == c.stan && I->second.status == 2 ) {
+      resp += I->second.resp;
+      localidComm.erase(I);
+      done = true;
+    } else {
+      ++I;
+    } 
+  } 
+  if( resp != "" ) {
+    logger.error("resp is " + resp);
+  }  else {
+    logger.error("can't find localid resp " + c.localid + " for command " + c.op);
+    rc = -1;
+  }
+  if( pthread_mutex_unlock(&controlMutex ) != 0 ) {
+    logger.error( "ERROR: failed to unlock mutex" );
+    g_quit = true;
+    return -1;
+  }
+
+#endif
+
+  //return SENDACK;
+  if( resp == "" ) resp = "none";
+
+  o.dataout = resp;
+  logger.error("returning " + itoa(SENDCLIENTDATA) + " " + resp);
+
+  return SENDCLIENTDATA;
 }
 
 // signal appropriate worker thread to do the command
@@ -986,8 +1111,8 @@ Mech::doCommand( commType& c ) {
     int semNum = 0, offset = 0;
     sems.getClientSem(I->second, semNum, offset);
     if( semNum && offset ) {
-      sems.semRelease(semNum, offset);
       logger.error("sent signal to " + itoa(I->second));
+      sems.semRelease(semNum, offset);
     }
   } else {
     logger.error("can't find localid " + c.localid + " for command " + c.op);
@@ -1099,10 +1224,11 @@ Mech::processTable( int table_nodeid, string& t, DssSaxParser& parser ) {
 #endif
 
 int 
-Mech::processHostData( string& s ) {
+Mech::processHostData( string& s, DssObject& o ) {
   int  prev = 0, pos = 0, hcount= 0, payloadsize = 0;
   int  len  = s.size();
   string h[6];
+  int rc = SENDACK;
 
   pos   = s.find("\n", prev);
   if( pos > 0 && pos < len ) {
@@ -1131,7 +1257,7 @@ Mech::processHostData( string& s ) {
     // type: json size: 167 
     if( i == 4 && h[0] == "type:" && h[1] == "json" ) {
       string json = s.substr(pos,len-pos);
-      processHostCommand(json);
+      rc = processHostCommand(json, o);
     }
     else {
       logger.error("bad header, exiting data import");
@@ -1141,7 +1267,7 @@ Mech::processHostData( string& s ) {
   }
   logger.debug("done with host message");
 
-  return SENDACK;
+  return rc;
 }
 
 int
@@ -1178,9 +1304,11 @@ Mech::processHostMsg( Icomm& hostIn, DssObject& o ) {
     int rc = o.socket->doRead( o.databuf, len );
     if( rc ) {
       string s(o.databuf);
-      return processHostData(s);
+      return processHostData(s, o);
     }
   }
+  logger.error("returning SENDACK");
+
   return SENDACK;
 }
 
@@ -1626,7 +1754,9 @@ Mech::doWorker2( int& threadID ) {
   SocketIO* socket        = NULL;
   DssObject o;
 
+#ifndef _HAVEMACOS
   o.semDataID = semget(DATAKEY + _DpsServerNumber, 0, 0);
+#endif
   
   if( clientFD > 0 )  {
     socket = new SocketIO(clientFD); 
@@ -1838,7 +1968,7 @@ Mech::add_client_data( DssObject& o, string databuf ) {
   }
 
 #ifdef _HAVEMACOS
-  //dispatch_semaphore_signal( o.server->dispatch_sem );
+  dispatch_semaphore_signal( o.server->dispatch_sem );
 #else 
   semRelease(o.semDataID);
 #endif 

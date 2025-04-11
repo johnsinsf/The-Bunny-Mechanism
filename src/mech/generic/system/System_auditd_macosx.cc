@@ -498,18 +498,6 @@ System_auditd_macosx::parse_buf2( const char* bufptr, int len, int msgid, bool& 
         t += itoa((unsigned char)*(bufptr+i++)) + ":";
       t += "\n";
     }
-    // 129:0:26:0:192:254:128:0:0:0:0:0:0:16:91:110:194:95:143:14:189  :36:0:0:1:245:0:0:1:245:0:0:0:20:0:0:1:245:0:0:0:20:0:0:45:236:0:1:134
-    // 129:0:26:241:245:254:128:0:0:0:0:0:0:128:213:246:173:0:209:36:30
-    // socket-inet6,26,53,2001:4860:4860::8888
-    // 129,26,53,2001:4860:4860::8888
-/*
-    else
-    if( (unsigned char)*(bufptr + cnt) == 129 ) {
-      //if( g_logLevel > 2 )
-        logger.error("found type 129");
-      cnt += 21;
-    }
-*/
     else
     if( *(bufptr + cnt) == 113 ) {
       if( g_logLevel > 2 )
@@ -624,6 +612,18 @@ System_auditd_macosx::parse_buf2( const char* bufptr, int len, int msgid, bool& 
       //exe = t;
       rc = 1;
     }
+    // 129:0:26:0:192:254:128:0:0:0:0:0:0:16:91:110:194:95:143:14:189  :36:0:0:1:245:0:0:1:245:0:0:0:20:0:0:1:245:0:0:0:20:0:0:45:236:0:1:134
+    // 129:0:26:241:245:254:128:0:0:0:0:0:0:128:213:246:173:0:209:36:30
+    // socket-inet6,26,53,2001:4860:4860::8888
+    // 129,26,53,2001:4860:4860::8888
+/*
+    else
+    if( (unsigned char)*(bufptr + cnt) == 129 ) {
+      //if( g_logLevel > 2 )
+        logger.error("found type 129");
+      cnt += 21;
+    }
+*/
     else
     if( (unsigned char)*(bufptr + cnt) == 130 ) {
       if( g_logLevel > 2 )

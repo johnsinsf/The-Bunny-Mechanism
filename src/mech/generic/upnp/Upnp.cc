@@ -48,6 +48,8 @@ Upnp::main( DssObject& o ) {
   o.getInterface().setHostname( o.hostname );
   logger.error("running model " + o.model);
 
+  //semRespID = o.semRespID;
+
   Upnp* a = NULL;
   if( o.model == "USHARE" ) {
     logger.error("new ushare host");

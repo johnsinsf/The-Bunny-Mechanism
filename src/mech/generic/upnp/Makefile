@@ -10,7 +10,7 @@ DSS_SRC = Upnp.cc Upnp_ushare.cc
 
 DSS_OBJ=$(DSS_SRC:.cc=.o)
 
-CXX = g++ $(CCFLAGS) -I ../../ -I../../../include  -I../../../icomm -I../../../baseServer -I ../../../classes  -I ../../../dpsio $(XMLINC) 
+CXX = g++ $(CCFLAGS) -I ushare/src -I ../../ -I../../../include  -I../../../icomm -I../../../baseServer -I ../../../classes  -I ../../../dpsio $(XMLINC) 
 
 OBJ :	libdssushare.so
 
