@@ -820,6 +820,42 @@ ushare_kill (ctrl_telnet_client *client,
 }
 
 #ifdef USE_BUNNY
+/*
+int handleCommand(  struct ushare_t* ut, DssObject& o ) {
+  int errorAddress = 0;
+
+  logger.error("handleCommand ip is " + string(ut->ip));
+
+  if( pthread_mutex_lock( &o.server->controlMutex ) != 0 ) {
+    logger.error( "ERROR: failed to lock mutex" );
+    g_quit = true;
+    return -1;
+  }
+
+  //typedef multimap<string, commType>::const_iterator I2;
+  //for( I2 i = _dpsServer->localidComm.begin(); i != _dpsServer->localidComm.end(); ++i ) {
+    //logger.error("list is " + i->first);
+  //}
+  multimap<string, commType>::const_iterator I = o.server->localidComm.find( o.getLocalId() );
+  int numUpdateFrames = 0;
+  bool conflict = false;
+  while( I != o.server->localidComm.end() ) {
+
+    logger.error("found command " + I->second.op + " chan " + I->second.channel + " val " + I->second.val);
+
+    if( I->second.op == "update" ) {
+    }
+    ++I;
+  }
+
+  if( pthread_mutex_unlock( &o.server->controlMutex ) != 0 ) {
+    //logger.error( "ERROR: failed to unlock mutex" );
+    g_quit = true;
+  }
+
+  return 0;
+}
+*/
 
 int
 ushare_main (DssObject &o) {
@@ -827,6 +863,7 @@ ushare_main (DssObject &o) {
   int argc = 0;
 
 #else
+
 
 int
 main (int argc, char **argv) {
@@ -969,6 +1006,19 @@ main (int argc, char **argv) {
     while (!ut->term && !sleep(10)) {
       //free_bunny_metadata_list (ut);
       //build_bunny_metadata_list (ut);
+/*
+      time_t timeoutns = 25000000; 
+      time_t timeout = 0;
+      struct timespec ts;
+      ts.tv_sec = 0;
+      ts.tv_nsec = timeoutns - 10;
+      nanosleep(&ts, NULL);
+      int rc = o.server->sems.semGet( o.semNum, o.offset, 0, 10);
+      if( rc == 0 ) { // should probably return a 1 here 
+        logger.error("received a signal, doing commands");
+        rc = handleCommand( ut, o );
+      }
+*/
     }
   } else {
     build_metadata_list(ut);

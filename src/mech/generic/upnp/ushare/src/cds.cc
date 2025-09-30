@@ -290,7 +290,7 @@ didl_add_item (struct buffer_t *out, int item_id,
     buffer_appendf (out, "<%s", DIDL_RES);
     // protocolInfo is required :
     didl_add_param (out, DIDL_RES_INFO, protocol_info);
-    if (filter_has_val (filter, "@"DIDL_RES_SIZE))
+    if (filter_has_val (filter, "@" DIDL_RES_SIZE))
       didl_add_value (out, DIDL_RES_SIZE, size);
     buffer_append (out, ">");
     if (url)

@@ -129,11 +129,31 @@ itoa(int i, int len) {
 }
 
 std::string 
+ltoa(long i, int len) {
+  if( ! len ) 
+    return std::to_string(i);
+
+  char s[24];
+  char t[24];
+  if( ( len > 0 ) && ( len < 11 ) ) {
+        sprintf( &t[1], ".%dld", len );
+        t[0] = '%';
+  } else {
+        memcpy( t, "%ld", 2 );
+        t[2] = 0;
+  }
+  sprintf( s, t, i );
+  return std::string(s);
+}
+
+/*
+std::string 
 ltoa(long i) {
     char s[24];
     sprintf( s, "%ld", i );
     return std::string(s);
 }
+*/
 
 std::string 
 itoa(void* i) {

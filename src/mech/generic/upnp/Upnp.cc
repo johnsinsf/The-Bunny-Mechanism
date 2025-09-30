@@ -26,7 +26,7 @@ Upnp::main( DssObject& o ) {
   if( o.hostname.size() == 0 )
     o.hostname= get_hostname();
 
-  logger.error("Upnp main running now " + itoa(geteuid()) + " localid " + o.localID + " on " + o.hostname);
+  logger.error("XXXN Upnp main running now " + itoa(geteuid()) + " localid " + o.localid + " on " + o.hostname + " dispatch_sem2 " + itoa(o.semRespID));
 
   int id = semget( INITKEY2 + _DpsServerNumber, 1, S_IRWXU );
   if( id )
@@ -44,7 +44,7 @@ Upnp::main( DssObject& o ) {
 
   _dpsServer->sems.getClientSem( o.localidsem, o.semNum, o.offset );
 
-  o.getInterface().setLocalID( o.localID );
+  o.getInterface().setLocalID( o.localid );
   o.getInterface().setHostname( o.hostname );
   logger.error("running model " + o.model);
 

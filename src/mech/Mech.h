@@ -38,11 +38,14 @@
 
 #define _TESTMSGINTERVAL 200
 #define _SIZELIMIT1 32000
-#define _SIZELIMIT2 64000
-//#define _SIZELIMIT1 64000
-#define _MAXDATASIZE 256000
-#define F_STRING 1
-#define F_BINARY 2
+//#define _MAXDATASIZE 256000
+#define _MAXDATASIZE 128000
+
+//#define _SIZELIMIT1 2048000
+//#define _MAXDATASIZE 4096000
+
+//#define _SIZELIMIT1 512000
+//#define _MAXDATASIZE 1024000
 
 typedef struct {
   int    structtype;
@@ -80,9 +83,11 @@ typedef struct {
       string channeltrig;
       string strval;
       string resp;
+      string respheader;
       string yxc_cmd;
       int    status;
       int    stan;
+      int    rc;
 } commType;
 
 class Mech;
@@ -113,10 +118,9 @@ class DssObject {
       databasesync = false;
       send_data_alerts = false;
       localstorage = true;
-      audit_mode = F_BINARY;
       memset(databuf,0,sizeof(databuf));
     }
-    void setLocalId  ( string s ) { localID = s; }
+    void setLocalId  ( string s ) { localid = s; }
     void setModel    ( string s ) { model = s; }
     void setHardware ( string s ) { hardware = s; }
     void setLog      ( Logs& o )  { log = o; }
@@ -128,7 +132,7 @@ class DssObject {
     Interfaces& getInterface ( void ) { return interface; }
     Hosts& getHost           ( void ) { return host; }
     Channels& getChannel     ( void ) { return channel; }
-    string getLocalId        ( void ) { return localID; }
+    string getLocalId        ( void ) { return localid; }
     string getHostname       ( void ) { return hostname; }
     Channels_analog& getChannelAnalog  ( void ) { return channel_analog; }
     Channels_digital& getChannelDigital( void ) { return channel_digital; }
@@ -137,6 +141,7 @@ class DssObject {
     SocketIO* socket;
     Mech* server;
     string dataout;
+    string dataout_header;
     time_t timestamp;
     string pass, siteid, companyid, dpsid, uid, gid;
     int semInitID;
@@ -160,7 +165,7 @@ class DssObject {
     const char* cNames[MAX_CHANNELS_PER_INTERFACE];
     double cValues[MAX_CHANNELS_PER_INTERFACE];
     string hostname;
-    string localID;
+    string localid;
     string model;
     string hardware;
     string ipaddress;
@@ -172,7 +177,6 @@ class DssObject {
     bool   localstorage;
     pid_t  threadID;
     int    localidsem;
-    int    audit_mode;
     string motor_channela;
     string motor_channelb;
     string motor_channelc;

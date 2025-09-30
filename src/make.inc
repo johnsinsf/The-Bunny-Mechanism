@@ -6,18 +6,18 @@
 # set DIR to the installation directory
 # set SRC to the source directory
 #
-DIR = /bunnymech
-SRC = /home/johns/bunnymech/src
+DIR = /Users/johns/bunnymech
+SRC = /Users/johns/bunnymech/src
 
 #
 # uncomment each interface type you want to build
 #
 #labjacku3 = yes
 #labjackt4 = yes
-system_netlink = yes
-system_auditd = yes
+#system_netlink = yes
+#system_auditd = yes
 system_host = yes
-#system_macos  = yes
+system_macos  = yes
 
 #
 # if you want to enable XML support, uncomment the following lines 
@@ -41,7 +41,8 @@ use_parenttgid = yes
 #
 # set the flags to whatever you want to use for the build
 #
-CCFLAGS = -Wall -g -O2 -fPIC -ansi -pedantic -DINSTALLDIR=\"$(DIR)\" -I/usr/include/mysql
+#CCFLAGS = -Wall -g -O2 -fPIC -ansi -pedantic -DINSTALLDIR=\"$(DIR)\" -I/usr/include/mysql
+CCFLAGS = -g -O2 -fPIC -ansi -pedantic -DINSTALLDIR=\"$(DIR)\" -I/usr/include/mysql
 
 ifdef libxml 
   CCFLAGS += -D_USELIBXML

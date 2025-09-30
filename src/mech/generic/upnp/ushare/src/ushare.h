@@ -151,5 +151,9 @@ struct action_event_t {
 
 void display_headers (void);
 
+#ifdef USE_BUNNY
+//int handleCommand( struct ushare_t* ut, DssObject& o );
+#endif
+
 
 #endif /* _USHARE_H_ */

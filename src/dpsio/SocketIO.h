@@ -11,8 +11,6 @@
 #ifndef __SocketIO
 #define __SocketIO
 
-#include "dpsframework.h"
-
 #include <stack>
 #include <sys/poll.h>
 
@@ -25,6 +23,7 @@
 #include <openssl/err.h>
 #include <openssl/rand.h>
 
+#include "dpsframework.h"
 
 extern log4cpp::Category& logger;
 
@@ -83,14 +82,14 @@ class SocketIO {
     virtual bool  write         ( int c );
     virtual bool  write         ( const char* c );
     virtual bool  writePacket   ( const char* c );
-    virtual bool  write         ( const char* c, int len );
-    virtual bool  write         ( const unsigned char* c, int len );
-    virtual bool  writePacket   ( const char* c, int len, bool useLRC = true, bool useLen = false );
-    virtual int   doReadPacket  ( char* buf, int len, int timeOut = READTIMEOUT, bool useLRC = true );
-    virtual int   doReadPacket  ( string& buf, int len, int timeOut = READTIMEOUT, bool useLRC = true );
-    virtual int   doReadLen     ( string& buf, int len, int timeOut = READTIMEOUT );
-    virtual int  doRead         ( char* buf, int len, int timeOut = READTIMEOUT, int checkInput = 0 );
-    virtual int  doReadLine     ( char* buf, int len, int timeOut = READTIMEOUT );
+    virtual bool  write         ( const char* c, long len );
+    virtual bool  write         ( const unsigned char* c, long len );
+    virtual bool  writePacket   ( const char* c, long len, bool useLRC = true, bool useLen = false );
+    virtual long   doReadPacket  ( char* buf, long len, int timeOut = READTIMEOUT, bool useLRC = true );
+    virtual long   doReadPacket  ( string& buf, long len, int timeOut = READTIMEOUT, bool useLRC = true );
+    virtual long  doReadLen     ( string& buf, long len, int timeOut = READTIMEOUT );
+    virtual long  doRead         ( char* buf, long len, int timeOut = READTIMEOUT, int checkInput = 0 );
+    virtual int  doReadLine     ( char* buf, long len, int timeOut = READTIMEOUT );
     virtual void setControlfd( int t ) { controlfd = t; };
     virtual int  doPoll    ( int timeOut, int mask[] );
     virtual int  doClear   ( char* buf );
@@ -140,6 +139,9 @@ class SocketIO {
  
     static map<string, certtype> serverNames;
     static map<string, SSL_CTX*> serverCerts;
+
+    //map<string, certtype> serverNames;
+    //map<string, SSL_CTX*> serverCerts;
 };
   
 #endif

@@ -27,7 +27,7 @@ Mech.o:
 	g++ $(CCFLAGS) -I/usr/local/include/openssl -fPIC -c Mech.cc
 
 clean:
-	rm -f *.o *.so labjack/*.o labjack/*.so generic/system/*.o generic/system/*.so generic/upnp/*[.o,.so] generic/upnp/ushare/src/*[.o,.so] bunnymech 
+	rm -f *.o *.so labjack/*.o labjack/*.so generic/system/*.o generic/system/*.so generic/dsp/*.o generic/dsp/*.so generic/upnp/*[.o,.so] generic/upnp/ushare/src/*[.o,.so] bunnymech 
 
 install:
 	@cp -f bunnymech $(DIR)/bin

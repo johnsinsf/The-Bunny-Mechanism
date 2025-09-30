@@ -179,7 +179,7 @@ build_presentation_page (struct ushare_t *ut)
   {
     buffer_appendf (ut->presentation, "<b>%s #%d :</b>", _("Share"), i + 1);
     buffer_appendf (ut->presentation,
-                    "<input type=\"checkbox\" name=\""CGI_SHARE"[%d]\"/>", i);
+                    "<input type=\"checkbox\" name=\"" CGI_SHARE "[%d]\"/>", i);
     buffer_appendf (ut->presentation, "%s<br/>", ut->contentlist->content[i]);
   }
   buffer_appendf (ut->presentation,
@@ -193,7 +193,7 @@ build_presentation_page (struct ushare_t *ut)
   buffer_appendf (ut->presentation,
                   "<input type=\"hidden\" name=\"action\" value=\"%s\"/>",
                   CGI_ACTION_ADD);
-  buffer_append (ut->presentation, "<input type=\"text\" name=\""CGI_PATH"\"/>");
+  buffer_append (ut->presentation, "<input type=\"text\" name=\"" CGI_PATH "\"/>");
   buffer_appendf (ut->presentation,
                   "<input type=\"submit\" value=\"%s\"/>", _("Share!"));
   buffer_append (ut->presentation, "</form>");

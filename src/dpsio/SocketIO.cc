@@ -8,14 +8,15 @@
   express written permission of the author.
 */
 
-#include "SocketIO.h"
 #include <sstream>
 #include <iostream>
 #include <stdio.h>
 #include <sys/syscall.h>
+#include "SocketIO.h"
 
 SSL_CTX* SocketIO::s_ctx           = NULL;
 
+// TESTING
 map<string,SSL_CTX*> SocketIO::serverCerts;
 map<string,SocketIO::certtype> SocketIO::serverNames;
 
@@ -26,7 +27,8 @@ extern int verify_callback(int preverify_ok, X509_STORE_CTX *ctx);
 
 int
 SocketIO::initServerSSL( void ) {
-  logger.error("initServerSSL");
+  if( g_logLevel > 0 )
+    logger.error("initServerSSL");
 /*
   map<string,SSL_CTX*>:iterator I = serverCerts.find("default");
   if( I != serverCerts.end() && I->second != NULL )
@@ -35,14 +37,15 @@ SocketIO::initServerSSL( void ) {
   if( s_ctx != NULL ) {
 */
   if( serverCerts.size() > 0 ) {
-    logger.error("SSL already initialized");
+    if( g_logLevel > 0 )
+      logger.error("SSL already initialized");
     return 1;
   }
 
   SSL_METHOD *ssl_method=(SSL_METHOD *)SSLv23_method();
 #ifndef _HAVEMACOS
-  //OPENSSL_INIT_SETTINGS *settings = NULL;
-  //OPENSSL_init_ssl( OPENSSL_INIT_ADD_ALL_CIPHERS | OPENSSL_INIT_ADD_ALL_DIGESTS | OPENSSL_INIT_ENGINE_OPENSSL, settings);
+  OPENSSL_INIT_SETTINGS *settings = NULL;
+  OPENSSL_init_ssl( OPENSSL_INIT_ADD_ALL_CIPHERS | OPENSSL_INIT_ADD_ALL_DIGESTS | OPENSSL_INIT_ENGINE_OPENSSL, settings);
   SSL_load_error_strings();
   SSL_library_init();
 #else
@@ -53,6 +56,7 @@ SocketIO::initServerSSL( void ) {
   s_ctx = SSL_CTX_new(ssl_method);
 
 #endif
+
 
   int i;
   int num_locks = CRYPTO_num_locks();
@@ -75,13 +79,17 @@ SocketIO::initServerSSL( void ) {
     c.certpass = CertPass;
     c.certcafile = CertCAFile;
     serverNames["default"] = c;
+    if( g_logLevel > 0 )
+      logger.error("serverNames added default");
   }
   map<string,certtype>::iterator I2;
 
-  logger.error("serverNames size " + itoa(serverNames.size()) );
+  if( g_logLevel > 0 )
+    logger.error("serverNames size " + itoa(serverNames.size()) );
 
   for( I2 = serverNames.begin(); I2 != serverNames.end(); ++I2 ) {
-    logger.error("serverNames creating certficate for " + I2->first);
+    if( g_logLevel > 0 )
+      logger.error("creating certficate for " + I2->first);
 
     s_ctx = SSL_CTX_new(ssl_method);
   
@@ -100,28 +108,30 @@ SocketIO::initServerSSL( void ) {
       CertFile = string(INSTALLDIR) + "/ssl/dss.pem";
       //CertCAFile = string(INSTALLDIR) + "/ssl/dssca.pem";
       CertPass = I2->second.certpass;
-      logger.error("default password " + CertPass + " for " + CertFile);
+      logger.error("default password " + CertPass);
     } else {
       CertFile = I2->second.certfile;
       CertPass = I2->second.certpass;
       CertCAFile= I2->second.certcafile;
-      logger.error("set cert password " + CertPass + " for " + CertFile);
     } 
     if( _certRequired ) {
       logger.error( "client cert is required");
       SSL_CTX_set_verify(s_ctx, SSL_VERIFY_PEER|SSL_VERIFY_CLIENT_ONCE, verify_callback );
     }
     if( CertCAFile != "" ) {
-      logger.error("loading CA file " + CertCAFile);
+      if( g_logLevel > 0 )
+        logger.error("loading CA file " + CertCAFile);
       if( SSL_CTX_load_verify_locations(s_ctx, CertCAFile.c_str(), NULL) <= 0 ) {
         logger.error("CAFile failure");
         return -1;
       }
     }
-    logger.error("Cert password " + CertPass + " using installdir " + string(INSTALLDIR));
+    if( g_logLevel > 0 )
+      logger.error("Cert password " + CertPass);
 
     if( CertPass != "" ) {
-      logger.error("using cert password " + CertPass);
+      if( g_logLevel > 0 )
+        logger.error("using cert password " + CertPass);
       SSL_CTX_set_default_passwd_cb_userdata( s_ctx, (void*)CertPass.c_str() );
     }
     /* set the local certificate from CertFile */
@@ -153,7 +163,8 @@ SocketIO::startUpSSL( int opt ) {
   ssl = NULL;
   initPeerName();
   initSockName();
-  logger.error( "startUpSSL " + itoa(fd) + " peer " + ipaddress + " me " + myipaddress );
+  if( g_logLevel > 0 )
+    logger.error( "startUpSSL " + itoa(fd) + " peer " + ipaddress + " me " + myipaddress );
 
   if( s_ctx == NULL ) {
     logger.error( "startUpSSL is null" );
@@ -183,7 +194,8 @@ SocketIO::startUpSSL( int opt ) {
     rc = poll(fds, 1, 5);
     pthread_sigmask(SIG_SETMASK, &origmask, NULL);
 #endif
-    logger.error("ppoll " + itoa(rc));
+    if( g_logLevel > 0 )
+      logger.error("ppoll " + itoa(rc));
 
     if( rc <= 0 ) {
       logger.error( "startUpSSL no data, bailing out" );
@@ -194,7 +206,8 @@ SocketIO::startUpSSL( int opt ) {
   }
 
   if( ssl == NULL ) {
-    logger.error("creating new ssl");
+    if( g_logLevel > 0 )
+      logger.error("creating new ssl");
     ssl = SSL_new( s_ctx );
 
     if( ! ssl ) {
@@ -212,9 +225,6 @@ SocketIO::startUpSSL( int opt ) {
 */
     SSL_set_fd( ssl, fd );
     SSL_set_mode( ssl, SSL_MODE_AUTO_RETRY );
-
-    SSL_set_read_ahead( ssl, 1 );
-
     unsigned char cid[5] = {"DPS3"};
     SSL_set_session_id_context(ssl, cid, 4 );
   }
@@ -235,7 +245,8 @@ SocketIO::startUpSSL( int opt ) {
       char ebuf[240];
       while (e) {
         ERR_error_string_n(e, ebuf, 240);
-        logger.error( "accept " + string(ebuf) );
+        if( g_logLevel > 0 )
+          logger.error( "accept " + string(ebuf) );
         e = ERR_get_error();
       }
       return -1;
@@ -262,7 +273,8 @@ SocketIO::startUpSSL( int opt ) {
 
 
 int dps_client_hello( SSL *s, int *al, void *arg ) {
-  logger.error("in client hello");
+  if( g_logLevel > 0 )
+    logger.error("in client hello");
 
 #ifndef _USEOLDSSL
   typedef map<string,SSL_CTX*> mytype;
@@ -271,7 +283,8 @@ int dps_client_hello( SSL *s, int *al, void *arg ) {
 
   typedef mytype::iterator I;
   for( I i = my_var->begin();i != my_var->end(); ++i ) {
-    logger.error("my arg " + i->first);
+    if( g_logLevel > 0 )
+      logger.error("my arg " + i->first);
   }
  
   const char *servername;
@@ -279,7 +292,8 @@ int dps_client_hello( SSL *s, int *al, void *arg ) {
   size_t len = 0, remaining = 0;
 
   int rc = SSL_client_hello_get0_ext(s, TLSEXT_TYPE_server_name, &p, &remaining);
-  logger.error("rc " + itoa(rc) + " " + itoa(remaining) );
+  if( g_logLevel > 0 )
+    logger.error("rc " + itoa(rc) + " " + itoa(remaining) );
 
   if( ! rc || remaining <= 2) {
     logger.error("bad host in client hello, using default");
@@ -303,11 +317,13 @@ int dps_client_hello( SSL *s, int *al, void *arg ) {
     remaining = len;
     servername = (const char *)p;
   
-    logger.error("servername " + string(servername));
+    if( g_logLevel > 0 )
+      logger.error("servername " + string(servername));
   }
   I i = my_var->find(servername);
   if( i != my_var->end() ) {
-    logger.error("loading " + i->first);
+    if( g_logLevel > 0 )
+      logger.error("loading " + i->first);
     SSL_CTX *new_ctx = i->second;
     SSL_set_SSL_CTX(s, new_ctx);
 #ifndef _HAVEMACOS
@@ -354,7 +370,8 @@ SocketIO::openServer( int port, int euid, int egid ) {
     logger.error( "socket failed " + itoa(errno) );
     return -1;
   }
-  logger.error( "socket opened " + itoa(_fd) );
+  if( g_logLevel > 0 )
+    logger.error( "socket opened " + itoa(_fd) );
 
   bzero( (char*)&addr, sizeof( addr ) );
   addr.sin_family     = AF_INET;
@@ -370,32 +387,36 @@ SocketIO::openServer( int port, int euid, int egid ) {
   setsockopt( _fd, SOL_SOCKET, SO_KEEPALIVE, &sockOpt, sizeof(sockOpt) );
 
   if( port < 1024 ) {
-    logger.error("setting euid to " + itoa(0));
+    if( g_logLevel > 0 )
+      logger.error("setting euid to " + itoa(0));
     if( euid > 0 ) {
       int rc = seteuid(0);
-      logger.error("results: " + itoa(rc));
+      if( g_logLevel > 0 )
+        logger.error("results: " + itoa(rc));
     }
     if( egid > 0 )
       setegid(0);
     int rc = fchmod( _fd, S_IWOTH | S_IXOTH | S_IROTH );
-    logger.error("chmod results " + itoa(rc) + " err: " + itoa(errno));
+    if( g_logLevel > 0 )
+      logger.error("chmod results " + itoa(rc) + " err: " + itoa(errno));
   }
-  int rc = 0;
-  rc = ::bind( _fd, (struct sockaddr *)&addr, sizeof(addr) );
-  if( rc < 0 ) {
+
+  if( ::bind( _fd, (struct sockaddr *)&addr, sizeof(addr) ) < 0 ) {
     logger.error( "bind failed err: " + itoa(errno) );
     return -1;
   }
   if( port < 1024 ) {
-    logger.error("setting euid to " + itoa(euid));
+    if( g_logLevel > 0 )
+      logger.error("setting euid to " + itoa(euid));
     if( euid > 0 ) {
       int rc = seteuid(euid);
-      logger.error("seteuid results: " + itoa(rc));
+      if( g_logLevel > 0 )
+        logger.error("seteuid results: " + itoa(rc));
     }
     if( egid > 0 )
       setegid(egid);
   }
-  listen( _fd, 2048 );
+  ::listen( _fd, 1024000 );
   //logger.error( "socket listened" );
   return( _fd );  
 }
@@ -410,7 +431,8 @@ SocketIO::initPeerName( void ) {
   int rc = getpeername( fd, (struct sockaddr *)&addr, &addrLen );
   if( rc == 0 )  {
     ipaddress = inet_ntoa( addr.sin_addr );
-    logger.error( "peername: " + ipaddress);
+    if( g_logLevel > 0 )
+      logger.error( "peername: " + ipaddress);
   }
   else {
     logger.error( "error getting peer name: "  + itoa(rc) );
@@ -429,7 +451,8 @@ SocketIO::initSockName( void ) {
   int rc = getsockname( fd, (struct sockaddr *)&addr, &addrLen );
   if( rc == 0 )  {
     myipaddress = inet_ntoa( addr.sin_addr );
-    logger.error( "sockname: " + myipaddress);
+    if( g_logLevel > 0 )
+      logger.error( "sockname: " + myipaddress);
   }
   else {
     logger.error( "error getting sock name: "  + itoa(rc) );
@@ -470,7 +493,7 @@ SocketIO::openClient( string serverName, int port, bool blocking, bool reopen ) 
   isConnected = false;
   fd = -1;
 
-  //if( g_logLevel > 0 )
+  if( g_logLevel > 0 )
     logger.error( "openClient " + serverName + " " + itoa(port) + " blocking " + itoa(blocking) );
 
   if( useSSL ) {
@@ -479,7 +502,8 @@ SocketIO::openClient( string serverName, int port, bool blocking, bool reopen ) 
         logger.error( "initSSL failed" );
         return -1;
       } else {
-        logger.error( "openClient initSSL done " + itoa(ssl) );
+        if( g_logLevel > 0 )
+          logger.error( "openClient initSSL done " + itoa(ssl) );
       }
     }
   }
@@ -487,7 +511,7 @@ SocketIO::openClient( string serverName, int port, bool blocking, bool reopen ) 
     fd = socket( AF_INET, SOCK_STREAM, 0 );
 
     if( fd < 0 ) {
-      logger.error( "socket failed" );
+      logger.error( "socket failed " + itoa(errno) );
       return -1;
     }
     int sockOpt = 1;
@@ -498,7 +522,8 @@ SocketIO::openClient( string serverName, int port, bool blocking, bool reopen ) 
     addr.sin_family = AF_INET;
   
     if( ( in_addr = inet_addr( serverName.c_str() ) ) != INADDR_NONE ) {
-      logger.error("using server as IP address " + serverName);
+      if( g_logLevel > 0 )
+        logger.error("using server as IP address " + serverName);
       memcpy( &addr.sin_addr, &in_addr, sizeof(in_addr) );
     } else {
       hp = gethostbyname( serverName.c_str() );
@@ -511,7 +536,8 @@ SocketIO::openClient( string serverName, int port, bool blocking, bool reopen ) 
       memcpy( &addr.sin_addr, hp->h_addr, hp->h_length );
       endhostent();
       //logger.error("converted server to IP address " + string(*hp->h_addr));
-      logger.error("converted server to IP address");
+      if( g_logLevel > 0 )
+        logger.error("converted server to IP address");
     }
     addr.sin_port = htons( (uint16_t)port );
   
@@ -535,11 +561,13 @@ SocketIO::openClient( string serverName, int port, bool blocking, bool reopen ) 
         sleep( 5 );
     } else {
       connected = true;
-      logger.error("connected!");
+      if( g_logLevel > 0 )
+        logger.error("connected!");
     }
   }
   if( useSSL ) {
-    logger.error("starting ssl");
+    if( g_logLevel > 0 )
+      logger.error("starting ssl");
     int rc = startUpSSL(1);
     if( rc != 1 ) {
       logger.error("SSL failed, closing");
@@ -549,7 +577,8 @@ SocketIO::openClient( string serverName, int port, bool blocking, bool reopen ) 
       connected = false;
     }
   } else {
-    logger.error("no ssl " + itoa(fd));
+    if( g_logLevel > 0 )
+      logger.error("no ssl " + itoa(fd));
   }
   //logger.error("openClient fd is " + itoa(fd));
   isConnected = connected;
@@ -569,7 +598,7 @@ SocketIO::openClient( string serverName, string af_socket ) {
     fd = socket( AF_UNIX, SOCK_STREAM, 0 );
 
     if( fd < 0 ) {
-      logger.error( "socket failed" );
+      logger.error( "socket failed " + itoa(errno) );
       return -1;
     }
     memset(&addr, '\0', sizeof(struct sockaddr_un));
@@ -577,11 +606,12 @@ SocketIO::openClient( string serverName, string af_socket ) {
     strncpy(addr.sun_path, af_socket.c_str(), sizeof(addr.sun_path) -1);
 
     if (::bind(fd, (struct sockaddr *) &addr, sizeof(struct sockaddr_un)) == -1) {
-      logger.error( "socket failed" );
+      logger.error( "bind failed " + itoa(errno) );
       return -1;
     } else {
       connected = true;
-      logger.error("connected!");
+      if( g_logLevel > 0 )
+        logger.error("connected!");
     }
   }
   isConnected = connected;
@@ -594,29 +624,14 @@ SocketIO::doPoll( int timeOut, int mask[] ) {
   int rc;
   if( useSSL && ssl ) {
     rc = SSL_pending( ssl );  
-#ifdef _USESSLPENDING
-    if( rc == 0 )
-      rc = SSL_has_pending( ssl );  
-#endif
-    if( g_logLevel > 1 )
-      logger.error("doPoll using ssl " + itoa(rc) + " " + itoa(useSSL));
+    //if( g_logLevel > 5 )
+      //logger.error("doPoll using ssl " + itoa(rc));
+    //return rc;
+
     if( rc ) {
-      return 1;
+      return rc;
     }
-/*
-    int t = 1;
-    while( rc == 0 && t++ < timeOut && ! g_quit ) {
-      rc = SSL_pending( ssl );  
-      if( rc == 0 )
-        rc = SSL_has_pending( ssl );  
-      if( rc ) {
-        return 1;
-      }
-      sleep(1);
-      if( g_logLevel > 1 )
-        logger.error("doPoll sleeping " + itoa(t) + " " + itoa(timeOut));
-    }
-*/
+
   }
   // not used?
   mask[0] = 1;
@@ -704,12 +719,12 @@ SocketIO::doDump( char* buf, int len ) {
   string dbuf;
 
   for( int i = 0; i < len; i++ ) {
-    snprintf( buf2, 256, "%X ", buf[i] & 0xFF );
+    sprintf( buf2, "%X ", buf[i] & 0xFF );
     tbuf = tbuf + string(buf2);
     if( ( buf[i] > 'z' ) || ( buf[i] < 20 ) )
       dbuf = dbuf + ".";
     else {
-      snprintf( buf2, 256, "%c", buf[i] );
+      sprintf( buf2, "%c", buf[i] );
       dbuf = dbuf + string(buf2);
     }
     if( tbuf.length() > 200 ) {
@@ -742,20 +757,21 @@ SocketIO::doClear( char* buf ) {
   return rc;
 }
 
-int 
-SocketIO::doRead( char* buf, int len, int timeOut, int checkInput ) {
-  int total  = 0;
-  int reads  = 0;
-  int rc     = 0;
+long 
+SocketIO::doRead( char* buf, long len, int timeOut, int checkInput ) {
+  long total  = 0;
+  long reads  = 0;
+  long logreads  = 0;
+  long rc     = 0;
   time_t timeEnd  = time( NULL ) + timeOut;
   *buf = '\0';
   int mask[2];
 
-  if( g_logLevel > 10 )
-    logger.error( "doRead " + itoa(fd) + " len " + itoa(len) + " timeout " + itoa(timeOut) + " ssl " + itoa(useSSL) );
+  if( g_logLevel > 5 && len > 1 )
+    logger.error( "doRead fd " + itoa(fd) + " len " + ltoa(len) + " timeout " + itoa(timeOut) );
 
   // loop waiting to get the full len, expects at least 1 char per read
-  while( ! g_quit && ( total != len ) && ( reads < (len + 15) ) ) {
+  while( ! g_quit && ( total != len ) && ( reads < (len + 25) ) ) {
     errno = 0;
     int myerrno = 0;
     reads++;
@@ -774,35 +790,49 @@ SocketIO::doRead( char* buf, int len, int timeOut, int checkInput ) {
       return -2;
     }
     // see if any data is ready
+    //int fileReady = doPoll( t, mask );
     int fileReady = 1;
 #ifndef _HAVEMACOS
     fileReady = doPoll( t, mask );
 #endif
 
-    //if( g_logLevel > 1 ) 
+    //if( g_logLevel > 5 ) 
       //logger.error("fileready: " + itoa(fileReady));
 
-    if( fileReady == -1 ) {
-      if( useSSL ) {
-        fileReady = 1;
-        logger.error("fileready set: " + itoa(fileReady));
-      }
-    }
-
-    if( ! g_quit && fileReady > 0 ) {
+    if( ! g_quit && fileReady > 0 && rc >= 0) {
       if( useSSL && ssl ) {
-        if( ssl ) 
-          rc = SSL_read( ssl, buf+total, len-total );
-        else
+        if( ssl ) {
+          int readlen = 384000;
+          if( len-total < readlen ) readlen = len-total;
+
+          rc = SSL_read( ssl, buf+total, readlen );
+        } else {
           rc = -1;
-        //if( g_logLevel > 1 ) 
+        }
+
+        if( g_logLevel > 5 ) {
           //logger.error("read ssl total: " + itoa(total) + " " + itoa(rc) + " " + buf);
+          if( logreads++ > 10000 ) {
+            logger.error("read ssl total: " + to_string(total) + " " + to_string(len-total) );
+            logreads = 0;
+          }
+          //if( rc == 16384 )
+            //usleep(200);
+        }
+
+        if( rc <= 0 ) {
+          logger.error("ssl sleep");
+          rc = 0;
+          if( reads < 10 )
+            usleep(10000);
+          else
+            sleep(1);
+        }
 /*
         if( ssl && rc > 0 && (rc+total) < len ) {
-          //int rc2 = SSL_has_pending( ssl );  
           int rc2 = SSL_pending( ssl );  
           if( rc2 > 0 ) {
-            logger.error("ssl read some more " + to_string(rc2));
+            logger.error("ssl read some more");
             rc += SSL_read( ssl, buf+total+rc, rc2 );
           } else {
             logger.error("ssl read some more 1 char");
@@ -813,14 +843,17 @@ SocketIO::doRead( char* buf, int len, int timeOut, int checkInput ) {
 */
       } else {
         rc = ::read( fd, buf+total, len-total );
-        if( rc > 0 && rc < (len-total) ) {
+        if( rc >= 0 && rc < (len-total) ) {
           //if( g_logLevel > 3 )
-            //logger.error("short read " + itoa(rc) + " " + itoa(len) + " " + itoa(total));
+            //logger.error("short read " + itoa(rc) + " " + ltoa(len) + " " + ltoa(total));
           //sleep(1);
+          //usleep(1000);
         }
       }
-      if( rc == -1 )
+      if( rc == -1 ) {
         myerrno = errno;
+        logger.error("error set " + itoa(myerrno));
+      }
     }
     else    
     if( g_quit ) 
@@ -852,19 +885,22 @@ SocketIO::doRead( char* buf, int len, int timeOut, int checkInput ) {
     }
   }
   if( total != len ) {
-    logger.error( "WARNING: bad read: only " + itoa(total) + ", of " + itoa(len) );
+    logger.error( "WARNING: bad read: only " + ltoa(total) + ", of " + ltoa(len) );
     return -1;
   }
   if( checkInput ) {
-    for( int i = 0; i <= total; i++ )
+    for( long i = 0; i <= total; i++ )
       if( ( buf[i] == '\\' ) || ( buf[i] == ';') || ( buf[i] == '"' ) || ( buf[i] == '\'' ) ) 
         buf[i] = ' ';
   }
+  //if( g_logLevel > 0 )
+    //logger.error("read done " + ltoa(total));
+
   return total;
 }
 
-int 
-SocketIO::doReadPacket( char* buf, int len, int timeOut, bool useLRC ) {
+long 
+SocketIO::doReadPacket( char* buf, long len, int timeOut, bool useLRC ) {
   int rc     = 0;
   unsigned char  lrc   = '\0';
   unsigned char   inlrc  = '\0';
@@ -880,12 +916,12 @@ SocketIO::doReadPacket( char* buf, int len, int timeOut, bool useLRC ) {
       buf[0] = c;
       return 1;
     }
-    logger.error( "bad STX read, rc= %d", c );
+    logger.error( "bad STX read, rc=" + c );
 
     return false;
   }
   bool etxFound = false;
-  int i = 0;
+  long i = 0;
   rc = 1;
 
   while( ( i <= len ) && ( ! etxFound ) && ( rc == 1 ) ) {
@@ -930,9 +966,9 @@ SocketIO::doReadPacket( char* buf, int len, int timeOut, bool useLRC ) {
   return true;
 }
 
-int 
-SocketIO::doReadPacket( string& buf, int len, int timeOut, bool useLRC ) {
-  int rc     = 0;
+long 
+SocketIO::doReadPacket( string& buf, long len, int timeOut, bool useLRC ) {
+  long rc     = 0;
   unsigned char  lrc   = '\0';
   unsigned char   inlrc  = '\0';
   char c;
@@ -947,12 +983,12 @@ SocketIO::doReadPacket( string& buf, int len, int timeOut, bool useLRC ) {
       buf = c;
       return 1;
     }
-    logger.error( "bad STX read, rc= %d", c );
+    logger.error( "bad STX read, rc=" + c );
 
     return false;
   }
   bool etxFound = false;
-  int i = 0;
+  long i = 0;
   rc = 1;
 
   while( ( i <= len ) && ( ! etxFound ) && ( rc == 1 ) ) {
@@ -995,10 +1031,10 @@ SocketIO::doReadPacket( string& buf, int len, int timeOut, bool useLRC ) {
   return true;
 }
 
-int 
-SocketIO::doReadLen( string& buf, int len, int timeOut ) {
-  int rc     = 0;
-  char c;
+long 
+SocketIO::doReadLen( string& buf, long len, int timeOut ) {
+  long rc     = 0;
+  char c = 0;
 
   rc = doRead( &c, 1, timeOut );
   if( ! rc ) {
@@ -1010,16 +1046,19 @@ SocketIO::doReadLen( string& buf, int len, int timeOut ) {
       buf = c;
       return 1;
     }
-    logger.error( "bad STX read, rc= %d", c );
+    if( c != 0 )
+      logger.error( "bad STX read, rc=" + c );
+    else
+      logger.error( "bad STX read");
 
     return false;
   }
   bool etxFound = false;
-  int i = 0;
+  long i = 0;
   rc = 1;
   string lenbuf;
 
-  while( ( i < 8 ) && ( ! etxFound ) && ( rc == 1 ) ) {
+  while( ( i < 10 ) && ( ! etxFound ) && ( rc == 1 ) ) {
     rc = doRead( &c, 1, 5 );
     if( ( c == ETX ) || ( c == ETB ) ) {
       etxFound = true;
@@ -1028,15 +1067,24 @@ SocketIO::doReadLen( string& buf, int len, int timeOut ) {
       i++;
     }
   }
-  int inlen = atoi(lenbuf.c_str());
-  if( inlen > len || etxFound ) {
-    logger.error("data too large or etx found " + lenbuf);
+  long inlen = atol(lenbuf.c_str());
+  if( inlen > len || etxFound || inlen <= 0 ) {
+    logger.error("data too large or etx found " + lenbuf + " inlen " + to_string(inlen));
     return false;
   }
-  char inbuf[inlen + 1];
-  memset(inbuf, 0, sizeof(inbuf));
 
-  //logger.error("reading for len " + lenbuf);
+  if( inlen > 500000000 || g_logLevel > 0 )
+    logger.error("reading for len " + lenbuf);
+
+  char inbuf[inlen + 1];
+  //memset(inbuf, 0, inlen + 1);
+
+  //bzero(inbuf, inlen + 1);
+
+  inbuf[inlen] = 0;
+
+  if( inlen > 500000000 || g_logLevel > 0 )
+    logger.error("now reading for len " + lenbuf);
 
   rc = doRead( inbuf, inlen, 5 );
 
@@ -1058,24 +1106,32 @@ SocketIO::doReadLen( string& buf, int len, int timeOut ) {
   string out(inbuf, inlen);
   buf = out;
 
+  if( g_logLevel > 0 )
+    logger.error( "doReadLen done " + ltoa(inlen) );
+
   return true;
 }
 
 int 
-SocketIO::doReadLine( char* buf, int len, int timeOut ) {
-  int rc  = 1;
-  int i   = 0;
+SocketIO::doReadLine( char* buf, long len, int timeOut ) {
+  long rc  = 1;
+  long i   = 0;
   bool crFound = false;
 
   while( ( i <= len ) && ( ! crFound ) && ( rc == 1 ) ) {
     rc = doRead( (char*)&buf[i], 1, timeOut );
     //char x = buf[i];
     //logger.error("read " + itoa(x) + " " + x + " rc " + itoa(rc));
+    if( i == 0 && buf[i] == ACK ) {
+      if( g_logLevel > 0 )
+        logger.error("ACK read");
+      return 0;
+    }
     if( rc == 1 && ( buf[i] == LF || buf[i] == CR ) ) {
       crFound = true;
       if( buf[i] == CR ) {
         char dummy;
-        logger.error("read dummy");
+        //logger.error("read dummy");
         rc = doRead( &dummy, 1, 1 );
       }
       buf[i] = '\0';
@@ -1113,7 +1169,7 @@ SocketIO::write( int c ) {
 
   if( rc != 1 ) {
     int myerr = errno;
-    logger.error( "bad write client:" + itoa(rc) + " err: " + itoa(myerr) );
+    logger.error( "bad write client:" + itoa(rc) + " err: " + itoa(myerr) + " " + itoa(useSSL));
 
     return false;
   }
@@ -1121,22 +1177,38 @@ SocketIO::write( int c ) {
 }
 
 bool
-SocketIO::writePacket( const char* c, int len, bool useLRC, bool useLen ) {
+SocketIO::writePacket( const char* c, long len, bool useLRC, bool useLen ) {
 
-  char buf[len+12];
+  char buf[len+14];
   unsigned char lrc = 0;
-  int x = 1;
+  //memset(buf, 0, sizeof(buf));
+  buf[len+13] = 0;
+
+  if( g_logLevel > 0 || len < 0 || len > 10000000 )
+   logger.error("writePacket len1: " + ltoa(len));
+
+  long x = 1;
   if( ! useLen ) {
     memcpy( (char*)&buf[1], c, len );
   } else {
-    string lenbuf = itoa(len,8);
-    memcpy( (char*)&buf[1], lenbuf.c_str(), 8 );
-    memcpy( (char*)&buf[9], c, len );
-    x = 9;
+    string lenbuf = ltoa(len,10);
+    if( g_logLevel > 0 )
+      logger.error("writePacket lenbuf1: " + lenbuf);
+    memcpy( (char*)&buf[1], lenbuf.c_str(), 10 );
+
+    if( g_logLevel > 0 )
+      logger.error("writePacket memcpy1 " + string((char*)&buf[1]) );
+
+    memcpy( (char*)&buf[11], c, len );
+
+    if( g_logLevel > 0 )
+      logger.error("writePacket memcpy2 " + string((char*)&buf[1]) );
+
+    x = 11;
   }
 
   if( useLRC ) {
-    for( int i = 1; i < len + x; i++ )
+    for( long i = 1; i < len + x; i++ )
       lrc ^= buf[i];
 
     lrc ^= ETX;
@@ -1147,19 +1219,19 @@ SocketIO::writePacket( const char* c, int len, bool useLRC, bool useLen ) {
   buf[len+x+2] = '\0';
 
   useLRC ? len += 3 : len += 2;
-  if( useLen ) len += 8;
+  if( useLen ) len += 10;
 
   if( g_logLevel > 0 )
-    logger.error( "writingPacket: len: " + itoa(len) );
+    logger.error( "writingPacket: len: " + ltoa(len) );
  
   return write( buf, len );
 }
 
 bool
-SocketIO::write( const char* c, int len ) {
+SocketIO::write( const char* c, long len ) {
   errno = 0;
   
-  int rc = 0;
+  long rc = 0;
   if( useSSL && ssl ) {
 
     rc = SSL_write( ssl, c, len );
@@ -1167,8 +1239,8 @@ SocketIO::write( const char* c, int len ) {
     if( g_logLevel > 1 )
       logger.error("ssl write rc " + itoa(rc));
 
-    int x  = 0;
-    int rc1  = 0;
+    long x  = 0;
+    long rc1  = 0;
     while( rc < len ) {
       logger.error("ssl write retry " + itoa(rc) + " " + itoa(fd) + " " + itoa(ssl));
       if( x++ > 5 )
@@ -1182,13 +1254,19 @@ SocketIO::write( const char* c, int len ) {
       rc = SSL_write( ssl, c, len );
     }
   }
-  else
-    rc = ::write( fd, c, len );
+  else {
+    long numwrites = 0;
+    long written = 0;
+    while( written != len && numwrites++ < 100 && rc >= 0 ) {
+      rc = ::write( fd, c + written, len - written );
+      written += rc;
+    } 
+    rc = written;
+  }
 
   if( rc != len ) {
     int myerr = errno;
-    logger.error( "bad write client:" + itoa(rc) + 
-          " err: " + itoa(myerr) );
+    logger.error( "bad write client1:" + ltoa(rc) + " err: " + itoa(myerr) + " " + itoa(useSSL) + " " + ltoa(len) );
     return false;
   }
   if( g_logLevel > 1 )
@@ -1198,9 +1276,9 @@ SocketIO::write( const char* c, int len ) {
  
 // testing
 bool
-SocketIO::write( const unsigned char* c, int len ) {
+SocketIO::write( const unsigned char* c, long len ) {
   errno = 0;
-  int rc = 0;
+  long rc = 0;
   
   if( g_logLevel > 1 )
     logger.error("unsigned socket writing " + itoa(len));
@@ -1212,8 +1290,8 @@ SocketIO::write( const unsigned char* c, int len ) {
     if( g_logLevel > 1 )
       logger.error("ssl write rc " + itoa(rc));
 
-    int x  = 0;
-    int rc1  = 0;
+    long x  = 0;
+    long rc1  = 0;
 
     while( rc < len ) {
       logger.error("ssl write retry " + itoa(rc) );
@@ -1234,7 +1312,7 @@ SocketIO::write( const unsigned char* c, int len ) {
 
   if( rc != len ) {
     int myerr = errno;
-    logger.error( "bad write client:" + itoa(rc) + " err: " + itoa(myerr) );
+    logger.error( "bad write client2:" + itoa(rc) + " err: " + itoa(myerr) + " " + itoa(useSSL) + " " + ltoa(len) );
 
     return false;
   }
@@ -1249,14 +1327,14 @@ SocketIO::write( const char* c ) {
 
 bool
 SocketIO::writePacket( const char* c ) {
-  int len = strlen( c );
+  long len = strlen( c );
   return writePacket( c, len );
 }
 
 char
 SocketIO::hexToChar( char x ) {
   char buf[8];
-  snprintf( buf, 8, "%d", x );
+  sprintf( buf, "%d", x );
 
   switch( x )
   {
@@ -1342,7 +1420,7 @@ SocketIO::bcdToStr( unsigned char* buf, int len, char* obuf ) {
   char y, z;
 
   char tbuf[8];
-  snprintf( tbuf, 8, "%d %d", buf[0], buf[1] );
+  sprintf( tbuf, "%d %d", buf[0], buf[1] );
   //logger.error( "converting: " + string(tbuf) );
 
   for( int i = 0; i < len; i++ ) {
@@ -1422,23 +1500,30 @@ SocketIO::doClose( void ) {
   if( ! fd )
     return;
 
+  if( fd > 0 ) {
+    char tbuf[40];
+    sprintf(tbuf, "closing syncing socket %d", fd);
+    //logger.error( "closing socket " + to_string(fd));
+    if( g_logLevel > 0 )
+      logger.error( tbuf );
+    fsync( fd );
+    shutdown( fd, SHUT_RDWR );
+    sleep(1);
+    if( fd > 0 ) {
+      ::close(fd);
+    }
+    fd = -1;
+  }
   if( useSSL ) {
     if( useSSL && ssl ) {
-      //logger.error( "closing ssl socket " + itoa(ssl) );
+      if( g_logLevel > 0 )
+        logger.error( "closing ssl socket ssl " + itoa(ssl) );
       SSL_set_shutdown(ssl, SSL_SENT_SHUTDOWN|SSL_RECEIVED_SHUTDOWN);
       SSL_shutdown(ssl);
       if( ssl )
         SSL_free( ssl );
       ssl = NULL;
     }
-  }
-  if( fd > 0 ) {
-    shutdown( fd, SHUT_RDWR );
-    sleep(1);
-    if( fd > 0 )
-      ::close(fd);
-    logger.error( "closed socket " + itoa(fd));
-    fd = -1;
   }
   isConnected = false;
 

@@ -19,6 +19,9 @@ make install
 cd ../generic/system
 make
 make install
+cd ../dsp
+make
+make install
 cd ../upnp/ushare/src
 make
 make install

@@ -28,7 +28,7 @@ dispatch_semaphore_t Mech::dispatch_sem2 = 0;
 
 int
 Mech::doWork( int& threadID ) {
-  logger.error("running worker " + itoa(_threadID) + " thread " + itoa(threadID));
+  logger.error("2 running worker " + itoa(_threadID) + " thread " + itoa(threadID));
  
   string _localID, hardware, model, maker, library, ipaddress;
 
@@ -114,6 +114,8 @@ Mech::doWork( int& threadID ) {
     return -1;
   }
 
+  logger.error("localid sem is " + itoa(localidsem) + " for " + _localID);
+
   localidSems[_localID] = localidsem;
 
   int semInitID = semget(INITKEY + _DpsServerNumber, 0, 0);
@@ -140,14 +142,14 @@ Mech::doWork( int& threadID ) {
     semRelease(semInitID);
     return -1;
   } 
-  logger.error("launching hardware client " + hardware + " " + model);
+  logger.error("launching hardware client " + hardware + " " + model + " sem2 " + itoa(dispatch_sem2) + " id " + itoa(localidsem));
 
   void* mkr = dlsym( h1, maker.c_str() );
   if( mkr ) {
 
     DssObject o;
     o.localidsem = localidsem;
-    o.localID   = _localID;
+    o.localid   = _localID;
     o.idx       = idx;
     o.threadID  = threadID;
     o.semInitID = semInitID;
@@ -194,6 +196,8 @@ Mech::doWork( int& threadID, SocketIO* socket ) {
   string host, localssl, localcerts;
   int port = -1;
 
+  logger.error("in doWork");
+
   typedef map<string,string>::const_iterator I;
 
   if( configMap.size() == 0 ) {
@@ -220,17 +224,7 @@ Mech::doWork( int& threadID, SocketIO* socket ) {
   i != configMap.end() ? localssl = i->second : localssl = "";
 
   i = configMap.find("localcerts");
-
   i != configMap.end() ? localcerts = i->second : localcerts = "";
-
-  i = configMap.find("audit_mode");
-  if( i != configMap.end() ) {
-    if( i->second == "1" )
-      o.audit_mode = F_STRING;
-    else
-    if( i->second == "2" )
-      o.audit_mode = F_BINARY;
-  }
 
   i = configMap.find("dpsid");
   if( i != configMap.end() ) {
@@ -310,7 +304,9 @@ Mech::doWork( int& threadID, SocketIO* socket ) {
 #ifdef _HAVEMACOS
 
   dispatch_sem = dispatch_semaphore_create(0);
+  logger.error("XXX have dispatch_sem " + itoa(dispatch_sem));
   dispatch_sem2 = dispatch_semaphore_create(0);
+  logger.error("XXX have dispatch_sem2 " + itoa(dispatch_sem2));
 
 #else
 
@@ -341,6 +337,9 @@ Mech::doWork( int& threadID, SocketIO* socket ) {
   else
     semctl( o.semRespID, 0, SETVAL, 0 );
 #endif
+
+  logger.error("have semDataID " + itoa(o.semDataID));
+  logger.error("have semRespID " + itoa(o.semRespID));
 
   _threadID = 0;
   int j = 0;
@@ -393,6 +392,7 @@ Mech::doWork( int& threadID, SocketIO* socket ) {
   i = configMap.find("startcontrolport");
   logger.error("checking for controlport");
   if( i != configMap.end() && i->second == "on" ) {
+    logger.error("controlport found " + itoa(dispatch_sem2));
     startThread(true, 2);
     semGet( o.semInitID );
   }
@@ -759,6 +759,8 @@ Mech::doControl( int& threadID ) {
   o.semRespID = semget( RESPKEY + _DpsServerNumber, 0, 0);
 #endif
     
+  logger.error("have semRespID " + itoa(o.semRespID) + " dispatch " + itoa(_dpsServer->dispatch_sem2) );
+
   // signal main thread that we're running
 
   semRelease(o.semInitID);
@@ -812,10 +814,21 @@ Mech::doControl( int& threadID ) {
         break;
 
       case SENDCLIENTDATA:  
-        logger.error("SENDCLIENTDATA sending resp " + o.dataout);
-        rc = socket->write( STX );
-        rc = socket->write( o.dataout.c_str(), o.dataout.size()  );
-        rc = socket->write( ETX );
+        //rc = socket->write( STX );
+        //rc = socket->write( o.dataout.c_str(), o.dataout.size()  );
+        //rc = socket->write( ETX );
+
+        if( o.dataout_header == "" ) o.dataout_header = "none";
+
+        logger.error("SENDCLIENTDATA sending resp1 " + to_string(o.dataout_header.size()));
+        rc = socket->writePacket( o.dataout_header.c_str(), o.dataout_header.size(), false, true );
+
+        // TESTING        
+        sleep(2);
+
+        logger.error("SENDCLIENTDATA sending resp2 " + to_string(o.dataout.size()));
+        rc = socket->writePacket( o.dataout.c_str(), o.dataout.size(), false, true );
+
         if( ! rc ) {
           step = reconnectHost(socket, host, port);
         } else {
@@ -830,8 +843,10 @@ Mech::doControl( int& threadID ) {
           logger.error( "control READCLIENT socket is not open" );
           step = reconnectHost(socket, host, port);
         } else {
-          logger.debug("control thread reading for 305 seconds");
+          logger.error("control thread reading for 305 seconds");
           rc = hostOut.read( socket, 305 );
+
+          logger.error("control thread read " + to_string(rc));
 
           if( rc != 1 ) {
             if( rc == 2 ) 
@@ -848,6 +863,7 @@ Mech::doControl( int& threadID ) {
           } else {
             if( headerDone ) {
               step = processHostMsg(hostOut, o);
+              logger.error("return step is " + itoa(step));
             }
             else
             if( headerProcessing && ! headerDone ) {
@@ -930,6 +946,14 @@ Mech::processHostCommand(string& json, DssObject& o) {
   char* endptr = NULL;
   JsonValue value;
   JsonAllocator allocator;
+  commType c;
+  c.strval = json;
+  c.status = 0;
+  c.stan = 0;
+  c.rc = 0;
+  o.dataout = "";
+
+  logger.error("have json input " + json);
 
   int rc = jsonParse((char*)json.c_str(), &endptr, &value, allocator);
   if( rc != 0 ) { 
@@ -941,11 +965,6 @@ Mech::processHostCommand(string& json, DssObject& o) {
 
   string type; //op, which, localid;
   int tag = 0;
-  commType c;
-  c.strval = json;
-  c.status = 0;
-  c.stan = 0;
-  o.dataout = "";
 
   while( i.p != j.p ) {
     tag  = i.p->value.getTag();
@@ -1026,7 +1045,7 @@ Mech::processHostCommand(string& json, DssObject& o) {
       }
     } 
     // now do commands
-    logger.error("op " + c.op + " which " + c.which + " val " + c.val + " localid " + c.localid + " chan " + c.channel + " stan " + itoa(c.stan));
+    logger.error("XXX op " + c.op + " which " + c.which + " val " + c.val + " localid " + c.localid + " chan " + c.channel + " stan " + itoa(c.stan) + " strval " + c.strval);
     doCommand(c);
     i.p = i.p->next;
   }
@@ -1056,21 +1075,23 @@ Mech::processHostCommand(string& json, DssObject& o) {
     g_quit = true;
     return -1;
   }
-  string resp;
+  string resp, respheader;
   map<string, commType>::iterator I = localidComm.find(c.localid);
   bool done = false;
   while( ! done && I != localidComm.end() ) {
-    logger.error("resp check " + I->second.resp + " stan " + to_string(I->second.stan) + " " + itoa(c.stan) + " " + itoa(I->second.status));
+    //logger.error("resp check " + I->second.resp + " stan " + to_string(I->second.stan) + " " + itoa(c.stan) + " " + itoa(I->second.status));
+    logger.error("resp check stan " + to_string(I->second.stan) + " " + itoa(c.stan) + " " + itoa(I->second.status));
     if( I->second.stan == c.stan && I->second.status == 2 ) {
       resp += I->second.resp;
+      respheader += I->second.respheader;
       localidComm.erase(I);
       done = true;
     } else {
       ++I;
     } 
   } 
-  if( resp != "" ) {
-    logger.error("resp is " + resp);
+  if( resp.size() > 0 ) {
+    logger.error("resp is set");
   }  else {
     logger.error("can't find localid resp " + c.localid + " for command " + c.op);
     rc = -1;
@@ -1087,7 +1108,9 @@ Mech::processHostCommand(string& json, DssObject& o) {
   if( resp == "" ) resp = "none";
 
   o.dataout = resp;
-  logger.error("returning " + itoa(SENDCLIENTDATA) + " " + resp);
+  o.dataout_header = respheader;
+  //logger.error("returning " + itoa(SENDCLIENTDATA) + " " + resp);
+  logger.error("returning " + itoa(SENDCLIENTDATA));
 
   return SENDCLIENTDATA;
 }
@@ -1103,6 +1126,8 @@ Mech::doCommand( commType& c ) {
     g_quit = true;
     return -1;
   }
+
+  logger.error("sending command to " + c.localid);
 
   localidComm.insert(make_pair(c.localid, c));
 
@@ -1765,8 +1790,7 @@ Mech::doWorker2( int& threadID ) {
       logger.error("starting SSL");
       socket->startUpSSL();
     }
-    string s = socket->initPeerName();
-    logger.error("created new socket " + itoa(clientFD) + " for " + s);
+    logger.error("created new socket " + itoa(clientFD));
   } else {
     logger.error("no client fds, exiting");
     return -1;
@@ -1885,7 +1909,7 @@ Mech::processLocalMsg( Icomm& localIn, DssObject& o ) {
       if( rc > 0 ) {
         add_client_data( o, string(o.databuf) );
       } else {
-        logger.error("bad read in process local msg for: " + o.socket->getIpAddress());
+        logger.error("bad read in process local msg");
   
         //return ATEND;
         return SENDACK;

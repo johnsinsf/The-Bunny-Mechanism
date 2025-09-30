@@ -1,0 +1,1170 @@
+cds.o: cds.cc /usr/local/include/upnp/upnp.h \
+  /usr/local/include/upnp/UpnpGlobal.h \
+  /usr/local/include/upnp/UpnpInet.h \
+  /usr/local/include/upnp/UpnpUniStd.h /usr/local/include/upnp/ixml.h \
+  /usr/local/include/upnp/upnpconfig.h \
+  /usr/local/include/upnp/UpnpActionComplete.h \
+  /usr/local/include/upnp/UpnpString.h \
+  /usr/local/include/upnp/UpnpActionRequest.h \
+  /usr/local/include/upnp/UpnpDiscovery.h \
+  /usr/local/include/upnp/UpnpEvent.h \
+  /usr/local/include/upnp/UpnpEventSubscribe.h \
+  /usr/local/include/upnp/UpnpFileInfo.h /usr/local/include/upnp/list.h \
+  /usr/local/include/upnp/UpnpStateVarComplete.h \
+  /usr/local/include/upnp/UpnpStateVarRequest.h \
+  /usr/local/include/upnp/UpnpSubscriptionRequest.h \
+  /usr/local/include/upnp/Callback.h /usr/local/include/upnp/upnptools.h \
+  ushare.h content.h buffer.h redblack.h \
+  /Users/johns/bunnymech/src/mech/Mech.h \
+  /Users/johns/bunnymech/src/include/dpsframework.h \
+  /usr/local/include/openssl/sha.h /usr/local/include/openssl/e_os2.h \
+  /usr/local/include/openssl/opensslconf.h \
+  /usr/local/include/openssl/opensslv.h \
+  /usr/local/include/openssl/x509_vfy.h \
+  /usr/local/include/openssl/x509.h \
+  /usr/local/include/openssl/ossl_typ.h \
+  /usr/local/include/openssl/symhacks.h \
+  /usr/local/include/openssl/buffer.h \
+  /usr/local/include/openssl/crypto.h \
+  /usr/local/include/openssl/safestack.h \
+  /usr/local/include/openssl/stack.h \
+  /usr/local/include/openssl/cryptoerr.h \
+  /usr/local/include/openssl/buffererr.h \
+  /usr/local/include/openssl/evp.h /usr/local/include/openssl/bio.h \
+  /usr/local/include/openssl/bioerr.h \
+  /usr/local/include/openssl/evperr.h \
+  /usr/local/include/openssl/objects.h \
+  /usr/local/include/openssl/obj_mac.h /usr/local/include/openssl/asn1.h \
+  /usr/local/include/openssl/asn1err.h /usr/local/include/openssl/bn.h \
+  /usr/local/include/openssl/bnerr.h \
+  /usr/local/include/openssl/objectserr.h \
+  /usr/local/include/openssl/ec.h /usr/local/include/openssl/ecerr.h \
+  /usr/local/include/openssl/rsa.h /usr/local/include/openssl/rsaerr.h \
+  /usr/local/include/openssl/dsa.h /usr/local/include/openssl/dh.h \
+  /usr/local/include/openssl/dherr.h /usr/local/include/openssl/dsaerr.h \
+  /usr/local/include/openssl/x509err.h \
+  /usr/local/include/openssl/pkcs7.h \
+  /usr/local/include/openssl/pkcs7err.h \
+  /usr/local/include/openssl/lhash.h /usr/local/include/openssl/ssl.h \
+  /usr/local/include/openssl/comp.h /usr/local/include/openssl/comperr.h \
+  /usr/local/include/openssl/pem.h /usr/local/include/openssl/pemerr.h \
+  /usr/local/include/openssl/hmac.h /usr/local/include/openssl/async.h \
+  /usr/local/include/openssl/asyncerr.h /usr/local/include/openssl/ct.h \
+  /usr/local/include/openssl/cterr.h /usr/local/include/openssl/sslerr.h \
+  /usr/local/include/openssl/ssl2.h /usr/local/include/openssl/ssl3.h \
+  /usr/local/include/openssl/tls1.h /usr/local/include/openssl/dtls1.h \
+  /usr/local/include/openssl/srtp.h /usr/local/include/openssl/err.h \
+  /usr/local/include/openssl/rand.h /usr/local/include/openssl/randerr.h \
+  /Users/johns/bunnymech/src/include/Log4.h \
+  /usr/local/include/log4cpp/Category.hh \
+  /usr/local/include/log4cpp/Portability.hh \
+  /usr/local/include/log4cpp/config.h \
+  /usr/local/include/log4cpp/Export.hh \
+  /usr/local/include/log4cpp/Appender.hh \
+  /usr/local/include/log4cpp/Priority.hh \
+  /usr/local/include/log4cpp/Layout.hh \
+  /usr/local/include/log4cpp/LoggingEvent.hh \
+  /usr/local/include/log4cpp/TimeStamp.hh \
+  /usr/local/include/log4cpp/threading/Threading.hh \
+  /usr/local/include/log4cpp/threading/PThreads.hh \
+  /usr/local/include/log4cpp/CategoryStream.hh \
+  /usr/local/include/log4cpp/Manipulator.hh \
+  /usr/local/include/log4cpp/convenience.h \
+  /usr/local/include/log4cpp/PropertyConfigurator.hh \
+  /usr/local/include/log4cpp/Configurator.hh \
+  /usr/local/include/log4cpp/NDC.hh \
+  /Users/johns/bunnymech/src/baseServer/BaseServer.h \
+  /Users/johns/bunnymech/src/icomm/Icomm.h \
+  /Users/johns/bunnymech/src/dpsio/SocketIO.h \
+  /Users/johns/bunnymech/src/dpsio/DssSems.h \
+  /Users/johns/bunnymech/src/classes/Logs.h \
+  /Users/johns/bunnymech/src/classes/SBase.h \
+  /Users/johns/bunnymech/src/classes/SBase_files.h \
+  /Users/johns/bunnymech/src/dpsio/DssSaxParser.h \
+  /Users/johns/bunnymech/src/classes/Channels.h \
+  /Users/johns/bunnymech/src/classes/Interfaces.h \
+  /Users/johns/bunnymech/src/classes/Channels_digital.h \
+  /Users/johns/bunnymech/src/classes/Channels_analog.h \
+  /Users/johns/bunnymech/src/classes/Hosts.h \
+  /Users/johns/bunnymech/src/classes/Locations.h services.h metadata.h \
+  http.h mime.h minmax.h
+cms.o: cms.cc /usr/local/include/upnp/upnp.h \
+  /usr/local/include/upnp/UpnpGlobal.h \
+  /usr/local/include/upnp/UpnpInet.h \
+  /usr/local/include/upnp/UpnpUniStd.h /usr/local/include/upnp/ixml.h \
+  /usr/local/include/upnp/upnpconfig.h \
+  /usr/local/include/upnp/UpnpActionComplete.h \
+  /usr/local/include/upnp/UpnpString.h \
+  /usr/local/include/upnp/UpnpActionRequest.h \
+  /usr/local/include/upnp/UpnpDiscovery.h \
+  /usr/local/include/upnp/UpnpEvent.h \
+  /usr/local/include/upnp/UpnpEventSubscribe.h \
+  /usr/local/include/upnp/UpnpFileInfo.h /usr/local/include/upnp/list.h \
+  /usr/local/include/upnp/UpnpStateVarComplete.h \
+  /usr/local/include/upnp/UpnpStateVarRequest.h \
+  /usr/local/include/upnp/UpnpSubscriptionRequest.h \
+  /usr/local/include/upnp/Callback.h /usr/local/include/upnp/upnptools.h \
+  ushare.h content.h buffer.h redblack.h \
+  /Users/johns/bunnymech/src/mech/Mech.h \
+  /Users/johns/bunnymech/src/include/dpsframework.h \
+  /usr/local/include/openssl/sha.h /usr/local/include/openssl/e_os2.h \
+  /usr/local/include/openssl/opensslconf.h \
+  /usr/local/include/openssl/opensslv.h \
+  /usr/local/include/openssl/x509_vfy.h \
+  /usr/local/include/openssl/x509.h \
+  /usr/local/include/openssl/ossl_typ.h \
+  /usr/local/include/openssl/symhacks.h \
+  /usr/local/include/openssl/buffer.h \
+  /usr/local/include/openssl/crypto.h \
+  /usr/local/include/openssl/safestack.h \
+  /usr/local/include/openssl/stack.h \
+  /usr/local/include/openssl/cryptoerr.h \
+  /usr/local/include/openssl/buffererr.h \
+  /usr/local/include/openssl/evp.h /usr/local/include/openssl/bio.h \
+  /usr/local/include/openssl/bioerr.h \
+  /usr/local/include/openssl/evperr.h \
+  /usr/local/include/openssl/objects.h \
+  /usr/local/include/openssl/obj_mac.h /usr/local/include/openssl/asn1.h \
+  /usr/local/include/openssl/asn1err.h /usr/local/include/openssl/bn.h \
+  /usr/local/include/openssl/bnerr.h \
+  /usr/local/include/openssl/objectserr.h \
+  /usr/local/include/openssl/ec.h /usr/local/include/openssl/ecerr.h \
+  /usr/local/include/openssl/rsa.h /usr/local/include/openssl/rsaerr.h \
+  /usr/local/include/openssl/dsa.h /usr/local/include/openssl/dh.h \
+  /usr/local/include/openssl/dherr.h /usr/local/include/openssl/dsaerr.h \
+  /usr/local/include/openssl/x509err.h \
+  /usr/local/include/openssl/pkcs7.h \
+  /usr/local/include/openssl/pkcs7err.h \
+  /usr/local/include/openssl/lhash.h /usr/local/include/openssl/ssl.h \
+  /usr/local/include/openssl/comp.h /usr/local/include/openssl/comperr.h \
+  /usr/local/include/openssl/pem.h /usr/local/include/openssl/pemerr.h \
+  /usr/local/include/openssl/hmac.h /usr/local/include/openssl/async.h \
+  /usr/local/include/openssl/asyncerr.h /usr/local/include/openssl/ct.h \
+  /usr/local/include/openssl/cterr.h /usr/local/include/openssl/sslerr.h \
+  /usr/local/include/openssl/ssl2.h /usr/local/include/openssl/ssl3.h \
+  /usr/local/include/openssl/tls1.h /usr/local/include/openssl/dtls1.h \
+  /usr/local/include/openssl/srtp.h /usr/local/include/openssl/err.h \
+  /usr/local/include/openssl/rand.h /usr/local/include/openssl/randerr.h \
+  /Users/johns/bunnymech/src/include/Log4.h \
+  /usr/local/include/log4cpp/Category.hh \
+  /usr/local/include/log4cpp/Portability.hh \
+  /usr/local/include/log4cpp/config.h \
+  /usr/local/include/log4cpp/Export.hh \
+  /usr/local/include/log4cpp/Appender.hh \
+  /usr/local/include/log4cpp/Priority.hh \
+  /usr/local/include/log4cpp/Layout.hh \
+  /usr/local/include/log4cpp/LoggingEvent.hh \
+  /usr/local/include/log4cpp/TimeStamp.hh \
+  /usr/local/include/log4cpp/threading/Threading.hh \
+  /usr/local/include/log4cpp/threading/PThreads.hh \
+  /usr/local/include/log4cpp/CategoryStream.hh \
+  /usr/local/include/log4cpp/Manipulator.hh \
+  /usr/local/include/log4cpp/convenience.h \
+  /usr/local/include/log4cpp/PropertyConfigurator.hh \
+  /usr/local/include/log4cpp/Configurator.hh \
+  /usr/local/include/log4cpp/NDC.hh \
+  /Users/johns/bunnymech/src/baseServer/BaseServer.h \
+  /Users/johns/bunnymech/src/icomm/Icomm.h \
+  /Users/johns/bunnymech/src/dpsio/SocketIO.h \
+  /Users/johns/bunnymech/src/dpsio/DssSems.h \
+  /Users/johns/bunnymech/src/classes/Logs.h \
+  /Users/johns/bunnymech/src/classes/SBase.h \
+  /Users/johns/bunnymech/src/classes/SBase_files.h \
+  /Users/johns/bunnymech/src/dpsio/DssSaxParser.h \
+  /Users/johns/bunnymech/src/classes/Channels.h \
+  /Users/johns/bunnymech/src/classes/Interfaces.h \
+  /Users/johns/bunnymech/src/classes/Channels_digital.h \
+  /Users/johns/bunnymech/src/classes/Channels_analog.h \
+  /Users/johns/bunnymech/src/classes/Hosts.h \
+  /Users/johns/bunnymech/src/classes/Locations.h services.h mime.h
+msr.o: msr.cc /usr/local/include/upnp/upnp.h \
+  /usr/local/include/upnp/UpnpGlobal.h \
+  /usr/local/include/upnp/UpnpInet.h \
+  /usr/local/include/upnp/UpnpUniStd.h /usr/local/include/upnp/ixml.h \
+  /usr/local/include/upnp/upnpconfig.h \
+  /usr/local/include/upnp/UpnpActionComplete.h \
+  /usr/local/include/upnp/UpnpString.h \
+  /usr/local/include/upnp/UpnpActionRequest.h \
+  /usr/local/include/upnp/UpnpDiscovery.h \
+  /usr/local/include/upnp/UpnpEvent.h \
+  /usr/local/include/upnp/UpnpEventSubscribe.h \
+  /usr/local/include/upnp/UpnpFileInfo.h /usr/local/include/upnp/list.h \
+  /usr/local/include/upnp/UpnpStateVarComplete.h \
+  /usr/local/include/upnp/UpnpStateVarRequest.h \
+  /usr/local/include/upnp/UpnpSubscriptionRequest.h \
+  /usr/local/include/upnp/Callback.h /usr/local/include/upnp/upnptools.h \
+  ushare.h content.h buffer.h redblack.h \
+  /Users/johns/bunnymech/src/mech/Mech.h \
+  /Users/johns/bunnymech/src/include/dpsframework.h \
+  /usr/local/include/openssl/sha.h /usr/local/include/openssl/e_os2.h \
+  /usr/local/include/openssl/opensslconf.h \
+  /usr/local/include/openssl/opensslv.h \
+  /usr/local/include/openssl/x509_vfy.h \
+  /usr/local/include/openssl/x509.h \
+  /usr/local/include/openssl/ossl_typ.h \
+  /usr/local/include/openssl/symhacks.h \
+  /usr/local/include/openssl/buffer.h \
+  /usr/local/include/openssl/crypto.h \
+  /usr/local/include/openssl/safestack.h \
+  /usr/local/include/openssl/stack.h \
+  /usr/local/include/openssl/cryptoerr.h \
+  /usr/local/include/openssl/buffererr.h \
+  /usr/local/include/openssl/evp.h /usr/local/include/openssl/bio.h \
+  /usr/local/include/openssl/bioerr.h \
+  /usr/local/include/openssl/evperr.h \
+  /usr/local/include/openssl/objects.h \
+  /usr/local/include/openssl/obj_mac.h /usr/local/include/openssl/asn1.h \
+  /usr/local/include/openssl/asn1err.h /usr/local/include/openssl/bn.h \
+  /usr/local/include/openssl/bnerr.h \
+  /usr/local/include/openssl/objectserr.h \
+  /usr/local/include/openssl/ec.h /usr/local/include/openssl/ecerr.h \
+  /usr/local/include/openssl/rsa.h /usr/local/include/openssl/rsaerr.h \
+  /usr/local/include/openssl/dsa.h /usr/local/include/openssl/dh.h \
+  /usr/local/include/openssl/dherr.h /usr/local/include/openssl/dsaerr.h \
+  /usr/local/include/openssl/x509err.h \
+  /usr/local/include/openssl/pkcs7.h \
+  /usr/local/include/openssl/pkcs7err.h \
+  /usr/local/include/openssl/lhash.h /usr/local/include/openssl/ssl.h \
+  /usr/local/include/openssl/comp.h /usr/local/include/openssl/comperr.h \
+  /usr/local/include/openssl/pem.h /usr/local/include/openssl/pemerr.h \
+  /usr/local/include/openssl/hmac.h /usr/local/include/openssl/async.h \
+  /usr/local/include/openssl/asyncerr.h /usr/local/include/openssl/ct.h \
+  /usr/local/include/openssl/cterr.h /usr/local/include/openssl/sslerr.h \
+  /usr/local/include/openssl/ssl2.h /usr/local/include/openssl/ssl3.h \
+  /usr/local/include/openssl/tls1.h /usr/local/include/openssl/dtls1.h \
+  /usr/local/include/openssl/srtp.h /usr/local/include/openssl/err.h \
+  /usr/local/include/openssl/rand.h /usr/local/include/openssl/randerr.h \
+  /Users/johns/bunnymech/src/include/Log4.h \
+  /usr/local/include/log4cpp/Category.hh \
+  /usr/local/include/log4cpp/Portability.hh \
+  /usr/local/include/log4cpp/config.h \
+  /usr/local/include/log4cpp/Export.hh \
+  /usr/local/include/log4cpp/Appender.hh \
+  /usr/local/include/log4cpp/Priority.hh \
+  /usr/local/include/log4cpp/Layout.hh \
+  /usr/local/include/log4cpp/LoggingEvent.hh \
+  /usr/local/include/log4cpp/TimeStamp.hh \
+  /usr/local/include/log4cpp/threading/Threading.hh \
+  /usr/local/include/log4cpp/threading/PThreads.hh \
+  /usr/local/include/log4cpp/CategoryStream.hh \
+  /usr/local/include/log4cpp/Manipulator.hh \
+  /usr/local/include/log4cpp/convenience.h \
+  /usr/local/include/log4cpp/PropertyConfigurator.hh \
+  /usr/local/include/log4cpp/Configurator.hh \
+  /usr/local/include/log4cpp/NDC.hh \
+  /Users/johns/bunnymech/src/baseServer/BaseServer.h \
+  /Users/johns/bunnymech/src/icomm/Icomm.h \
+  /Users/johns/bunnymech/src/dpsio/SocketIO.h \
+  /Users/johns/bunnymech/src/dpsio/DssSems.h \
+  /Users/johns/bunnymech/src/classes/Logs.h \
+  /Users/johns/bunnymech/src/classes/SBase.h \
+  /Users/johns/bunnymech/src/classes/SBase_files.h \
+  /Users/johns/bunnymech/src/dpsio/DssSaxParser.h \
+  /Users/johns/bunnymech/src/classes/Channels.h \
+  /Users/johns/bunnymech/src/classes/Interfaces.h \
+  /Users/johns/bunnymech/src/classes/Channels_digital.h \
+  /Users/johns/bunnymech/src/classes/Channels_analog.h \
+  /Users/johns/bunnymech/src/classes/Hosts.h \
+  /Users/johns/bunnymech/src/classes/Locations.h services.h
+http.o: http.cc /usr/local/include/upnp/upnp.h \
+  /usr/local/include/upnp/UpnpGlobal.h \
+  /usr/local/include/upnp/UpnpInet.h \
+  /usr/local/include/upnp/UpnpUniStd.h /usr/local/include/upnp/ixml.h \
+  /usr/local/include/upnp/upnpconfig.h \
+  /usr/local/include/upnp/UpnpActionComplete.h \
+  /usr/local/include/upnp/UpnpString.h \
+  /usr/local/include/upnp/UpnpActionRequest.h \
+  /usr/local/include/upnp/UpnpDiscovery.h \
+  /usr/local/include/upnp/UpnpEvent.h \
+  /usr/local/include/upnp/UpnpEventSubscribe.h \
+  /usr/local/include/upnp/UpnpFileInfo.h /usr/local/include/upnp/list.h \
+  /usr/local/include/upnp/UpnpStateVarComplete.h \
+  /usr/local/include/upnp/UpnpStateVarRequest.h \
+  /usr/local/include/upnp/UpnpSubscriptionRequest.h \
+  /usr/local/include/upnp/Callback.h /usr/local/include/upnp/upnptools.h \
+  services.h ushare.h content.h buffer.h redblack.h \
+  /Users/johns/bunnymech/src/mech/Mech.h \
+  /Users/johns/bunnymech/src/include/dpsframework.h \
+  /usr/local/include/openssl/sha.h /usr/local/include/openssl/e_os2.h \
+  /usr/local/include/openssl/opensslconf.h \
+  /usr/local/include/openssl/opensslv.h \
+  /usr/local/include/openssl/x509_vfy.h \
+  /usr/local/include/openssl/x509.h \
+  /usr/local/include/openssl/ossl_typ.h \
+  /usr/local/include/openssl/symhacks.h \
+  /usr/local/include/openssl/buffer.h \
+  /usr/local/include/openssl/crypto.h \
+  /usr/local/include/openssl/safestack.h \
+  /usr/local/include/openssl/stack.h \
+  /usr/local/include/openssl/cryptoerr.h \
+  /usr/local/include/openssl/buffererr.h \
+  /usr/local/include/openssl/evp.h /usr/local/include/openssl/bio.h \
+  /usr/local/include/openssl/bioerr.h \
+  /usr/local/include/openssl/evperr.h \
+  /usr/local/include/openssl/objects.h \
+  /usr/local/include/openssl/obj_mac.h /usr/local/include/openssl/asn1.h \
+  /usr/local/include/openssl/asn1err.h /usr/local/include/openssl/bn.h \
+  /usr/local/include/openssl/bnerr.h \
+  /usr/local/include/openssl/objectserr.h \
+  /usr/local/include/openssl/ec.h /usr/local/include/openssl/ecerr.h \
+  /usr/local/include/openssl/rsa.h /usr/local/include/openssl/rsaerr.h \
+  /usr/local/include/openssl/dsa.h /usr/local/include/openssl/dh.h \
+  /usr/local/include/openssl/dherr.h /usr/local/include/openssl/dsaerr.h \
+  /usr/local/include/openssl/x509err.h \
+  /usr/local/include/openssl/pkcs7.h \
+  /usr/local/include/openssl/pkcs7err.h \
+  /usr/local/include/openssl/lhash.h /usr/local/include/openssl/ssl.h \
+  /usr/local/include/openssl/comp.h /usr/local/include/openssl/comperr.h \
+  /usr/local/include/openssl/pem.h /usr/local/include/openssl/pemerr.h \
+  /usr/local/include/openssl/hmac.h /usr/local/include/openssl/async.h \
+  /usr/local/include/openssl/asyncerr.h /usr/local/include/openssl/ct.h \
+  /usr/local/include/openssl/cterr.h /usr/local/include/openssl/sslerr.h \
+  /usr/local/include/openssl/ssl2.h /usr/local/include/openssl/ssl3.h \
+  /usr/local/include/openssl/tls1.h /usr/local/include/openssl/dtls1.h \
+  /usr/local/include/openssl/srtp.h /usr/local/include/openssl/err.h \
+  /usr/local/include/openssl/rand.h /usr/local/include/openssl/randerr.h \
+  /Users/johns/bunnymech/src/include/Log4.h \
+  /usr/local/include/log4cpp/Category.hh \
+  /usr/local/include/log4cpp/Portability.hh \
+  /usr/local/include/log4cpp/config.h \
+  /usr/local/include/log4cpp/Export.hh \
+  /usr/local/include/log4cpp/Appender.hh \
+  /usr/local/include/log4cpp/Priority.hh \
+  /usr/local/include/log4cpp/Layout.hh \
+  /usr/local/include/log4cpp/LoggingEvent.hh \
+  /usr/local/include/log4cpp/TimeStamp.hh \
+  /usr/local/include/log4cpp/threading/Threading.hh \
+  /usr/local/include/log4cpp/threading/PThreads.hh \
+  /usr/local/include/log4cpp/CategoryStream.hh \
+  /usr/local/include/log4cpp/Manipulator.hh \
+  /usr/local/include/log4cpp/convenience.h \
+  /usr/local/include/log4cpp/PropertyConfigurator.hh \
+  /usr/local/include/log4cpp/Configurator.hh \
+  /usr/local/include/log4cpp/NDC.hh \
+  /Users/johns/bunnymech/src/baseServer/BaseServer.h \
+  /Users/johns/bunnymech/src/icomm/Icomm.h \
+  /Users/johns/bunnymech/src/dpsio/SocketIO.h \
+  /Users/johns/bunnymech/src/dpsio/DssSems.h \
+  /Users/johns/bunnymech/src/classes/Logs.h \
+  /Users/johns/bunnymech/src/classes/SBase.h \
+  /Users/johns/bunnymech/src/classes/SBase_files.h \
+  /Users/johns/bunnymech/src/dpsio/DssSaxParser.h \
+  /Users/johns/bunnymech/src/classes/Channels.h \
+  /Users/johns/bunnymech/src/classes/Interfaces.h \
+  /Users/johns/bunnymech/src/classes/Channels_digital.h \
+  /Users/johns/bunnymech/src/classes/Channels_analog.h \
+  /Users/johns/bunnymech/src/classes/Hosts.h \
+  /Users/johns/bunnymech/src/classes/Locations.h cds.h cms.h msr.h \
+  metadata.h http.h minmax.h trace.h presentation.h osdep.h mime.h
+bunny.o: bunny.cc /usr/local/include/upnp/upnp.h \
+  /usr/local/include/upnp/UpnpGlobal.h \
+  /usr/local/include/upnp/UpnpInet.h \
+  /usr/local/include/upnp/UpnpUniStd.h /usr/local/include/upnp/ixml.h \
+  /usr/local/include/upnp/upnpconfig.h \
+  /usr/local/include/upnp/UpnpActionComplete.h \
+  /usr/local/include/upnp/UpnpString.h \
+  /usr/local/include/upnp/UpnpActionRequest.h \
+  /usr/local/include/upnp/UpnpDiscovery.h \
+  /usr/local/include/upnp/UpnpEvent.h \
+  /usr/local/include/upnp/UpnpEventSubscribe.h \
+  /usr/local/include/upnp/UpnpFileInfo.h /usr/local/include/upnp/list.h \
+  /usr/local/include/upnp/UpnpStateVarComplete.h \
+  /usr/local/include/upnp/UpnpStateVarRequest.h \
+  /usr/local/include/upnp/UpnpSubscriptionRequest.h \
+  /usr/local/include/upnp/Callback.h /usr/local/include/upnp/upnptools.h \
+  services.h ushare.h content.h buffer.h redblack.h \
+  /Users/johns/bunnymech/src/mech/Mech.h \
+  /Users/johns/bunnymech/src/include/dpsframework.h \
+  /usr/local/include/openssl/sha.h /usr/local/include/openssl/e_os2.h \
+  /usr/local/include/openssl/opensslconf.h \
+  /usr/local/include/openssl/opensslv.h \
+  /usr/local/include/openssl/x509_vfy.h \
+  /usr/local/include/openssl/x509.h \
+  /usr/local/include/openssl/ossl_typ.h \
+  /usr/local/include/openssl/symhacks.h \
+  /usr/local/include/openssl/buffer.h \
+  /usr/local/include/openssl/crypto.h \
+  /usr/local/include/openssl/safestack.h \
+  /usr/local/include/openssl/stack.h \
+  /usr/local/include/openssl/cryptoerr.h \
+  /usr/local/include/openssl/buffererr.h \
+  /usr/local/include/openssl/evp.h /usr/local/include/openssl/bio.h \
+  /usr/local/include/openssl/bioerr.h \
+  /usr/local/include/openssl/evperr.h \
+  /usr/local/include/openssl/objects.h \
+  /usr/local/include/openssl/obj_mac.h /usr/local/include/openssl/asn1.h \
+  /usr/local/include/openssl/asn1err.h /usr/local/include/openssl/bn.h \
+  /usr/local/include/openssl/bnerr.h \
+  /usr/local/include/openssl/objectserr.h \
+  /usr/local/include/openssl/ec.h /usr/local/include/openssl/ecerr.h \
+  /usr/local/include/openssl/rsa.h /usr/local/include/openssl/rsaerr.h \
+  /usr/local/include/openssl/dsa.h /usr/local/include/openssl/dh.h \
+  /usr/local/include/openssl/dherr.h /usr/local/include/openssl/dsaerr.h \
+  /usr/local/include/openssl/x509err.h \
+  /usr/local/include/openssl/pkcs7.h \
+  /usr/local/include/openssl/pkcs7err.h \
+  /usr/local/include/openssl/lhash.h /usr/local/include/openssl/ssl.h \
+  /usr/local/include/openssl/comp.h /usr/local/include/openssl/comperr.h \
+  /usr/local/include/openssl/pem.h /usr/local/include/openssl/pemerr.h \
+  /usr/local/include/openssl/hmac.h /usr/local/include/openssl/async.h \
+  /usr/local/include/openssl/asyncerr.h /usr/local/include/openssl/ct.h \
+  /usr/local/include/openssl/cterr.h /usr/local/include/openssl/sslerr.h \
+  /usr/local/include/openssl/ssl2.h /usr/local/include/openssl/ssl3.h \
+  /usr/local/include/openssl/tls1.h /usr/local/include/openssl/dtls1.h \
+  /usr/local/include/openssl/srtp.h /usr/local/include/openssl/err.h \
+  /usr/local/include/openssl/rand.h /usr/local/include/openssl/randerr.h \
+  /Users/johns/bunnymech/src/include/Log4.h \
+  /usr/local/include/log4cpp/Category.hh \
+  /usr/local/include/log4cpp/Portability.hh \
+  /usr/local/include/log4cpp/config.h \
+  /usr/local/include/log4cpp/Export.hh \
+  /usr/local/include/log4cpp/Appender.hh \
+  /usr/local/include/log4cpp/Priority.hh \
+  /usr/local/include/log4cpp/Layout.hh \
+  /usr/local/include/log4cpp/LoggingEvent.hh \
+  /usr/local/include/log4cpp/TimeStamp.hh \
+  /usr/local/include/log4cpp/threading/Threading.hh \
+  /usr/local/include/log4cpp/threading/PThreads.hh \
+  /usr/local/include/log4cpp/CategoryStream.hh \
+  /usr/local/include/log4cpp/Manipulator.hh \
+  /usr/local/include/log4cpp/convenience.h \
+  /usr/local/include/log4cpp/PropertyConfigurator.hh \
+  /usr/local/include/log4cpp/Configurator.hh \
+  /usr/local/include/log4cpp/NDC.hh \
+  /Users/johns/bunnymech/src/baseServer/BaseServer.h \
+  /Users/johns/bunnymech/src/icomm/Icomm.h \
+  /Users/johns/bunnymech/src/dpsio/SocketIO.h \
+  /Users/johns/bunnymech/src/dpsio/DssSems.h \
+  /Users/johns/bunnymech/src/classes/Logs.h \
+  /Users/johns/bunnymech/src/classes/SBase.h \
+  /Users/johns/bunnymech/src/classes/SBase_files.h \
+  /Users/johns/bunnymech/src/dpsio/DssSaxParser.h \
+  /Users/johns/bunnymech/src/classes/Channels.h \
+  /Users/johns/bunnymech/src/classes/Interfaces.h \
+  /Users/johns/bunnymech/src/classes/Channels_digital.h \
+  /Users/johns/bunnymech/src/classes/Channels_analog.h \
+  /Users/johns/bunnymech/src/classes/Hosts.h \
+  /Users/johns/bunnymech/src/classes/Locations.h cds.h cms.h msr.h \
+  metadata.h http.h bunny_meta.h bunny.h LObj.h minmax.h trace.h \
+  presentation.h osdep.h mime.h
+bunny_meta.o: bunny_meta.cc /usr/local/include/upnp/upnp.h \
+  /usr/local/include/upnp/UpnpGlobal.h \
+  /usr/local/include/upnp/UpnpInet.h \
+  /usr/local/include/upnp/UpnpUniStd.h /usr/local/include/upnp/ixml.h \
+  /usr/local/include/upnp/upnpconfig.h \
+  /usr/local/include/upnp/UpnpActionComplete.h \
+  /usr/local/include/upnp/UpnpString.h \
+  /usr/local/include/upnp/UpnpActionRequest.h \
+  /usr/local/include/upnp/UpnpDiscovery.h \
+  /usr/local/include/upnp/UpnpEvent.h \
+  /usr/local/include/upnp/UpnpEventSubscribe.h \
+  /usr/local/include/upnp/UpnpFileInfo.h /usr/local/include/upnp/list.h \
+  /usr/local/include/upnp/UpnpStateVarComplete.h \
+  /usr/local/include/upnp/UpnpStateVarRequest.h \
+  /usr/local/include/upnp/UpnpSubscriptionRequest.h \
+  /usr/local/include/upnp/Callback.h /usr/local/include/upnp/upnptools.h \
+  mime.h metadata.h ushare.h content.h buffer.h redblack.h \
+  /Users/johns/bunnymech/src/mech/Mech.h \
+  /Users/johns/bunnymech/src/include/dpsframework.h \
+  /usr/local/include/openssl/sha.h /usr/local/include/openssl/e_os2.h \
+  /usr/local/include/openssl/opensslconf.h \
+  /usr/local/include/openssl/opensslv.h \
+  /usr/local/include/openssl/x509_vfy.h \
+  /usr/local/include/openssl/x509.h \
+  /usr/local/include/openssl/ossl_typ.h \
+  /usr/local/include/openssl/symhacks.h \
+  /usr/local/include/openssl/buffer.h \
+  /usr/local/include/openssl/crypto.h \
+  /usr/local/include/openssl/safestack.h \
+  /usr/local/include/openssl/stack.h \
+  /usr/local/include/openssl/cryptoerr.h \
+  /usr/local/include/openssl/buffererr.h \
+  /usr/local/include/openssl/evp.h /usr/local/include/openssl/bio.h \
+  /usr/local/include/openssl/bioerr.h \
+  /usr/local/include/openssl/evperr.h \
+  /usr/local/include/openssl/objects.h \
+  /usr/local/include/openssl/obj_mac.h /usr/local/include/openssl/asn1.h \
+  /usr/local/include/openssl/asn1err.h /usr/local/include/openssl/bn.h \
+  /usr/local/include/openssl/bnerr.h \
+  /usr/local/include/openssl/objectserr.h \
+  /usr/local/include/openssl/ec.h /usr/local/include/openssl/ecerr.h \
+  /usr/local/include/openssl/rsa.h /usr/local/include/openssl/rsaerr.h \
+  /usr/local/include/openssl/dsa.h /usr/local/include/openssl/dh.h \
+  /usr/local/include/openssl/dherr.h /usr/local/include/openssl/dsaerr.h \
+  /usr/local/include/openssl/x509err.h \
+  /usr/local/include/openssl/pkcs7.h \
+  /usr/local/include/openssl/pkcs7err.h \
+  /usr/local/include/openssl/lhash.h /usr/local/include/openssl/ssl.h \
+  /usr/local/include/openssl/comp.h /usr/local/include/openssl/comperr.h \
+  /usr/local/include/openssl/pem.h /usr/local/include/openssl/pemerr.h \
+  /usr/local/include/openssl/hmac.h /usr/local/include/openssl/async.h \
+  /usr/local/include/openssl/asyncerr.h /usr/local/include/openssl/ct.h \
+  /usr/local/include/openssl/cterr.h /usr/local/include/openssl/sslerr.h \
+  /usr/local/include/openssl/ssl2.h /usr/local/include/openssl/ssl3.h \
+  /usr/local/include/openssl/tls1.h /usr/local/include/openssl/dtls1.h \
+  /usr/local/include/openssl/srtp.h /usr/local/include/openssl/err.h \
+  /usr/local/include/openssl/rand.h /usr/local/include/openssl/randerr.h \
+  /Users/johns/bunnymech/src/include/Log4.h \
+  /usr/local/include/log4cpp/Category.hh \
+  /usr/local/include/log4cpp/Portability.hh \
+  /usr/local/include/log4cpp/config.h \
+  /usr/local/include/log4cpp/Export.hh \
+  /usr/local/include/log4cpp/Appender.hh \
+  /usr/local/include/log4cpp/Priority.hh \
+  /usr/local/include/log4cpp/Layout.hh \
+  /usr/local/include/log4cpp/LoggingEvent.hh \
+  /usr/local/include/log4cpp/TimeStamp.hh \
+  /usr/local/include/log4cpp/threading/Threading.hh \
+  /usr/local/include/log4cpp/threading/PThreads.hh \
+  /usr/local/include/log4cpp/CategoryStream.hh \
+  /usr/local/include/log4cpp/Manipulator.hh \
+  /usr/local/include/log4cpp/convenience.h \
+  /usr/local/include/log4cpp/PropertyConfigurator.hh \
+  /usr/local/include/log4cpp/Configurator.hh \
+  /usr/local/include/log4cpp/NDC.hh \
+  /Users/johns/bunnymech/src/baseServer/BaseServer.h \
+  /Users/johns/bunnymech/src/icomm/Icomm.h \
+  /Users/johns/bunnymech/src/dpsio/SocketIO.h \
+  /Users/johns/bunnymech/src/dpsio/DssSems.h \
+  /Users/johns/bunnymech/src/classes/Logs.h \
+  /Users/johns/bunnymech/src/classes/SBase.h \
+  /Users/johns/bunnymech/src/classes/SBase_files.h \
+  /Users/johns/bunnymech/src/dpsio/DssSaxParser.h \
+  /Users/johns/bunnymech/src/classes/Channels.h \
+  /Users/johns/bunnymech/src/classes/Interfaces.h \
+  /Users/johns/bunnymech/src/classes/Channels_digital.h \
+  /Users/johns/bunnymech/src/classes/Channels_analog.h \
+  /Users/johns/bunnymech/src/classes/Hosts.h \
+  /Users/johns/bunnymech/src/classes/Locations.h http.h bunny_meta.h \
+  util_iconv.h gettext.h trace.h LObj.h
+presentation.o: presentation.cc ../config.h metadata.h \
+  /usr/local/include/upnp/upnp.h /usr/local/include/upnp/UpnpGlobal.h \
+  /usr/local/include/upnp/UpnpInet.h \
+  /usr/local/include/upnp/UpnpUniStd.h /usr/local/include/upnp/ixml.h \
+  /usr/local/include/upnp/upnpconfig.h \
+  /usr/local/include/upnp/UpnpActionComplete.h \
+  /usr/local/include/upnp/UpnpString.h \
+  /usr/local/include/upnp/UpnpActionRequest.h \
+  /usr/local/include/upnp/UpnpDiscovery.h \
+  /usr/local/include/upnp/UpnpEvent.h \
+  /usr/local/include/upnp/UpnpEventSubscribe.h \
+  /usr/local/include/upnp/UpnpFileInfo.h /usr/local/include/upnp/list.h \
+  /usr/local/include/upnp/UpnpStateVarComplete.h \
+  /usr/local/include/upnp/UpnpStateVarRequest.h \
+  /usr/local/include/upnp/UpnpSubscriptionRequest.h \
+  /usr/local/include/upnp/Callback.h /usr/local/include/upnp/upnptools.h \
+  ushare.h content.h buffer.h redblack.h \
+  /Users/johns/bunnymech/src/mech/Mech.h \
+  /Users/johns/bunnymech/src/include/dpsframework.h \
+  /usr/local/include/openssl/sha.h /usr/local/include/openssl/e_os2.h \
+  /usr/local/include/openssl/opensslconf.h \
+  /usr/local/include/openssl/opensslv.h \
+  /usr/local/include/openssl/x509_vfy.h \
+  /usr/local/include/openssl/x509.h \
+  /usr/local/include/openssl/ossl_typ.h \
+  /usr/local/include/openssl/symhacks.h \
+  /usr/local/include/openssl/buffer.h \
+  /usr/local/include/openssl/crypto.h \
+  /usr/local/include/openssl/safestack.h \
+  /usr/local/include/openssl/stack.h \
+  /usr/local/include/openssl/cryptoerr.h \
+  /usr/local/include/openssl/buffererr.h \
+  /usr/local/include/openssl/evp.h /usr/local/include/openssl/bio.h \
+  /usr/local/include/openssl/bioerr.h \
+  /usr/local/include/openssl/evperr.h \
+  /usr/local/include/openssl/objects.h \
+  /usr/local/include/openssl/obj_mac.h /usr/local/include/openssl/asn1.h \
+  /usr/local/include/openssl/asn1err.h /usr/local/include/openssl/bn.h \
+  /usr/local/include/openssl/bnerr.h \
+  /usr/local/include/openssl/objectserr.h \
+  /usr/local/include/openssl/ec.h /usr/local/include/openssl/ecerr.h \
+  /usr/local/include/openssl/rsa.h /usr/local/include/openssl/rsaerr.h \
+  /usr/local/include/openssl/dsa.h /usr/local/include/openssl/dh.h \
+  /usr/local/include/openssl/dherr.h /usr/local/include/openssl/dsaerr.h \
+  /usr/local/include/openssl/x509err.h \
+  /usr/local/include/openssl/pkcs7.h \
+  /usr/local/include/openssl/pkcs7err.h \
+  /usr/local/include/openssl/lhash.h /usr/local/include/openssl/ssl.h \
+  /usr/local/include/openssl/comp.h /usr/local/include/openssl/comperr.h \
+  /usr/local/include/openssl/pem.h /usr/local/include/openssl/pemerr.h \
+  /usr/local/include/openssl/hmac.h /usr/local/include/openssl/async.h \
+  /usr/local/include/openssl/asyncerr.h /usr/local/include/openssl/ct.h \
+  /usr/local/include/openssl/cterr.h /usr/local/include/openssl/sslerr.h \
+  /usr/local/include/openssl/ssl2.h /usr/local/include/openssl/ssl3.h \
+  /usr/local/include/openssl/tls1.h /usr/local/include/openssl/dtls1.h \
+  /usr/local/include/openssl/srtp.h /usr/local/include/openssl/err.h \
+  /usr/local/include/openssl/rand.h /usr/local/include/openssl/randerr.h \
+  /Users/johns/bunnymech/src/include/Log4.h \
+  /usr/local/include/log4cpp/Category.hh \
+  /usr/local/include/log4cpp/Portability.hh \
+  /usr/local/include/log4cpp/config.h \
+  /usr/local/include/log4cpp/Export.hh \
+  /usr/local/include/log4cpp/Appender.hh \
+  /usr/local/include/log4cpp/Priority.hh \
+  /usr/local/include/log4cpp/Layout.hh \
+  /usr/local/include/log4cpp/LoggingEvent.hh \
+  /usr/local/include/log4cpp/TimeStamp.hh \
+  /usr/local/include/log4cpp/threading/Threading.hh \
+  /usr/local/include/log4cpp/threading/PThreads.hh \
+  /usr/local/include/log4cpp/CategoryStream.hh \
+  /usr/local/include/log4cpp/Manipulator.hh \
+  /usr/local/include/log4cpp/convenience.h \
+  /usr/local/include/log4cpp/PropertyConfigurator.hh \
+  /usr/local/include/log4cpp/Configurator.hh \
+  /usr/local/include/log4cpp/NDC.hh \
+  /Users/johns/bunnymech/src/baseServer/BaseServer.h \
+  /Users/johns/bunnymech/src/icomm/Icomm.h \
+  /Users/johns/bunnymech/src/dpsio/SocketIO.h \
+  /Users/johns/bunnymech/src/dpsio/DssSems.h \
+  /Users/johns/bunnymech/src/classes/Logs.h \
+  /Users/johns/bunnymech/src/classes/SBase.h \
+  /Users/johns/bunnymech/src/classes/SBase_files.h \
+  /Users/johns/bunnymech/src/dpsio/DssSaxParser.h \
+  /Users/johns/bunnymech/src/classes/Channels.h \
+  /Users/johns/bunnymech/src/classes/Interfaces.h \
+  /Users/johns/bunnymech/src/classes/Channels_digital.h \
+  /Users/johns/bunnymech/src/classes/Channels_analog.h \
+  /Users/johns/bunnymech/src/classes/Hosts.h \
+  /Users/johns/bunnymech/src/classes/Locations.h http.h presentation.h \
+  gettext.h util_iconv.h
+metadata.o: metadata.cc /usr/local/include/upnp/upnp.h \
+  /usr/local/include/upnp/UpnpGlobal.h \
+  /usr/local/include/upnp/UpnpInet.h \
+  /usr/local/include/upnp/UpnpUniStd.h /usr/local/include/upnp/ixml.h \
+  /usr/local/include/upnp/upnpconfig.h \
+  /usr/local/include/upnp/UpnpActionComplete.h \
+  /usr/local/include/upnp/UpnpString.h \
+  /usr/local/include/upnp/UpnpActionRequest.h \
+  /usr/local/include/upnp/UpnpDiscovery.h \
+  /usr/local/include/upnp/UpnpEvent.h \
+  /usr/local/include/upnp/UpnpEventSubscribe.h \
+  /usr/local/include/upnp/UpnpFileInfo.h /usr/local/include/upnp/list.h \
+  /usr/local/include/upnp/UpnpStateVarComplete.h \
+  /usr/local/include/upnp/UpnpStateVarRequest.h \
+  /usr/local/include/upnp/UpnpSubscriptionRequest.h \
+  /usr/local/include/upnp/Callback.h /usr/local/include/upnp/upnptools.h \
+  mime.h metadata.h ushare.h content.h buffer.h redblack.h \
+  /Users/johns/bunnymech/src/mech/Mech.h \
+  /Users/johns/bunnymech/src/include/dpsframework.h \
+  /usr/local/include/openssl/sha.h /usr/local/include/openssl/e_os2.h \
+  /usr/local/include/openssl/opensslconf.h \
+  /usr/local/include/openssl/opensslv.h \
+  /usr/local/include/openssl/x509_vfy.h \
+  /usr/local/include/openssl/x509.h \
+  /usr/local/include/openssl/ossl_typ.h \
+  /usr/local/include/openssl/symhacks.h \
+  /usr/local/include/openssl/buffer.h \
+  /usr/local/include/openssl/crypto.h \
+  /usr/local/include/openssl/safestack.h \
+  /usr/local/include/openssl/stack.h \
+  /usr/local/include/openssl/cryptoerr.h \
+  /usr/local/include/openssl/buffererr.h \
+  /usr/local/include/openssl/evp.h /usr/local/include/openssl/bio.h \
+  /usr/local/include/openssl/bioerr.h \
+  /usr/local/include/openssl/evperr.h \
+  /usr/local/include/openssl/objects.h \
+  /usr/local/include/openssl/obj_mac.h /usr/local/include/openssl/asn1.h \
+  /usr/local/include/openssl/asn1err.h /usr/local/include/openssl/bn.h \
+  /usr/local/include/openssl/bnerr.h \
+  /usr/local/include/openssl/objectserr.h \
+  /usr/local/include/openssl/ec.h /usr/local/include/openssl/ecerr.h \
+  /usr/local/include/openssl/rsa.h /usr/local/include/openssl/rsaerr.h \
+  /usr/local/include/openssl/dsa.h /usr/local/include/openssl/dh.h \
+  /usr/local/include/openssl/dherr.h /usr/local/include/openssl/dsaerr.h \
+  /usr/local/include/openssl/x509err.h \
+  /usr/local/include/openssl/pkcs7.h \
+  /usr/local/include/openssl/pkcs7err.h \
+  /usr/local/include/openssl/lhash.h /usr/local/include/openssl/ssl.h \
+  /usr/local/include/openssl/comp.h /usr/local/include/openssl/comperr.h \
+  /usr/local/include/openssl/pem.h /usr/local/include/openssl/pemerr.h \
+  /usr/local/include/openssl/hmac.h /usr/local/include/openssl/async.h \
+  /usr/local/include/openssl/asyncerr.h /usr/local/include/openssl/ct.h \
+  /usr/local/include/openssl/cterr.h /usr/local/include/openssl/sslerr.h \
+  /usr/local/include/openssl/ssl2.h /usr/local/include/openssl/ssl3.h \
+  /usr/local/include/openssl/tls1.h /usr/local/include/openssl/dtls1.h \
+  /usr/local/include/openssl/srtp.h /usr/local/include/openssl/err.h \
+  /usr/local/include/openssl/rand.h /usr/local/include/openssl/randerr.h \
+  /Users/johns/bunnymech/src/include/Log4.h \
+  /usr/local/include/log4cpp/Category.hh \
+  /usr/local/include/log4cpp/Portability.hh \
+  /usr/local/include/log4cpp/config.h \
+  /usr/local/include/log4cpp/Export.hh \
+  /usr/local/include/log4cpp/Appender.hh \
+  /usr/local/include/log4cpp/Priority.hh \
+  /usr/local/include/log4cpp/Layout.hh \
+  /usr/local/include/log4cpp/LoggingEvent.hh \
+  /usr/local/include/log4cpp/TimeStamp.hh \
+  /usr/local/include/log4cpp/threading/Threading.hh \
+  /usr/local/include/log4cpp/threading/PThreads.hh \
+  /usr/local/include/log4cpp/CategoryStream.hh \
+  /usr/local/include/log4cpp/Manipulator.hh \
+  /usr/local/include/log4cpp/convenience.h \
+  /usr/local/include/log4cpp/PropertyConfigurator.hh \
+  /usr/local/include/log4cpp/Configurator.hh \
+  /usr/local/include/log4cpp/NDC.hh \
+  /Users/johns/bunnymech/src/baseServer/BaseServer.h \
+  /Users/johns/bunnymech/src/icomm/Icomm.h \
+  /Users/johns/bunnymech/src/dpsio/SocketIO.h \
+  /Users/johns/bunnymech/src/dpsio/DssSems.h \
+  /Users/johns/bunnymech/src/classes/Logs.h \
+  /Users/johns/bunnymech/src/classes/SBase.h \
+  /Users/johns/bunnymech/src/classes/SBase_files.h \
+  /Users/johns/bunnymech/src/dpsio/DssSaxParser.h \
+  /Users/johns/bunnymech/src/classes/Channels.h \
+  /Users/johns/bunnymech/src/classes/Interfaces.h \
+  /Users/johns/bunnymech/src/classes/Channels_digital.h \
+  /Users/johns/bunnymech/src/classes/Channels_analog.h \
+  /Users/johns/bunnymech/src/classes/Hosts.h \
+  /Users/johns/bunnymech/src/classes/Locations.h http.h bunny_meta.h \
+  util_iconv.h gettext.h trace.h
+mime.o: mime.cc mime.h ushare.h /usr/local/include/upnp/upnp.h \
+  /usr/local/include/upnp/UpnpGlobal.h \
+  /usr/local/include/upnp/UpnpInet.h \
+  /usr/local/include/upnp/UpnpUniStd.h /usr/local/include/upnp/ixml.h \
+  /usr/local/include/upnp/upnpconfig.h \
+  /usr/local/include/upnp/UpnpActionComplete.h \
+  /usr/local/include/upnp/UpnpString.h \
+  /usr/local/include/upnp/UpnpActionRequest.h \
+  /usr/local/include/upnp/UpnpDiscovery.h \
+  /usr/local/include/upnp/UpnpEvent.h \
+  /usr/local/include/upnp/UpnpEventSubscribe.h \
+  /usr/local/include/upnp/UpnpFileInfo.h /usr/local/include/upnp/list.h \
+  /usr/local/include/upnp/UpnpStateVarComplete.h \
+  /usr/local/include/upnp/UpnpStateVarRequest.h \
+  /usr/local/include/upnp/UpnpSubscriptionRequest.h \
+  /usr/local/include/upnp/Callback.h /usr/local/include/upnp/upnptools.h \
+  content.h buffer.h redblack.h /Users/johns/bunnymech/src/mech/Mech.h \
+  /Users/johns/bunnymech/src/include/dpsframework.h \
+  /usr/local/include/openssl/sha.h /usr/local/include/openssl/e_os2.h \
+  /usr/local/include/openssl/opensslconf.h \
+  /usr/local/include/openssl/opensslv.h \
+  /usr/local/include/openssl/x509_vfy.h \
+  /usr/local/include/openssl/x509.h \
+  /usr/local/include/openssl/ossl_typ.h \
+  /usr/local/include/openssl/symhacks.h \
+  /usr/local/include/openssl/buffer.h \
+  /usr/local/include/openssl/crypto.h \
+  /usr/local/include/openssl/safestack.h \
+  /usr/local/include/openssl/stack.h \
+  /usr/local/include/openssl/cryptoerr.h \
+  /usr/local/include/openssl/buffererr.h \
+  /usr/local/include/openssl/evp.h /usr/local/include/openssl/bio.h \
+  /usr/local/include/openssl/bioerr.h \
+  /usr/local/include/openssl/evperr.h \
+  /usr/local/include/openssl/objects.h \
+  /usr/local/include/openssl/obj_mac.h /usr/local/include/openssl/asn1.h \
+  /usr/local/include/openssl/asn1err.h /usr/local/include/openssl/bn.h \
+  /usr/local/include/openssl/bnerr.h \
+  /usr/local/include/openssl/objectserr.h \
+  /usr/local/include/openssl/ec.h /usr/local/include/openssl/ecerr.h \
+  /usr/local/include/openssl/rsa.h /usr/local/include/openssl/rsaerr.h \
+  /usr/local/include/openssl/dsa.h /usr/local/include/openssl/dh.h \
+  /usr/local/include/openssl/dherr.h /usr/local/include/openssl/dsaerr.h \
+  /usr/local/include/openssl/x509err.h \
+  /usr/local/include/openssl/pkcs7.h \
+  /usr/local/include/openssl/pkcs7err.h \
+  /usr/local/include/openssl/lhash.h /usr/local/include/openssl/ssl.h \
+  /usr/local/include/openssl/comp.h /usr/local/include/openssl/comperr.h \
+  /usr/local/include/openssl/pem.h /usr/local/include/openssl/pemerr.h \
+  /usr/local/include/openssl/hmac.h /usr/local/include/openssl/async.h \
+  /usr/local/include/openssl/asyncerr.h /usr/local/include/openssl/ct.h \
+  /usr/local/include/openssl/cterr.h /usr/local/include/openssl/sslerr.h \
+  /usr/local/include/openssl/ssl2.h /usr/local/include/openssl/ssl3.h \
+  /usr/local/include/openssl/tls1.h /usr/local/include/openssl/dtls1.h \
+  /usr/local/include/openssl/srtp.h /usr/local/include/openssl/err.h \
+  /usr/local/include/openssl/rand.h /usr/local/include/openssl/randerr.h \
+  /Users/johns/bunnymech/src/include/Log4.h \
+  /usr/local/include/log4cpp/Category.hh \
+  /usr/local/include/log4cpp/Portability.hh \
+  /usr/local/include/log4cpp/config.h \
+  /usr/local/include/log4cpp/Export.hh \
+  /usr/local/include/log4cpp/Appender.hh \
+  /usr/local/include/log4cpp/Priority.hh \
+  /usr/local/include/log4cpp/Layout.hh \
+  /usr/local/include/log4cpp/LoggingEvent.hh \
+  /usr/local/include/log4cpp/TimeStamp.hh \
+  /usr/local/include/log4cpp/threading/Threading.hh \
+  /usr/local/include/log4cpp/threading/PThreads.hh \
+  /usr/local/include/log4cpp/CategoryStream.hh \
+  /usr/local/include/log4cpp/Manipulator.hh \
+  /usr/local/include/log4cpp/convenience.h \
+  /usr/local/include/log4cpp/PropertyConfigurator.hh \
+  /usr/local/include/log4cpp/Configurator.hh \
+  /usr/local/include/log4cpp/NDC.hh \
+  /Users/johns/bunnymech/src/baseServer/BaseServer.h \
+  /Users/johns/bunnymech/src/icomm/Icomm.h \
+  /Users/johns/bunnymech/src/dpsio/SocketIO.h \
+  /Users/johns/bunnymech/src/dpsio/DssSems.h \
+  /Users/johns/bunnymech/src/classes/Logs.h \
+  /Users/johns/bunnymech/src/classes/SBase.h \
+  /Users/johns/bunnymech/src/classes/SBase_files.h \
+  /Users/johns/bunnymech/src/dpsio/DssSaxParser.h \
+  /Users/johns/bunnymech/src/classes/Channels.h \
+  /Users/johns/bunnymech/src/classes/Interfaces.h \
+  /Users/johns/bunnymech/src/classes/Channels_digital.h \
+  /Users/johns/bunnymech/src/classes/Channels_analog.h \
+  /Users/johns/bunnymech/src/classes/Hosts.h \
+  /Users/johns/bunnymech/src/classes/Locations.h
+services.o: services.cc /usr/local/include/upnp/upnp.h \
+  /usr/local/include/upnp/UpnpGlobal.h \
+  /usr/local/include/upnp/UpnpInet.h \
+  /usr/local/include/upnp/UpnpUniStd.h /usr/local/include/upnp/ixml.h \
+  /usr/local/include/upnp/upnpconfig.h \
+  /usr/local/include/upnp/UpnpActionComplete.h \
+  /usr/local/include/upnp/UpnpString.h \
+  /usr/local/include/upnp/UpnpActionRequest.h \
+  /usr/local/include/upnp/UpnpDiscovery.h \
+  /usr/local/include/upnp/UpnpEvent.h \
+  /usr/local/include/upnp/UpnpEventSubscribe.h \
+  /usr/local/include/upnp/UpnpFileInfo.h /usr/local/include/upnp/list.h \
+  /usr/local/include/upnp/UpnpStateVarComplete.h \
+  /usr/local/include/upnp/UpnpStateVarRequest.h \
+  /usr/local/include/upnp/UpnpSubscriptionRequest.h \
+  /usr/local/include/upnp/Callback.h /usr/local/include/upnp/upnptools.h \
+  ushare.h content.h buffer.h redblack.h \
+  /Users/johns/bunnymech/src/mech/Mech.h \
+  /Users/johns/bunnymech/src/include/dpsframework.h \
+  /usr/local/include/openssl/sha.h /usr/local/include/openssl/e_os2.h \
+  /usr/local/include/openssl/opensslconf.h \
+  /usr/local/include/openssl/opensslv.h \
+  /usr/local/include/openssl/x509_vfy.h \
+  /usr/local/include/openssl/x509.h \
+  /usr/local/include/openssl/ossl_typ.h \
+  /usr/local/include/openssl/symhacks.h \
+  /usr/local/include/openssl/buffer.h \
+  /usr/local/include/openssl/crypto.h \
+  /usr/local/include/openssl/safestack.h \
+  /usr/local/include/openssl/stack.h \
+  /usr/local/include/openssl/cryptoerr.h \
+  /usr/local/include/openssl/buffererr.h \
+  /usr/local/include/openssl/evp.h /usr/local/include/openssl/bio.h \
+  /usr/local/include/openssl/bioerr.h \
+  /usr/local/include/openssl/evperr.h \
+  /usr/local/include/openssl/objects.h \
+  /usr/local/include/openssl/obj_mac.h /usr/local/include/openssl/asn1.h \
+  /usr/local/include/openssl/asn1err.h /usr/local/include/openssl/bn.h \
+  /usr/local/include/openssl/bnerr.h \
+  /usr/local/include/openssl/objectserr.h \
+  /usr/local/include/openssl/ec.h /usr/local/include/openssl/ecerr.h \
+  /usr/local/include/openssl/rsa.h /usr/local/include/openssl/rsaerr.h \
+  /usr/local/include/openssl/dsa.h /usr/local/include/openssl/dh.h \
+  /usr/local/include/openssl/dherr.h /usr/local/include/openssl/dsaerr.h \
+  /usr/local/include/openssl/x509err.h \
+  /usr/local/include/openssl/pkcs7.h \
+  /usr/local/include/openssl/pkcs7err.h \
+  /usr/local/include/openssl/lhash.h /usr/local/include/openssl/ssl.h \
+  /usr/local/include/openssl/comp.h /usr/local/include/openssl/comperr.h \
+  /usr/local/include/openssl/pem.h /usr/local/include/openssl/pemerr.h \
+  /usr/local/include/openssl/hmac.h /usr/local/include/openssl/async.h \
+  /usr/local/include/openssl/asyncerr.h /usr/local/include/openssl/ct.h \
+  /usr/local/include/openssl/cterr.h /usr/local/include/openssl/sslerr.h \
+  /usr/local/include/openssl/ssl2.h /usr/local/include/openssl/ssl3.h \
+  /usr/local/include/openssl/tls1.h /usr/local/include/openssl/dtls1.h \
+  /usr/local/include/openssl/srtp.h /usr/local/include/openssl/err.h \
+  /usr/local/include/openssl/rand.h /usr/local/include/openssl/randerr.h \
+  /Users/johns/bunnymech/src/include/Log4.h \
+  /usr/local/include/log4cpp/Category.hh \
+  /usr/local/include/log4cpp/Portability.hh \
+  /usr/local/include/log4cpp/config.h \
+  /usr/local/include/log4cpp/Export.hh \
+  /usr/local/include/log4cpp/Appender.hh \
+  /usr/local/include/log4cpp/Priority.hh \
+  /usr/local/include/log4cpp/Layout.hh \
+  /usr/local/include/log4cpp/LoggingEvent.hh \
+  /usr/local/include/log4cpp/TimeStamp.hh \
+  /usr/local/include/log4cpp/threading/Threading.hh \
+  /usr/local/include/log4cpp/threading/PThreads.hh \
+  /usr/local/include/log4cpp/CategoryStream.hh \
+  /usr/local/include/log4cpp/Manipulator.hh \
+  /usr/local/include/log4cpp/convenience.h \
+  /usr/local/include/log4cpp/PropertyConfigurator.hh \
+  /usr/local/include/log4cpp/Configurator.hh \
+  /usr/local/include/log4cpp/NDC.hh \
+  /Users/johns/bunnymech/src/baseServer/BaseServer.h \
+  /Users/johns/bunnymech/src/icomm/Icomm.h \
+  /Users/johns/bunnymech/src/dpsio/SocketIO.h \
+  /Users/johns/bunnymech/src/dpsio/DssSems.h \
+  /Users/johns/bunnymech/src/classes/Logs.h \
+  /Users/johns/bunnymech/src/classes/SBase.h \
+  /Users/johns/bunnymech/src/classes/SBase_files.h \
+  /Users/johns/bunnymech/src/dpsio/DssSaxParser.h \
+  /Users/johns/bunnymech/src/classes/Channels.h \
+  /Users/johns/bunnymech/src/classes/Interfaces.h \
+  /Users/johns/bunnymech/src/classes/Channels_digital.h \
+  /Users/johns/bunnymech/src/classes/Channels_analog.h \
+  /Users/johns/bunnymech/src/classes/Hosts.h \
+  /Users/johns/bunnymech/src/classes/Locations.h services.h cms.h cds.h \
+  msr.h trace.h
+buffer.o: buffer.cc buffer.h minmax.h
+util_iconv.o: util_iconv.cc util_iconv.h
+content.o: content.cc content.h
+cfgparser.o: cfgparser.cc ../config.h gettext.h cfgparser.h ushare.h \
+  /usr/local/include/upnp/upnp.h /usr/local/include/upnp/UpnpGlobal.h \
+  /usr/local/include/upnp/UpnpInet.h \
+  /usr/local/include/upnp/UpnpUniStd.h /usr/local/include/upnp/ixml.h \
+  /usr/local/include/upnp/upnpconfig.h \
+  /usr/local/include/upnp/UpnpActionComplete.h \
+  /usr/local/include/upnp/UpnpString.h \
+  /usr/local/include/upnp/UpnpActionRequest.h \
+  /usr/local/include/upnp/UpnpDiscovery.h \
+  /usr/local/include/upnp/UpnpEvent.h \
+  /usr/local/include/upnp/UpnpEventSubscribe.h \
+  /usr/local/include/upnp/UpnpFileInfo.h /usr/local/include/upnp/list.h \
+  /usr/local/include/upnp/UpnpStateVarComplete.h \
+  /usr/local/include/upnp/UpnpStateVarRequest.h \
+  /usr/local/include/upnp/UpnpSubscriptionRequest.h \
+  /usr/local/include/upnp/Callback.h /usr/local/include/upnp/upnptools.h \
+  content.h buffer.h redblack.h /Users/johns/bunnymech/src/mech/Mech.h \
+  /Users/johns/bunnymech/src/include/dpsframework.h \
+  /usr/local/include/openssl/sha.h /usr/local/include/openssl/e_os2.h \
+  /usr/local/include/openssl/opensslconf.h \
+  /usr/local/include/openssl/opensslv.h \
+  /usr/local/include/openssl/x509_vfy.h \
+  /usr/local/include/openssl/x509.h \
+  /usr/local/include/openssl/ossl_typ.h \
+  /usr/local/include/openssl/symhacks.h \
+  /usr/local/include/openssl/buffer.h \
+  /usr/local/include/openssl/crypto.h \
+  /usr/local/include/openssl/safestack.h \
+  /usr/local/include/openssl/stack.h \
+  /usr/local/include/openssl/cryptoerr.h \
+  /usr/local/include/openssl/buffererr.h \
+  /usr/local/include/openssl/evp.h /usr/local/include/openssl/bio.h \
+  /usr/local/include/openssl/bioerr.h \
+  /usr/local/include/openssl/evperr.h \
+  /usr/local/include/openssl/objects.h \
+  /usr/local/include/openssl/obj_mac.h /usr/local/include/openssl/asn1.h \
+  /usr/local/include/openssl/asn1err.h /usr/local/include/openssl/bn.h \
+  /usr/local/include/openssl/bnerr.h \
+  /usr/local/include/openssl/objectserr.h \
+  /usr/local/include/openssl/ec.h /usr/local/include/openssl/ecerr.h \
+  /usr/local/include/openssl/rsa.h /usr/local/include/openssl/rsaerr.h \
+  /usr/local/include/openssl/dsa.h /usr/local/include/openssl/dh.h \
+  /usr/local/include/openssl/dherr.h /usr/local/include/openssl/dsaerr.h \
+  /usr/local/include/openssl/x509err.h \
+  /usr/local/include/openssl/pkcs7.h \
+  /usr/local/include/openssl/pkcs7err.h \
+  /usr/local/include/openssl/lhash.h /usr/local/include/openssl/ssl.h \
+  /usr/local/include/openssl/comp.h /usr/local/include/openssl/comperr.h \
+  /usr/local/include/openssl/pem.h /usr/local/include/openssl/pemerr.h \
+  /usr/local/include/openssl/hmac.h /usr/local/include/openssl/async.h \
+  /usr/local/include/openssl/asyncerr.h /usr/local/include/openssl/ct.h \
+  /usr/local/include/openssl/cterr.h /usr/local/include/openssl/sslerr.h \
+  /usr/local/include/openssl/ssl2.h /usr/local/include/openssl/ssl3.h \
+  /usr/local/include/openssl/tls1.h /usr/local/include/openssl/dtls1.h \
+  /usr/local/include/openssl/srtp.h /usr/local/include/openssl/err.h \
+  /usr/local/include/openssl/rand.h /usr/local/include/openssl/randerr.h \
+  /Users/johns/bunnymech/src/include/Log4.h \
+  /usr/local/include/log4cpp/Category.hh \
+  /usr/local/include/log4cpp/Portability.hh \
+  /usr/local/include/log4cpp/config.h \
+  /usr/local/include/log4cpp/Export.hh \
+  /usr/local/include/log4cpp/Appender.hh \
+  /usr/local/include/log4cpp/Priority.hh \
+  /usr/local/include/log4cpp/Layout.hh \
+  /usr/local/include/log4cpp/LoggingEvent.hh \
+  /usr/local/include/log4cpp/TimeStamp.hh \
+  /usr/local/include/log4cpp/threading/Threading.hh \
+  /usr/local/include/log4cpp/threading/PThreads.hh \
+  /usr/local/include/log4cpp/CategoryStream.hh \
+  /usr/local/include/log4cpp/Manipulator.hh \
+  /usr/local/include/log4cpp/convenience.h \
+  /usr/local/include/log4cpp/PropertyConfigurator.hh \
+  /usr/local/include/log4cpp/Configurator.hh \
+  /usr/local/include/log4cpp/NDC.hh \
+  /Users/johns/bunnymech/src/baseServer/BaseServer.h \
+  /Users/johns/bunnymech/src/icomm/Icomm.h \
+  /Users/johns/bunnymech/src/dpsio/SocketIO.h \
+  /Users/johns/bunnymech/src/dpsio/DssSems.h \
+  /Users/johns/bunnymech/src/classes/Logs.h \
+  /Users/johns/bunnymech/src/classes/SBase.h \
+  /Users/johns/bunnymech/src/classes/SBase_files.h \
+  /Users/johns/bunnymech/src/dpsio/DssSaxParser.h \
+  /Users/johns/bunnymech/src/classes/Channels.h \
+  /Users/johns/bunnymech/src/classes/Interfaces.h \
+  /Users/johns/bunnymech/src/classes/Channels_digital.h \
+  /Users/johns/bunnymech/src/classes/Channels_analog.h \
+  /Users/johns/bunnymech/src/classes/Hosts.h \
+  /Users/johns/bunnymech/src/classes/Locations.h trace.h osdep.h
+trace.o: trace.cc ../config.h trace.h ushare.h \
+  /usr/local/include/upnp/upnp.h /usr/local/include/upnp/UpnpGlobal.h \
+  /usr/local/include/upnp/UpnpInet.h \
+  /usr/local/include/upnp/UpnpUniStd.h /usr/local/include/upnp/ixml.h \
+  /usr/local/include/upnp/upnpconfig.h \
+  /usr/local/include/upnp/UpnpActionComplete.h \
+  /usr/local/include/upnp/UpnpString.h \
+  /usr/local/include/upnp/UpnpActionRequest.h \
+  /usr/local/include/upnp/UpnpDiscovery.h \
+  /usr/local/include/upnp/UpnpEvent.h \
+  /usr/local/include/upnp/UpnpEventSubscribe.h \
+  /usr/local/include/upnp/UpnpFileInfo.h /usr/local/include/upnp/list.h \
+  /usr/local/include/upnp/UpnpStateVarComplete.h \
+  /usr/local/include/upnp/UpnpStateVarRequest.h \
+  /usr/local/include/upnp/UpnpSubscriptionRequest.h \
+  /usr/local/include/upnp/Callback.h /usr/local/include/upnp/upnptools.h \
+  content.h buffer.h redblack.h /Users/johns/bunnymech/src/mech/Mech.h \
+  /Users/johns/bunnymech/src/include/dpsframework.h \
+  /usr/local/include/openssl/sha.h /usr/local/include/openssl/e_os2.h \
+  /usr/local/include/openssl/opensslconf.h \
+  /usr/local/include/openssl/opensslv.h \
+  /usr/local/include/openssl/x509_vfy.h \
+  /usr/local/include/openssl/x509.h \
+  /usr/local/include/openssl/ossl_typ.h \
+  /usr/local/include/openssl/symhacks.h \
+  /usr/local/include/openssl/buffer.h \
+  /usr/local/include/openssl/crypto.h \
+  /usr/local/include/openssl/safestack.h \
+  /usr/local/include/openssl/stack.h \
+  /usr/local/include/openssl/cryptoerr.h \
+  /usr/local/include/openssl/buffererr.h \
+  /usr/local/include/openssl/evp.h /usr/local/include/openssl/bio.h \
+  /usr/local/include/openssl/bioerr.h \
+  /usr/local/include/openssl/evperr.h \
+  /usr/local/include/openssl/objects.h \
+  /usr/local/include/openssl/obj_mac.h /usr/local/include/openssl/asn1.h \
+  /usr/local/include/openssl/asn1err.h /usr/local/include/openssl/bn.h \
+  /usr/local/include/openssl/bnerr.h \
+  /usr/local/include/openssl/objectserr.h \
+  /usr/local/include/openssl/ec.h /usr/local/include/openssl/ecerr.h \
+  /usr/local/include/openssl/rsa.h /usr/local/include/openssl/rsaerr.h \
+  /usr/local/include/openssl/dsa.h /usr/local/include/openssl/dh.h \
+  /usr/local/include/openssl/dherr.h /usr/local/include/openssl/dsaerr.h \
+  /usr/local/include/openssl/x509err.h \
+  /usr/local/include/openssl/pkcs7.h \
+  /usr/local/include/openssl/pkcs7err.h \
+  /usr/local/include/openssl/lhash.h /usr/local/include/openssl/ssl.h \
+  /usr/local/include/openssl/comp.h /usr/local/include/openssl/comperr.h \
+  /usr/local/include/openssl/pem.h /usr/local/include/openssl/pemerr.h \
+  /usr/local/include/openssl/hmac.h /usr/local/include/openssl/async.h \
+  /usr/local/include/openssl/asyncerr.h /usr/local/include/openssl/ct.h \
+  /usr/local/include/openssl/cterr.h /usr/local/include/openssl/sslerr.h \
+  /usr/local/include/openssl/ssl2.h /usr/local/include/openssl/ssl3.h \
+  /usr/local/include/openssl/tls1.h /usr/local/include/openssl/dtls1.h \
+  /usr/local/include/openssl/srtp.h /usr/local/include/openssl/err.h \
+  /usr/local/include/openssl/rand.h /usr/local/include/openssl/randerr.h \
+  /Users/johns/bunnymech/src/include/Log4.h \
+  /usr/local/include/log4cpp/Category.hh \
+  /usr/local/include/log4cpp/Portability.hh \
+  /usr/local/include/log4cpp/config.h \
+  /usr/local/include/log4cpp/Export.hh \
+  /usr/local/include/log4cpp/Appender.hh \
+  /usr/local/include/log4cpp/Priority.hh \
+  /usr/local/include/log4cpp/Layout.hh \
+  /usr/local/include/log4cpp/LoggingEvent.hh \
+  /usr/local/include/log4cpp/TimeStamp.hh \
+  /usr/local/include/log4cpp/threading/Threading.hh \
+  /usr/local/include/log4cpp/threading/PThreads.hh \
+  /usr/local/include/log4cpp/CategoryStream.hh \
+  /usr/local/include/log4cpp/Manipulator.hh \
+  /usr/local/include/log4cpp/convenience.h \
+  /usr/local/include/log4cpp/PropertyConfigurator.hh \
+  /usr/local/include/log4cpp/Configurator.hh \
+  /usr/local/include/log4cpp/NDC.hh \
+  /Users/johns/bunnymech/src/baseServer/BaseServer.h \
+  /Users/johns/bunnymech/src/icomm/Icomm.h \
+  /Users/johns/bunnymech/src/dpsio/SocketIO.h \
+  /Users/johns/bunnymech/src/dpsio/DssSems.h \
+  /Users/johns/bunnymech/src/classes/Logs.h \
+  /Users/johns/bunnymech/src/classes/SBase.h \
+  /Users/johns/bunnymech/src/classes/SBase_files.h \
+  /Users/johns/bunnymech/src/dpsio/DssSaxParser.h \
+  /Users/johns/bunnymech/src/classes/Channels.h \
+  /Users/johns/bunnymech/src/classes/Interfaces.h \
+  /Users/johns/bunnymech/src/classes/Channels_digital.h \
+  /Users/johns/bunnymech/src/classes/Channels_analog.h \
+  /Users/johns/bunnymech/src/classes/Hosts.h \
+  /Users/johns/bunnymech/src/classes/Locations.h
+redblack.o: redblack.cc redblack.h
+osdep.o: osdep.cc osdep.h
+ctrl_telnet.o: ctrl_telnet.cc ../config.h ctrl_telnet.h minmax.h trace.h
+ushare.o: ushare.cc /usr/local/include/upnp/upnp.h \
+  /usr/local/include/upnp/UpnpGlobal.h \
+  /usr/local/include/upnp/UpnpInet.h \
+  /usr/local/include/upnp/UpnpUniStd.h /usr/local/include/upnp/ixml.h \
+  /usr/local/include/upnp/upnpconfig.h \
+  /usr/local/include/upnp/UpnpActionComplete.h \
+  /usr/local/include/upnp/UpnpString.h \
+  /usr/local/include/upnp/UpnpActionRequest.h \
+  /usr/local/include/upnp/UpnpDiscovery.h \
+  /usr/local/include/upnp/UpnpEvent.h \
+  /usr/local/include/upnp/UpnpEventSubscribe.h \
+  /usr/local/include/upnp/UpnpFileInfo.h /usr/local/include/upnp/list.h \
+  /usr/local/include/upnp/UpnpStateVarComplete.h \
+  /usr/local/include/upnp/UpnpStateVarRequest.h \
+  /usr/local/include/upnp/UpnpSubscriptionRequest.h \
+  /usr/local/include/upnp/Callback.h /usr/local/include/upnp/upnptools.h \
+  ../config.h ushare.h content.h buffer.h redblack.h \
+  /Users/johns/bunnymech/src/mech/Mech.h \
+  /Users/johns/bunnymech/src/include/dpsframework.h \
+  /usr/local/include/openssl/sha.h /usr/local/include/openssl/e_os2.h \
+  /usr/local/include/openssl/opensslconf.h \
+  /usr/local/include/openssl/opensslv.h \
+  /usr/local/include/openssl/x509_vfy.h \
+  /usr/local/include/openssl/x509.h \
+  /usr/local/include/openssl/ossl_typ.h \
+  /usr/local/include/openssl/symhacks.h \
+  /usr/local/include/openssl/buffer.h \
+  /usr/local/include/openssl/crypto.h \
+  /usr/local/include/openssl/safestack.h \
+  /usr/local/include/openssl/stack.h \
+  /usr/local/include/openssl/cryptoerr.h \
+  /usr/local/include/openssl/buffererr.h \
+  /usr/local/include/openssl/evp.h /usr/local/include/openssl/bio.h \
+  /usr/local/include/openssl/bioerr.h \
+  /usr/local/include/openssl/evperr.h \
+  /usr/local/include/openssl/objects.h \
+  /usr/local/include/openssl/obj_mac.h /usr/local/include/openssl/asn1.h \
+  /usr/local/include/openssl/asn1err.h /usr/local/include/openssl/bn.h \
+  /usr/local/include/openssl/bnerr.h \
+  /usr/local/include/openssl/objectserr.h \
+  /usr/local/include/openssl/ec.h /usr/local/include/openssl/ecerr.h \
+  /usr/local/include/openssl/rsa.h /usr/local/include/openssl/rsaerr.h \
+  /usr/local/include/openssl/dsa.h /usr/local/include/openssl/dh.h \
+  /usr/local/include/openssl/dherr.h /usr/local/include/openssl/dsaerr.h \
+  /usr/local/include/openssl/x509err.h \
+  /usr/local/include/openssl/pkcs7.h \
+  /usr/local/include/openssl/pkcs7err.h \
+  /usr/local/include/openssl/lhash.h /usr/local/include/openssl/ssl.h \
+  /usr/local/include/openssl/comp.h /usr/local/include/openssl/comperr.h \
+  /usr/local/include/openssl/pem.h /usr/local/include/openssl/pemerr.h \
+  /usr/local/include/openssl/hmac.h /usr/local/include/openssl/async.h \
+  /usr/local/include/openssl/asyncerr.h /usr/local/include/openssl/ct.h \
+  /usr/local/include/openssl/cterr.h /usr/local/include/openssl/sslerr.h \
+  /usr/local/include/openssl/ssl2.h /usr/local/include/openssl/ssl3.h \
+  /usr/local/include/openssl/tls1.h /usr/local/include/openssl/dtls1.h \
+  /usr/local/include/openssl/srtp.h /usr/local/include/openssl/err.h \
+  /usr/local/include/openssl/rand.h /usr/local/include/openssl/randerr.h \
+  /Users/johns/bunnymech/src/include/Log4.h \
+  /usr/local/include/log4cpp/Category.hh \
+  /usr/local/include/log4cpp/Portability.hh \
+  /usr/local/include/log4cpp/config.h \
+  /usr/local/include/log4cpp/Export.hh \
+  /usr/local/include/log4cpp/Appender.hh \
+  /usr/local/include/log4cpp/Priority.hh \
+  /usr/local/include/log4cpp/Layout.hh \
+  /usr/local/include/log4cpp/LoggingEvent.hh \
+  /usr/local/include/log4cpp/TimeStamp.hh \
+  /usr/local/include/log4cpp/threading/Threading.hh \
+  /usr/local/include/log4cpp/threading/PThreads.hh \
+  /usr/local/include/log4cpp/CategoryStream.hh \
+  /usr/local/include/log4cpp/Manipulator.hh \
+  /usr/local/include/log4cpp/convenience.h \
+  /usr/local/include/log4cpp/PropertyConfigurator.hh \
+  /usr/local/include/log4cpp/Configurator.hh \
+  /usr/local/include/log4cpp/NDC.hh \
+  /Users/johns/bunnymech/src/baseServer/BaseServer.h \
+  /Users/johns/bunnymech/src/icomm/Icomm.h \
+  /Users/johns/bunnymech/src/dpsio/SocketIO.h \
+  /Users/johns/bunnymech/src/dpsio/DssSems.h \
+  /Users/johns/bunnymech/src/classes/Logs.h \
+  /Users/johns/bunnymech/src/classes/SBase.h \
+  /Users/johns/bunnymech/src/classes/SBase_files.h \
+  /Users/johns/bunnymech/src/dpsio/DssSaxParser.h \
+  /Users/johns/bunnymech/src/classes/Channels.h \
+  /Users/johns/bunnymech/src/classes/Interfaces.h \
+  /Users/johns/bunnymech/src/classes/Channels_digital.h \
+  /Users/johns/bunnymech/src/classes/Channels_analog.h \
+  /Users/johns/bunnymech/src/classes/Hosts.h \
+  /Users/johns/bunnymech/src/classes/Locations.h services.h http.h \
+  bunny.h LObj.h bunny_meta.h metadata.h util_iconv.h cfgparser.h \
+  gettext.h trace.h ctrl_telnet.h

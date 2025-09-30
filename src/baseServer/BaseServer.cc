@@ -362,6 +362,7 @@ BaseServer::runThread( void* a ) {
     g_debugging = true;
   }
   if( p != NULL ) {
+    logger.error("calling doWork");
     p->doWork( threadID, socket );
     if( socket != NULL ) {
       p->doFinish( threadID, socket );

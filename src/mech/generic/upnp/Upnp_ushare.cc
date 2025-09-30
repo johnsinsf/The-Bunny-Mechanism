@@ -21,6 +21,9 @@ Upnp_ushare::main( DssObject& o ) {
   _dpsServer = o.server;
   semRespID = o.semRespID;
 
+  logger.error("have dispatch sem " + itoa(o.semDataID));
+  logger.error("have dispatch sem2 " + itoa(o.semRespID));
+
   if( i != o.server->configMap.end() && i->second == "on" ) {
     logger.error("ushare controlport found");
     startThread(true, 2);
@@ -39,7 +42,7 @@ Upnp_ushare::send_data( DssObject& o, string& msg ) {
   dataType d;
   d.structtype = 0;
   d.datatype   = 5;
-  d.localid    = o.localID;
+  d.localid    = o.localid;
   d.channel    = "ushare";
   d.synced     = 0;
   d.tries      = 0;
@@ -102,7 +105,7 @@ Upnp_ushare::doControl( int& threadID ) {
     nanosleep(&ts, NULL);
     int rc = _dpsServer->sems.semGet( semNum, offset, 0, 10 );
     if( rc == 0 ) { 
-      logger.error("received a signal, doing commands");
+      logger.error("ushare received a signal, doing commands");
       int commandrc = handleCommand( localId, localidsem, ip );
 #ifdef _HAVEMACOS
       logger.error("have macos command resp " + itoa(commandrc) + " signaling " + itoa(semRespID) );
@@ -135,6 +138,15 @@ Upnp_ushare::handleCommand( string localId, int localidsem, string ip ) {
 
       logger.error("found command " + I2->second.op + " cmd " + I2->second.yxc_cmd + " val " + I2->second.strval);
 
+      if( I2->second.op == "setpower" ) {
+        string req = "/YamahaExtendedControl/v1/" + I2->second.which + "/setPower?power=" + I2->second.direction;
+        string resp = sendCommand( req, ip );
+        I2->second.resp = resp;
+        I2->second.status = 2;
+        logger.error("have resp " + resp);
+        rc++;
+      }
+      else
       if( I2->second.op == "yxc" ) {
         string req = I2->second.yxc_cmd;
         string resp = sendCommand( req, ip );
@@ -167,6 +179,7 @@ Upnp_ushare::sendCommand( string req, string ip ) {
     LObj obj;
    
     string fetch, id;
+ // GET /echo/bunnyman/" + id + "?hop=30 HTTP/1.0\n
     if( fd >= 0 ) {
       fetch = "GET " +  req + " HTTP/1.0\n";
       fetch += "host: " + ip + "\n\n";

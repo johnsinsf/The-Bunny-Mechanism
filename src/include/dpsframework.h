@@ -89,7 +89,8 @@ typedef struct {
 using namespace std;
 
 std::string itoa( int i, int len = 0 );
-std::string ltoa( long i );
+//std::string ltoa( long i );
+std::string ltoa( long i, int len = 0 );
 std::string ftoa( float f );
 std::string ftoa( double f );
 std::string ftoa3( double f );
