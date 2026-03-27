@@ -1,9 +1,6 @@
 include ../make.inc
 
-CCFLAGS +=  -I../include -I. -I ../dpsio -I../baseServer -I../icomm $(XMLINC) 
-ifndef system_macos
-  CCFLAGS += -shared
-endif
+CCFLAGS += -shared -I../include -I. -I ../dpsio -I../baseServer -I../icomm $(XMLINC) 
 
 CXX = g++ $(CXX_WARN_FLAGS) $(CXX_INCLUDE)
 CC = gcc $(CXX_WARN_FLAGS) $(CXX_INCLUDE)

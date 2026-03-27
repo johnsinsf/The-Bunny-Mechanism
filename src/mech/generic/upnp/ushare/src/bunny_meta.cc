@@ -36,6 +36,7 @@
 
 #include "mime.h"
 #include "metadata.h"
+#include "bunny.h"
 #include "bunny_meta.h"
 #include "util_iconv.h"
 #include "content.h"
@@ -329,7 +330,7 @@ bunny_upnp_get_entry (struct ushare_t *ut, int id)
 {
   struct upnp_entry_lookup_t *res, entry_lookup;
 
-  log_verbose ("Bunny Looking for entry id %d\n", id);
+  log_verbose ("get entry Bunny Looking for entry id %d\n", id);
   if (id == 0) // We do not store the root (id 0) as it is not a child 
     return ut->root_entry;
 
@@ -418,15 +419,26 @@ bunny_upnp_get_entry (struct ushare_t *ut, int id)
   
         string bunny_server = ((struct upnp_entry_lookup_t *) res)->entry_ptr->servername;
         int bunny_server_port = 443;
-  
-        int fd = bunny_sock.openClient( bunny_server, bunny_server_port );
+        int x = bunny_server.find("/");
+        string server, serverdir;
+        if( x > 0 ) {
+          server = bunny_server.substr(0, x);
+          serverdir = bunny_server.substr(x, bunny_server.size() - x);
+        } else {
+          server = bunny_server;
+          serverdir = "/";
+        }
+ 
+        log_verbose("have server %s -  %s\n", server.c_str(), serverdir.c_str());
+
+        int fd = bunny_sock.openClient( server, bunny_server_port );
   
         log_verbose("have fd %d\n", fd);
   
         if( fd >= 0 ) {
           string test;
-          test = "GET /echo/bunnyman/" + string(((struct upnp_entry_lookup_t *) res)->entry_ptr->fullpath) + "?hop=30 HTTP/1.0\n";
-          test += "host: buuna.dwanta.com\n\n";
+          test = "GET " + serverdir + "/" + string(((struct upnp_entry_lookup_t *) res)->entry_ptr->fullpath) + "?hop=30 HTTP/1.0\n";
+          test += "host: " + server + "\n\n";
     
           log_verbose("using buf %s \n", test.c_str());
           bunny_sock.write(test.c_str(), test.size());
@@ -471,7 +483,7 @@ metadata_add_file (struct ushare_t *ut, struct upnp_entry_t *entry,
     return;
   }
   if( ut->verbose )
-    log_verbose ("filesize: %s\n", fsize);
+    log_verbose ("filesize: %s server %s\n", fsize, entry->servername);
 
 #ifdef HAVE_DLNA
   if (ut->dlna_enabled || is_valid_extension (getExtension (file)))
@@ -685,7 +697,7 @@ metadata_add_container (struct ushare_t *ut,
           namelist[n]->d_server = NULL;
         n++;
         if( ut->verbose )
-          log_verbose("added %s %s %s\n", t_name, t_alias, t_server);
+          log_verbose("added entry %s %s %s\n", t_name, t_alias, t_server);
         //sleep(10);
         free(t_name);
         free(t_size);
@@ -699,17 +711,22 @@ metadata_add_container (struct ushare_t *ut,
       }
     }
   }
+
+  //log_verbose("have %d entries, limiting to 500 for testing!\n", n);
+  //if( n > 500 ) n = 500;
+
   for( i = 0; i < n; i++ ) {
     char *fullpath = NULL;
     fullpath = (char *) malloc (strlen (container) + strlen (namelist[i]->d_name) + 2);
 
     sprintf (fullpath, "%s%s", container, namelist[i]->d_name);
     if( ut->verbose )
-      log_verbose ("fullpath: %s %s %s\n", fullpath, namelist[i]->d_alias, namelist[i]->d_server);
+      log_verbose ("fullpath2: %s %s %s\n", fullpath, namelist[i]->d_alias, namelist[i]->d_server);
 
     if ( namelist[i]->d_type == 1 ) { // a directory 
       struct upnp_entry_t *child = NULL;
 
+      entry->servername = namelist[i]->d_server;
       child = upnp_entry_new (ut, namelist[i]->d_name, namelist[i]->d_alias, namelist[i]->d_server, entry, 0, true);
 
       if (child) {
@@ -721,7 +738,8 @@ metadata_add_container (struct ushare_t *ut,
     }
     else {
       if( ut->verbose )
-        log_verbose ("add file %s %s, %d\n", namelist[i]->d_name, namelist[i]->d_alias, entry->id);
+        log_verbose ("add file %s %s, %s, %d\n", namelist[i]->d_name, namelist[i]->d_alias, namelist[i]->d_server, entry->id);
+      entry->servername = namelist[i]->d_server;
       metadata_add_file (ut, entry, namelist[i]->d_alias, namelist[i]->d_name, namelist[i]->d_size );
     }
 
@@ -786,12 +804,29 @@ build_bunny_metadata_list (struct ushare_t *ut) {
       log_verbose("have bunny server port %s\n", I->second.c_str());
       bunny_server_port = atoi(I->second.c_str());
     }
+    I = configMap.find("bunny_cache_enabled");
+    if( I != configMap.end() ) {
+      log_verbose("have bunny cache enabled %s\n", I->second.c_str());
+      if( I->second == "yes" )
+        bunny_cache_enabled = true;
+    }
+    I = configMap.find("bunny_cache_size");
+    if( I != configMap.end() ) {
+      log_verbose("have bunny cache size %s\n", I->second.c_str());
+      bunny_cache_size = atoi(I->second.c_str());
+    }
   }
   bool cacheOK = false;
 
   if( ut->use_cache ) {
-    string filename = INSTALLDIR + string("/cache/") + bunny_user;
-    log_info ("reading bunny user cache %s\n", filename.c_str());
+    int x = bunny_user.find_last_of("/");
+    string fname;
+    if( x > 0 )
+      fname = bunny_user.substr(x + 1, bunny_user.size() - x - 1);
+    else
+      fname = bunny_user;
+    string filename = INSTALLDIR + string("/cache/") + fname;
+    log_verbose ("reading bunny user cache %s\n", filename.c_str());
     int fd2 = open(filename.c_str(), O_RDONLY);
     struct stat st;
     int rc = fstat(fd2, &st);
@@ -817,8 +852,8 @@ build_bunny_metadata_list (struct ushare_t *ut) {
 
     if( fd >= 0 ) {
       string test;
-      test = "GET /echo/bunnyman/" + bunny_user + "?hop=30 HTTP/1.0\n";
-      test += "host: buuna.dwanta.com\n\n";
+      test = "GET " + bunny_user + "?hop=30 HTTP/1.0\n";
+      test += "host: " + bunny_server + "\n\n";
   
       log_verbose("using buf %s \n", test.c_str());
       bunny_sock.write(test.c_str(), test.size());
@@ -834,7 +869,13 @@ build_bunny_metadata_list (struct ushare_t *ut) {
       log_info("ixml rc is %d\n", rc);
 
       if( ut->use_cache && obj.packet.size() > MINCACHESIZE ) {
-        string filename = INSTALLDIR + string("/cache/") + bunny_user;
+        int x = bunny_user.find_last_of("/");
+        string fname;
+        if( x > 0 )
+          fname = bunny_user.substr(x + 1, bunny_user.size() - x - 1);
+        else
+          fname = bunny_user;
+        string filename = INSTALLDIR + string("/cache/") + fname;
         log_info("writing bunny user cache %s\n", filename.c_str()); 
         int fd2 = open(filename.c_str(), O_WRONLY|O_TRUNC|O_CREAT, S_IRWXU);
         if( fd2 >= 0 ) { 

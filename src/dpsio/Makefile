@@ -1,9 +1,6 @@
 include ../make.inc
 
-CCFLAGS +=  -I. -I../include  -I../icomm $(XMLINC) -I/usr/local/include/openssl -D_USEOLDSSL
-ifndef system_macos
-  CCFLAGS += -shared
-endif
+CCFLAGS += -shared -I. -I../include  -I../icomm $(XMLINC) -I/usr/local/include/openssl
 
 CXX = g++ $(CXX_WARN_FLAGS) $(CXX_INCLUDE)
 CC = gcc $(CXX_WARN_FLAGS) $(CXX_INCLUDE)

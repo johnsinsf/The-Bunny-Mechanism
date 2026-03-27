@@ -103,7 +103,7 @@ MechLJU3::main( DssObject& o ) {
 
   o.server->sems.getClientSem( o.localidsem, o.semNum, o.offset );
 
-  o.getInterface().setLocalID( o.localID );
+  o.getInterface().setLocalID( o.localid );
   o.getInterface().setHostname( o.hostname );
   o.getInterface().setDpsId   ( o.dpsid );
   o.getLog().setHostname( o.hostname );
@@ -113,7 +113,7 @@ MechLJU3::main( DssObject& o ) {
 
   while( ! g_quit ) {
 
-    hDevice = openUSBConnection( atoi(o.localID.c_str()) ); // numeric only?
+    hDevice = openUSBConnection( atoi(o.localid.c_str()) ); // numeric only?
 
     if( hDevice != NULL ) {
   
@@ -149,7 +149,7 @@ MechLJU3::main( DssObject& o ) {
         }
       }
       o.getChannel().setInterface( o.getInterface().getId() );
-      o.getChannel().setLocalId( o.localID );
+      o.getChannel().setLocalId( o.localid );
 
       logger.error("getting dpsids");
       o.dpsids = o.getChannel().getDpsIds( o.numdpsids ) ; // gets the channels to monitor for this interface
@@ -169,7 +169,7 @@ MechLJU3::main( DssObject& o ) {
       hDevice = NULL;
     }
     if( error != 0 ) {
-      string s = "MechLJU3 device error, trying again on localid " + o.localID;
+      string s = "MechLJU3 device error, trying again on localid " + o.localid;
       logger.error(s);
       time_t t = time(NULL);
       if( lastalert == 0 || (t - lastalert > 600)) {

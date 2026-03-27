@@ -258,7 +258,7 @@ Icomm::readField( SocketIO* socket, int id ) {
       bcdToStr( (unsigned char*)lbuf, 1, buf2 );
       memcpy( lbuf, buf2, sizeof( lbuf ) );
       char buf3[65];
-      snprintf(buf3, 65, "read %x %s", lbuf[0], buf2);
+      sprintf(buf3, "read %x %s", lbuf[0], buf2);
     }
     int s = atoi( lbuf );
     char buf[s + 1];
@@ -572,7 +572,7 @@ Icomm::read2( SocketIO* socket, int timeOut ) {
     logger.error( "bad read: " + itoa(len1) );
     return 0;
   }
-  snprintf( tbuf, 17, "%d %d", buf[0], buf[1] );
+  sprintf( tbuf, "%d %d", buf[0], buf[1] );
 
   addToLRC( buf, len1 );
   if( useBCD ) {
@@ -704,7 +704,7 @@ Icomm::setHeaderBCD( unsigned char* in, int which ) {
 
   bcdToStr( (unsigned char*)in, 8, buf );
 
-  snprintf( buf2, 256, "header %s", buf);
+  sprintf( buf2, "header %s", buf);
 
   if( which == 1 )
     header.reset();
@@ -823,7 +823,7 @@ Icomm::setHeader( char* in, int which ) {
     }
     else
     if( in[i] != '0' ) {
-      logger.error("setHeader bad char: " + itoa(in[i]) );
+      logger.error("setHeader bad char: " + in[i] );
       return false;
     }
   }
@@ -912,9 +912,9 @@ Icomm::printField( ostringstream& o, int id ) {
   }
   else
   if( field_def[id].type == short_length ) {
-    char buf[4];
+    char buf[3];
     int i = fields[id].length();
-    snprintf(buf, 4, "%.2d", i);
+    sprintf(buf, "%.2d", i);
     if(  useBCD ) {
       //logger.debug( "exporting bcd length " + string(buf) );
       unsigned char buf2[4];
@@ -929,9 +929,9 @@ Icomm::printField( ostringstream& o, int id ) {
   if( field_def[id].type == long_length ) {
     char buf[5];
     if( ! useBCD )
-      snprintf(buf, 5, "%.3d", (int)(fields[id].length()) );
+      sprintf(buf, "%.3d", (int)(fields[id].length()) );
     else
-      snprintf(buf, 5, "%.4d", (int)(fields[id].length()) );
+      sprintf(buf, "%.4d", (int)(fields[id].length()) );
     if(  useBCD ) {
       logger.debug( "exporting bcd long length " + string(buf) );
       unsigned char buf2[5];
@@ -946,9 +946,9 @@ Icomm::printField( ostringstream& o, int id ) {
   if( field_def[id].type == vlong_length ) {
     char buf[7];
     if( ! useBCD )
-      snprintf(buf, 7, "%.6d", (int)(fields[id].length()) );
+      sprintf(buf, "%.6d", (int)(fields[id].length()) );
     else
-      snprintf(buf, 7, "%.4d", (int)(fields[id].length()) );
+      sprintf(buf, "%.4d", (int)(fields[id].length()) );
     if(  useBCD ) {
       //logger.debug( "exporting bcd long length " + string(buf) );
       unsigned char buf2[5];
@@ -974,7 +974,7 @@ Icomm::print( ostringstream& o ) {
   if( messageType > 999 )
     return;
 
-  snprintf( buf, 17, "%.4d", messageType );
+  sprintf( buf, "%.4d", messageType );
 
   if( ! useBCD )
     o << buf;

@@ -37,15 +37,11 @@
 #define _DSSCLIENTVERSION "0.0.1"
 
 #define _TESTMSGINTERVAL 200
-#define _SIZELIMIT1 32000
-//#define _MAXDATASIZE 256000
-#define _MAXDATASIZE 128000
 
-//#define _SIZELIMIT1 2048000
-//#define _MAXDATASIZE 4096000
-
-//#define _SIZELIMIT1 512000
-//#define _MAXDATASIZE 1024000
+//#define SIZELIMIT1 512000
+//#define MAXDATASIZE 1024000
+#define SIZELIMIT1 5000000
+#define MAXDATASIZE 10000000
 
 typedef struct {
   int    structtype;
@@ -118,8 +114,15 @@ class DssObject {
       databasesync = false;
       send_data_alerts = false;
       localstorage = true;
-      memset(databuf,0,sizeof(databuf));
+      databuf = (char*)malloc(MAXDATASIZE);
+      memset(databuf,0,MAXDATASIZE);
     }
+    ~DssObject( void ) {
+      if(databuf)
+        free(databuf);
+      databuf = NULL;
+    }
+
     void setLocalId  ( string s ) { localid = s; }
     void setModel    ( string s ) { model = s; }
     void setHardware ( string s ) { hardware = s; }
@@ -192,7 +195,7 @@ class DssObject {
     int    signon_status;
     map<string, int> clientDataMap;
     string idx;
-    char        databuf[_MAXDATASIZE];
+    char        *databuf;
 
   protected:
     Channels_digital channel_digital;
@@ -208,6 +211,7 @@ class Mech : public BaseServer {
     Mech( void ) : BaseServer() { 
       clientDataIndex = 0;
       localrecid      = 0;
+      mylogctr = 0;
     }
     ~Mech( void ) {
     }
@@ -251,6 +255,7 @@ class Mech : public BaseServer {
     Mech* _dpsServer;
     DssSems sems;
     int localrecid;
+    int mylogctr;
     string dpsid;
 
     static pthread_mutex_t controlMutex;

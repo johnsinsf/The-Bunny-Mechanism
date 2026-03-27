@@ -25,6 +25,10 @@
 #ifndef _BUNNY_H_
 #define _BUNNY_H_
 
+const int BUNNYKEY = 0x18060000;
+const int BUNNYKEY2 = 0x18060001;
+const int BUNNYKEY3 = 0x18060002;
+
 #include <upnp/upnp.h>
 #include <upnp/upnptools.h>
 
@@ -40,6 +44,11 @@ UpnpWebFileHandle bunny_open (const char *filename, enum UpnpOpenFileMode mode,
 	const void* requestCookie __attribute__((unused)));
 
 int bunny_read (UpnpWebFileHandle fh, char *buf, size_t buflen,
+	const void* cookie __attribute__((unused)),
+	const void* requestCookie __attribute__((unused)));
+
+// caching version
+int bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
 	const void* cookie __attribute__((unused)),
 	const void* requestCookie __attribute__((unused)));
 
@@ -61,5 +70,14 @@ int bunny_server_connect(UpnpWebFileHandle fh);
 
 int readHeader( SocketIO* socket, LObj& lobj );
 int parseHeader( SocketIO* socket, LObj& lobj );
+void* bunny_cache_thread( void* a );
+
+extern unsigned int bunny_cache_sem;
+extern unsigned int bunny_cache_seminit;
+extern unsigned int bunny_cache_semdata;
+extern unsigned int bunny_cache_size;
+extern bool  bunny_cache_enabled;
+
+static char *getExtension (const char *filename);
 
 #endif /* _BUNNY_H_ */

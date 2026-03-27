@@ -103,7 +103,7 @@ System_auditd_macosx::send_data( DssObject& o, unsigned int msgid, unsigned int 
   dataType d;
   d.structtype = 0;
   d.datatype   = 4;
-  d.localid    = o.localID;
+  d.localid    = o.localid;
   d.channel    = "AUDITD";
   d.synced     = 0;
   d.tries      = 0;

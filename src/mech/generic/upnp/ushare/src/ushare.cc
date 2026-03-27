@@ -123,14 +123,14 @@ ushare_new (int argc, char **argv)
                    DLNA_ORG_FLAG_DLNA_V15;
 #endif /* HAVE_DLNA */
   ut->xbox360 = false;
-  ut->verbose = false;
+  ut->verbose = true;
   ut->daemon = false;
   ut->override_iconv_err = false;
 #ifdef USE_BUNNY
   ut->bunny = false;
   ut->use_cache = true;
   // define this to true to get more debugging
-  ut->verbose = false;
+  ut->verbose = true;
   ut->xml_doc = NULL;
   ut->dssObj = NULL;
 #endif
@@ -382,6 +382,58 @@ init_upnp (struct ushare_t *ut)
 
   if( ut->bunny ) {
     log_error (_("Using Bunny!\n"));  \
+
+    bunny_cache_seminit = semget( BUNNYKEY, 1, S_IRWXU );
+    if( bunny_cache_seminit )
+      semctl( bunny_cache_seminit, 0, IPC_RMID, 0 );
+
+    bunny_cache_seminit = semget( BUNNYKEY, 1, S_IRWXU | IPC_CREAT );
+  
+    if( bunny_cache_seminit == -1 ) {
+      log_verbose( "ERROR: cache semget" );
+      return -1; 
+    }
+
+    semctl( bunny_cache_seminit, 0, SETVAL, 0 );
+
+    bunny_cache_semdata = semget( BUNNYKEY2, 1, S_IRWXU );
+    if( bunny_cache_semdata )
+      semctl( bunny_cache_semdata, 0, IPC_RMID, 0 );
+
+    bunny_cache_semdata = semget( BUNNYKEY2, 1, S_IRWXU | IPC_CREAT );
+  
+    if( bunny_cache_semdata == -1 ) {
+      log_verbose( "ERROR: cache semget" );
+      return -1; 
+    }
+
+    semctl( bunny_cache_semdata, 0, SETVAL, 0 );
+
+    bunny_cache_sem = semget( BUNNYKEY3, 1, S_IRWXU );
+    if( bunny_cache_sem )
+      semctl( bunny_cache_sem, 0, IPC_RMID, 0 );
+
+    bunny_cache_sem = semget( BUNNYKEY3, 1, S_IRWXU | IPC_CREAT );
+  
+    if( bunny_cache_sem == -1 ) {
+      log_verbose( "ERROR: cache semget" );
+      return -1; 
+    }
+
+    semctl( bunny_cache_sem, 0, SETVAL, 0 );
+
+    pthread_t tp;
+    int a = 1;
+    int rc = pthread_create( &tp, NULL, bunny_cache_thread, &a);
+
+    struct sembuf semOp;
+    semOp.sem_num = 0;
+    semOp.sem_op  = -1;
+    semOp.sem_flg = 0;
+ 
+    // wait for cache to run
+    rc = semop( bunny_cache_seminit, &semOp, 1 );
+
     upnp_set_callback(GetInfo, bunny_get_info);
     upnp_set_callback(Open,    bunny_open);
     upnp_set_callback(Read,    bunny_read);
@@ -908,8 +960,8 @@ main (int argc, char **argv) {
 
 #ifdef USE_BUNNY
   ut->bunny   = true;
-  ut->verbose = false;
-  //ut->verbose = true;
+  //ut->verbose = false;
+  ut->verbose = true;
   ut->xbox360 = true;
   ut->dssObj = &o;
   ut->use_cache = true;

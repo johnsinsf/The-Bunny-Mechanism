@@ -7,10 +7,6 @@
 
 #ifdef _USELIBXML 
 
-//#include <fstream>
-#include <libxml++/libxml++.h>
-#include "dpsframework.h"
-
 typedef struct {
   int    nodeid;
   int    parentid;
@@ -32,6 +28,12 @@ class nodeCmp {
                              const ::eKey& ) const;
 };
 
+#ifndef _HAVEMACOS
+#include <libxml++/libxml++.h>
+#endif
+
+#include "dpsframework.h"
+
 class DssSaxParser : public xmlpp::SaxParser {
 public:
   DssSaxParser ();
@@ -50,6 +52,7 @@ public:
 protected:
   void on_start_document() override;
   void on_end_document() override;
+#ifndef _HAVEMACOS
   void on_start_element(const Glib::ustring& name,
                                 const AttributeList& properties) override;
   void on_end_element(const Glib::ustring& name) override;
@@ -58,6 +61,7 @@ protected:
   void on_warning(const Glib::ustring& text) override;
   void on_error(const Glib::ustring& text) override;
   void on_fatal_error(const Glib::ustring& text) override;
+#endif
 
   int  _nodeid;
   int  _levelid;

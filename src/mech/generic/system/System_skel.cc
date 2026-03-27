@@ -13,7 +13,7 @@ System_skel::send_data( DssObject& o, string& msg ) {
   dataType d;
   d.structtype = 0;
   d.datatype   = 5;
-  d.localid    = o.localID;
+  d.localid    = o.localid;
   d.channel    = "NOT SET";
   d.synced     = 0;
   d.tries      = 0;

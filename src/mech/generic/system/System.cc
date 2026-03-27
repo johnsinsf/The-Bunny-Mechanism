@@ -34,7 +34,7 @@ System::main( DssObject& o ) {
   if( o.hostname.size() == 0 )
     o.hostname= get_hostname();
 
-  logger.error("System main running now " + itoa(geteuid()) + " localid " + o.localID + " on " + o.hostname);
+  logger.error("System main running now sem " + itoa(o.localidsem) + " localid " + o.localid + " on " + o.hostname + " sem " + itoa(o.localidsem));
 
   int id = semget( INITKEY2 + _DpsServerNumber, 1, S_IRWXU );
   if( id )
@@ -52,7 +52,7 @@ System::main( DssObject& o ) {
 
   _dpsServer->sems.getClientSem( o.localidsem, o.semNum, o.offset );
 
-  o.getInterface().setLocalID( o.localID );
+  o.getInterface().setLocalID( o.localid );
   o.getInterface().setHostname( o.hostname );
   logger.error("running model " + o.model);
 

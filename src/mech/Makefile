@@ -20,11 +20,11 @@ all: $(OBJS)
 ifndef system_macos
 	g++ $(CCFLAGS) $(SRCS) -o bunnymech  ../baseServer/BaseServer.o
 else
-	g++ $(CCFLAGS) dssClient1.cc Mech.o ../baseServer/BaseServer.o $(DIR)/lib/libdpsio3.a $(DIR)/lib/libmydss3.a $(DIR)/lib/libicomm3.a -ldl -lm -lpthread /usr/local/lib/libssl.a /usr/local/lib/libcrypto.a /usr/local/lib/liblog4cpp.a -o bunnymech -Wl,-stack_size -Wl,3f00000
+	g++ $(CCFLAGS) dssClient1.cc Mech.o ../baseServer/BaseServer.o $(DIR)/lib/libdpsio3.a $(DIR)/lib/libmydss3.a $(DIR)/lib/libicomm3.a -ldl -lm -lpthread -lssl -lcrypto /usr/local/lib/liblog4cpp.a -o bunnymech -Wl,-stack_size -Wl,0x4FF0000
 endif
 
 Mech.o:
-	g++ $(CCFLAGS) -I/usr/local/include/openssl -fPIC -c Mech.cc
+	g++ $(CCFLAGS) -fPIC -c Mech.cc
 
 clean:
 	rm -f *.o *.so labjack/*.o labjack/*.so generic/system/*.o generic/system/*.so generic/dsp/*.o generic/dsp/*.so generic/upnp/*[.o,.so] generic/upnp/ushare/src/*[.o,.so] bunnymech 

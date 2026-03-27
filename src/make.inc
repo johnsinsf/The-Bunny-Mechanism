@@ -1,23 +1,22 @@
 #
-#  main.inc  -  variables for building the bunny mechanism
+#  main.inc  -  variables for building the dssClient 
 #
 
 #
 # set DIR to the installation directory
-# set SRC to the source directory
 #
-DIR = /Users/johns/bunnymech
-SRC = /Users/johns/bunnymech/src
+DIR = /bunnymech
+SRC = /bunnymech/src
 
 #
 # uncomment each interface type you want to build
 #
-#labjacku3 = yes
-#labjackt4 = yes
-#system_netlink = yes
-#system_auditd = yes
+labjacku3 = yes
+labjackt4 = yes
+system_netlink = yes
+system_auditd = yes
 system_host = yes
-system_macos  = yes
+#system_macos  = yes
 
 #
 # if you want to enable XML support, uncomment the following lines 
@@ -31,25 +30,25 @@ system_macos  = yes
 #
 # other specific build options
 #
+
 #use_mysql = yes
 use_files = yes
 use_json = yes
 use_transform = yes
-use_parenttgid = yes
+use_parenttgid = no
 
 
 #
 # set the flags to whatever you want to use for the build
 #
-#CCFLAGS = -Wall -g -O2 -fPIC -ansi -pedantic -DINSTALLDIR=\"$(DIR)\" -I/usr/include/mysql
-CCFLAGS = -g -O2 -fPIC -ansi -pedantic -DINSTALLDIR=\"$(DIR)\" -I/usr/include/mysql
+CCFLAGS = -Wall -g -fPIC -ansi -pedantic -DINSTALLDIR=\"$(DIR)\" -I/usr/include/mysql
 
-ifdef libxml 
+ifdef libxml
   CCFLAGS += -D_USELIBXML
 endif
 ifdef use_mysql
   CCFLAGS += -D_USEMYSQL
-  MYSQLLIBS = -L/usr/lib64 -L/usr/lib64/mysql -lmysqlclient_r
+  MYSQLLIBS = -L/usr/lib64 -lmysqlclient_r
   CCFLAGS += -std=c++11
 endif
 ifdef use_files
@@ -64,7 +63,7 @@ ifdef use_transform
   CCFLAGS += -std=c++11
 endif
 ifdef system_macos
-  CCFLAGS += -D_HAVEMACOS
+  CCFLAGS += -D_HAVEMACOS -D_USEOLDSSL
 endif
 ifdef use_parenttgid 
   CCFLAGS += -D_HAVEPARENTTGID

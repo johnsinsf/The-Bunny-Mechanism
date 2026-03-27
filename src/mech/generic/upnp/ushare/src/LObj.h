@@ -1,3 +1,6 @@
+#ifndef _LOBJ_H_
+#define _LOBJ_H_
+
 class LObj {
   public:
     LObj( void ) {
@@ -47,3 +50,4 @@ class LObj {
     string range;
   protected:
 };
+#endif

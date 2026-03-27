@@ -350,7 +350,7 @@ MechLJT4::main( DssObject& o ) {
 
   o.server->sems.getClientSem( o.localidsem, o.semNum, o.offset );
 
-  o.getInterface().setLocalID( o.localID );
+  o.getInterface().setLocalID( o.localid );
   o.getLog().setHostname( o.hostname );
 
   int interfaceFound = false;
@@ -361,7 +361,7 @@ MechLJT4::main( DssObject& o ) {
     if( o.ipaddress.size() )
       rc = LJM_Open(LJM_dtT4, LJM_ctTCP, o.ipaddress.c_str(), &hDevice);
     else
-      rc = LJM_Open(LJM_dtT4, 0, o.localID.c_str(), &hDevice);
+      rc = LJM_Open(LJM_dtT4, 0, o.localid.c_str(), &hDevice);
 
     logger.error("opened " + itoa(hDevice) + " " + itoa(rc));
 
@@ -405,7 +405,7 @@ MechLJT4::main( DssObject& o ) {
       }
       if( o.localstorage ) {
         o.getChannel().setInterface( o.getInterface().getId() );
-        o.getChannel().setLocalId( o.localID );
+        o.getChannel().setLocalId( o.localid );
         logger.error("t4 getting dpsids");
         o.dpsids = o.getChannel().getDpsIds( o.numdpsids ) ; // gets the channels to monitor for this interface
       } else {
@@ -425,7 +425,7 @@ MechLJT4::main( DssObject& o ) {
       hDevice = -1;
     }
     if( error != 0 ) {
-      string s = "MechLJT4 device error, trying again on localid " + o.localID;
+      string s = "MechLJT4 device error, trying again on localid " + o.localid;
       logger.error(s);
       time_t t = time(NULL);
       if( lastalert == 0 || (t - lastalert > 600)) {

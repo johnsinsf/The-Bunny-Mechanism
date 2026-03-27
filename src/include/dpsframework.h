@@ -26,6 +26,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <limits.h>
 #include <sys/stat.h>
 #include <sys/un.h>
 #include <sys/socket.h>
@@ -89,8 +90,9 @@ typedef struct {
 using namespace std;
 
 std::string itoa( int i, int len = 0 );
-//std::string ltoa( long i );
+//#ifndef _HAVEMACOS
 std::string ltoa( long i, int len = 0 );
+//#endif
 std::string ftoa( float f );
 std::string ftoa( double f );
 std::string ftoa3( double f );
@@ -111,8 +113,8 @@ int has_binary_data(const char* in, int len);
 int remove_binary_data(char* in, int len);
 
 bool check_plain( string& s );
-void dpsencode( const char *input, char* output, int insize );
-void dpsdecode( const char *input, char* output, int insize );
+void dpsencode( const char *input, char* output, long insize );
+void dpsdecode( const char *input, char* output, long insize );
 void* resetHandles ( void *h1, void* h2 );
 unsigned long pthreads_thread_id(void);
 void pthreads_locking_callback(int mode, int type, char *file, int line);

@@ -135,7 +135,7 @@ System_macosx::send_data( DssObject& o, string& msg ) {
   dataType d;
   d.structtype = 0;
   d.datatype   = 4;
-  d.localid    = o.localID;
+  d.localid    = o.localid;
   d.channel    = "STD";
   d.synced     = 0;
   d.tries      = 0;

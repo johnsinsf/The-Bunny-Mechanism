@@ -1191,17 +1191,21 @@ SocketIO::writePacket( const char* c, long len, bool useLRC, bool useLen ) {
   if( ! useLen ) {
     memcpy( (char*)&buf[1], c, len );
   } else {
+#ifdef _HAVEMACOS
     string lenbuf = ltoa(len,10);
+#else
+    string lenbuf = ltoa(len);
+#endif
     if( g_logLevel > 0 )
       logger.error("writePacket lenbuf1: " + lenbuf);
     memcpy( (char*)&buf[1], lenbuf.c_str(), 10 );
 
-    if( g_logLevel > 0 )
+    if( g_logLevel > 0 && g_debugging )
       logger.error("writePacket memcpy1 " + string((char*)&buf[1]) );
 
     memcpy( (char*)&buf[11], c, len );
 
-    if( g_logLevel > 0 )
+    if( g_logLevel > 0 && g_debugging )
       logger.error("writePacket memcpy2 " + string((char*)&buf[1]) );
 
     x = 11;

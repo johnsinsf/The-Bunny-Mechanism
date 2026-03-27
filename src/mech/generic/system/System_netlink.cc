@@ -48,23 +48,18 @@ System_netlink::main( DssObject& o ) {
   if( nl_sock > -1 ) {
     logger.error("System_netlink running on " + hostname);
     rc = set_proc_ev_listen( nl_sock, true );
-    logger.error("System_netlink listen " + itoa(rc));
   } else {
     logger.error("System_netlink failed on " + hostname);
   }
 
-  logger.error("System_netlink releasing semaphore");
   // signal we are ready 
   semRelease( o.semInitID );
 
   if( o.semRunID > 0 )
     semGet( o.semRunID );
 
-  logger.error("System_netlink got semaphore");
-
   if( rc > -1 ) {
     // loop on events
-    logger.error("System_netlink run");
     rc = run( nl_sock, o );
 
     // release socket listener
@@ -109,44 +104,6 @@ System_netlink::nl_connect() {
 
 int 
 System_netlink::set_proc_ev_listen(int nl_sock, bool enable) {
-    int rc;
-    struct __attribute__ ((aligned(NLMSG_ALIGNTO))) {
-        struct nlmsghdr nl_hdr;
-        struct __attribute__ ((__packed__)) {
-            struct cn_msg cn_msg;
-            //enum proc_cn_mcast_op cn_mcast;
-        };
-    } nlcn_msg;
-
-    memset(&nlcn_msg, 0, sizeof(nlcn_msg));
-    nlcn_msg.nl_hdr.nlmsg_len = sizeof(nlcn_msg);
-    nlcn_msg.nl_hdr.nlmsg_pid = getpid();
-    nlcn_msg.nl_hdr.nlmsg_type = NLMSG_DONE;
-
-    nlcn_msg.cn_msg.id.idx = CN_IDX_PROC;
-    nlcn_msg.cn_msg.id.val = CN_VAL_PROC;
-    nlcn_msg.cn_msg.len = sizeof(enum proc_cn_mcast_op);
-    nlcn_msg.cn_msg.seq = seq++;
-    nlcn_msg.cn_msg.ack = 0;
-
-    enum proc_cn_mcast_op cn_mcast;
-    cn_mcast = enable ? PROC_CN_MCAST_LISTEN : PROC_CN_MCAST_IGNORE;
-
-    rc = ::send(nl_sock, &nlcn_msg, sizeof(nlcn_msg), 0);
-    logger.error("set_proc_ev_listen " + itoa(rc));
-    rc += ::send(nl_sock, &cn_mcast, sizeof(cn_mcast), 0);
-    logger.error("set_proc_ev_listen2 " + itoa(rc));
-
-    if (rc == -1) {
-        perror("netlink send");
-        return -1;
-    }
-    return rc;
-}
-/*
-
-int 
-System_netlink::set_proc_ev_listen(int nl_sock, bool enable) {
 
   struct cn_msg *m;
 
@@ -166,7 +123,6 @@ System_netlink::set_proc_ev_listen(int nl_sock, bool enable) {
   
   return len;
 }
-*/
 
 int 
 System_netlink::run( int nl_sock, DssObject& o ) {
@@ -198,7 +154,6 @@ System_netlink::run( int nl_sock, DssObject& o ) {
   }
   while( ! done && ! g_quit ) {
     memset(buf, 0, sizeof(buf));
-    logger.error("System_netlink recv");
     rc = recv(nl_sock, buf, sizeof(buf), 0);
 
     if (rc == 0) {
@@ -437,7 +392,7 @@ System_netlink::send_data( DssObject& o, string& msg ) {
   dataType d;
   d.structtype = 0;
   d.datatype   = 4;
-  d.localid    = o.localID;
+  d.localid    = o.localid;
   d.channel    = "NETLINK";
   d.synced     = 0;
   d.tries      = 0;
