@@ -929,6 +929,7 @@ main (int argc, char **argv) {
     return EXIT_FAILURE;
 
 #ifdef USE_BUNNY
+  ut->installdir =  strdup(INSTALLDIR);
   if( o.server != NULL ) {
     map<string,string>::const_iterator I = o.server->configMap.find("loglevel");
     if( I != o.server->configMap.end() ) {
@@ -940,8 +941,12 @@ main (int argc, char **argv) {
       if( I->second == "no" )
         ut->use_cache = false;
     }
+    I = o.server->configMap.find("installdir");
+    if( I != o.server->configMap.end() ) {
+      ut->installdir = strdup(I->second.c_str());
+    }
   }
-  string p = string(INSTALLDIR) + string("/conf/ushare.conf");
+  string p = ut->installdir + string("/conf/ushare.conf");
   ut->cfg_file = strdup (p.c_str());
 #endif
   /* Parse args before cfg file, as we may override the default file */

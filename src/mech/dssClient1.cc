@@ -37,7 +37,7 @@ main( int argc, char *argv[] ) {
   Mech* c = new Mech();
 
   c->setTag(tag);
-  c->loadConfigMap(string(INSTALLDIR) + "/conf/dss.conf");
+  c->loadConfigMap(configFile);
 
   c->run();
 

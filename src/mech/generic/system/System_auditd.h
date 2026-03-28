@@ -21,7 +21,7 @@ class System_auditd : public System {
     virtual int  parse_msgid( string b, DssObject& o, int& msgid, bool& eoeFound );
     virtual int  parse_buf2( string b, int msgid );
     virtual void send_data ( DssObject& o, int msgid );
-    virtual void load_defines( void );
+    virtual void load_defines( DssObject& o );
 
     int currentmsgid;
     map<string, string> vals;

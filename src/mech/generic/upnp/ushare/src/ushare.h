@@ -139,6 +139,7 @@ struct ushare_t {
   DssObject* dssObj;
   bool bunny;
   bool use_cache;
+  char* installdir;
   IXML_Document* xml_doc;
 #endif
 };

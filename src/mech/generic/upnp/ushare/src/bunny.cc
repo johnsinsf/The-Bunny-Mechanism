@@ -572,7 +572,7 @@ bunny_open (const char *filename, enum UpnpOpenFileMode mode,
       readHeader( &bunny_sock, obj );
     }
     if( obj.packet.size() > 0 ) {
-      string logname = INSTALLDIR + string("/cache/playlog");
+      string logname = ut->installdir + string("/cache/playlog");
       log_verbose("writing to cache/playlog %s\n", logname.c_str());
 
       int fd2 = open(logname.c_str(), O_WRONLY|O_APPEND|O_CREAT, S_IRWXU);

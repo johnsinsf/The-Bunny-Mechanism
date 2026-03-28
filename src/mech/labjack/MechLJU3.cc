@@ -27,7 +27,17 @@ MechLJU3::readDeviceLoop( HANDLE hDevice, DssObject& o ) {
   int error = 0;
   int count = 0;
   u3CalibrationInfo caliInfo;
-  string filename = string(INSTALLDIR) + "/status/interface_reader-" + o.getLocalId();
+
+  typedef map<string,string>::const_iterator I;
+
+  I i = o.server->configMap.find("installdir");
+  string installdir = string(INSTALLDIR);
+
+  if( i != o.server->configMap.end() )  {
+    installdir = i->second;
+  }
+
+  string filename = installdir + "/status/interface_reader-" + o.getLocalId();
 
   error = dpsLJConf( hDevice, &isDAC1Enabled );
 

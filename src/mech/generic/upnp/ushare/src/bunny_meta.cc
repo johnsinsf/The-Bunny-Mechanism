@@ -396,7 +396,7 @@ bunny_upnp_get_entry (struct ushare_t *ut, int id)
       bool cacheOK = false;
 
       if( ut->use_cache ) {
-        string filename = INSTALLDIR + string("/cache/") + string(((struct upnp_entry_lookup_t *) res)->entry_ptr->fullpath);
+        string filename = ut->installdir + string("/cache/") + string(((struct upnp_entry_lookup_t *) res)->entry_ptr->fullpath);
         log_info("trying cache %s\n", filename.c_str());
         int fd2 = open(filename.c_str(), O_RDONLY);
         struct stat st;
@@ -453,7 +453,7 @@ bunny_upnp_get_entry (struct ushare_t *ut, int id)
           bunny_sock.doClose();
   
           if( ut->use_cache && obj.packet.size() > MINCACHESIZE ) {
-            string filename = INSTALLDIR + string("/cache/") + string(((struct upnp_entry_lookup_t *) res)->entry_ptr->fullpath);
+            string filename = ut->installdir + string("/cache/") + string(((struct upnp_entry_lookup_t *) res)->entry_ptr->fullpath);
             log_verbose("writing to cache %s\n", filename.c_str());
             int fd2 = open(filename.c_str(), O_WRONLY|O_TRUNC|O_CREAT, S_IRWXU);
             if( fd2 >= 0 ) { 
@@ -825,7 +825,7 @@ build_bunny_metadata_list (struct ushare_t *ut) {
       fname = bunny_user.substr(x + 1, bunny_user.size() - x - 1);
     else
       fname = bunny_user;
-    string filename = INSTALLDIR + string("/cache/") + fname;
+    string filename = ut->installdir + string("/cache/") + fname;
     log_verbose ("reading bunny user cache %s\n", filename.c_str());
     int fd2 = open(filename.c_str(), O_RDONLY);
     struct stat st;
@@ -875,7 +875,7 @@ build_bunny_metadata_list (struct ushare_t *ut) {
           fname = bunny_user.substr(x + 1, bunny_user.size() - x - 1);
         else
           fname = bunny_user;
-        string filename = INSTALLDIR + string("/cache/") + fname;
+        string filename = ut->installdir + string("/cache/") + fname;
         log_info("writing bunny user cache %s\n", filename.c_str()); 
         int fd2 = open(filename.c_str(), O_WRONLY|O_TRUNC|O_CREAT, S_IRWXU);
         if( fd2 >= 0 ) { 

@@ -34,7 +34,7 @@ System_auditd::main( DssObject& o ) {
   semRelease( o.semInitID );
 
   if( nl_sock > -1 ) {
-    load_defines();
+    load_defines( o );
     rc = run( nl_sock, o );
     close(nl_sock);
   }
@@ -540,7 +540,7 @@ System_auditd::parse_buf2( string buf, int msgid ) {
 }
 
 void
-System_auditd::load_defines( void ) {
+System_auditd::load_defines( DssObject& o ) {
   std::ifstream f1("/usr/include/linux/audit.h");
   std::stringstream buffer;
   buffer << f1.rdbuf();
@@ -562,7 +562,18 @@ System_auditd::load_defines( void ) {
       i = buffer.str().find("#define AUDIT_", k);
   }
 
-  string buf = string(INSTALLDIR) + "/includes/syscalls.x86_64";
+  typedef map<string,string>::const_iterator I;
+  string d;
+
+  I j = o.server->configMap.find("installdir");
+
+  string installdir = string(INSTALLDIR);
+
+  if( j != o.server->configMap.end() )  {
+    installdir = j->second;
+  }
+
+  string buf = installdir + "/includes/syscalls.x86_64";
   std::ifstream f2(buf.c_str());
   std::stringstream buffer2;
   buffer2 << f2.rdbuf();
@@ -584,7 +595,7 @@ System_auditd::load_defines( void ) {
     callvals64[key] = val;
   }
 
-  buf = string(INSTALLDIR) + "/includes/syscalls.i386";
+  buf = installdir + "/includes/syscalls.i386";
   std::ifstream f3(buf.c_str());
   std::stringstream buffer3;
   buffer3 << f3.rdbuf();

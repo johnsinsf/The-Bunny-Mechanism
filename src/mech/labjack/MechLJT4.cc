@@ -138,6 +138,15 @@ MechLJT4::readDeviceLoop( int hDevice, DssObject& o ) {
   o.semInitID = semget( INITKEY + _DpsServerNumber, 0, 0);
   o.semDataID = semget( DATAKEY + _DpsServerNumber, 0, 0);
 
+  typedef map<string,string>::const_iterator I;
+
+  I i = o.server->configMap.find("installdir");
+
+  string installdir = string(INSTALLDIR);
+  if( i != o.server->configMap.end() )  {
+    installdir = i->second;
+  }
+
   // prime the dpsids so we don't get alerts during startup
   error = dpsLJRead( hDevice, o );
   if( ! error )
@@ -182,7 +191,7 @@ MechLJT4::readDeviceLoop( int hDevice, DssObject& o ) {
         count = 0;
         string s = "worker " + o.getLocalId() + " is still running";
         logger.error("MechLJT4: " + s);
-        string filename = string(INSTALLDIR) + "/status/interface_reader-" + o.getLocalId();
+        string filename = installdir + "/status/interface_reader-" + o.getLocalId();
         utimes(filename.c_str(), NULL);
         if( o.localstorage ) {
           time_t now = time(NULL);
