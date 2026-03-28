@@ -1179,17 +1179,22 @@ SocketIO::write( int c ) {
 bool
 SocketIO::writePacket( const char* c, long len, bool useLRC, bool useLen ) {
 
-  char buf[len+14];
+  //char buf[len+14];
+  char* buf = (char*)malloc(len+14);
+  if( ! buf ) {
+    logger.error("failed to allocate buffer in writePacket");
+    return false;
+  }
+
   unsigned char lrc = 0;
-  //memset(buf, 0, sizeof(buf));
-  buf[len+13] = 0;
+  *(buf + len + 13) = 0;
 
   if( g_logLevel > 0 || len < 0 || len > 10000000 )
    logger.error("writePacket len1: " + ltoa(len));
 
   long x = 1;
   if( ! useLen ) {
-    memcpy( (char*)&buf[1], c, len );
+    memcpy( (char*)buf + 1, c, len );
   } else {
 #ifdef _HAVEMACOS
     string lenbuf = ltoa(len,10);
@@ -1198,15 +1203,12 @@ SocketIO::writePacket( const char* c, long len, bool useLRC, bool useLen ) {
 #endif
     if( g_logLevel > 0 )
       logger.error("writePacket lenbuf1: " + lenbuf);
-    memcpy( (char*)&buf[1], lenbuf.c_str(), 10 );
+    memcpy( (char*)(buf + 1), lenbuf.c_str(), 10 );
 
     if( g_logLevel > 0 && g_debugging )
-      logger.error("writePacket memcpy1 " + string((char*)&buf[1]) );
+      logger.error("writePacket memcpy1 " + string((char*)(buf + 1)) );
 
-    memcpy( (char*)&buf[11], c, len );
-
-    if( g_logLevel > 0 && g_debugging )
-      logger.error("writePacket memcpy2 " + string((char*)&buf[1]) );
+    memcpy( (char*)(buf + 11), c, len );
 
     x = 11;
   }
@@ -1217,18 +1219,23 @@ SocketIO::writePacket( const char* c, long len, bool useLRC, bool useLen ) {
 
     lrc ^= ETX;
   } 
-  buf[0]    = STX;
-  buf[len+x] = ETX;
-  buf[len+x+1] = lrc;
-  buf[len+x+2] = '\0';
+  *buf    = STX;
+  *(buf + len + x) = ETX;
+  *(buf + len + x + 1) = lrc;
+  *(buf + len + x + 2) = '\0';
 
   useLRC ? len += 3 : len += 2;
   if( useLen ) len += 10;
 
   if( g_logLevel > 0 )
     logger.error( "writingPacket: len: " + ltoa(len) );
- 
-  return write( buf, len );
+
+  bool rc = false; 
+  if( buf ) {
+    rc = write( buf, len );
+    free(buf);
+  } 
+  return rc;
 }
 
 bool
