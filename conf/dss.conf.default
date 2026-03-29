@@ -9,6 +9,8 @@ dssport = 22925
 
 hostname = 
 
+installdir = /Users/johns
+
 dsshost = 64.62.178.198
 dssport = 22925
 dssmode = remote
