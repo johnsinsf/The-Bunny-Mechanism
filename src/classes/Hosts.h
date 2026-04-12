@@ -11,9 +11,7 @@
 #ifndef __Hosts
 #define __Hosts
 
-//#include <string>
 #include "dpsframework.h"
-//#include "Log4.h"
 #include "SBase.h"
 
 class Hosts : public SBase {
@@ -29,19 +27,20 @@ class Hosts : public SBase {
     Hosts( unsigned int s ) : SBase() { 
       _dss_init();
     }
-    virtual ~Hosts( void ) {
+    ~Hosts( void ) {
     }
 
-    virtual void setSearch( int by );
-    virtual int  insert   ( int opt = 0 );
-    virtual void setStrings( void );
-    virtual void export_data_XML( string& s );
-    virtual void setVar1   ( string& s ) { var1 = s; }
-    virtual void setVar2   ( string& s ) { var2 = s; }
-    virtual void setVar3   ( string& s ) { var3 = s; }
-    virtual void setHostname( string& s ) { hostname = s; }
+    void setSearch( int by ) override;
+    int  insert   ( int opt = 0 ) override;
+    void setStrings( void ) override;
+
+    void export_data_XML( string& s );
+    void setVar1   ( string& s ) { var1 = s; }
+    void setVar2   ( string& s ) { var2 = s; }
+    void setVar3   ( string& s ) { var3 = s; }
+    void setHostname( string& s ) { hostname = s; }
 #ifdef _USELIBXML
-    virtual int  load( int nodeid, map<eKey, eData>::const_iterator& I, map<eKey, eData, class nodeCmp>& M );
+    int  load( int nodeid, map<eKey, eData>::const_iterator& I, map<eKey, eData, class nodeCmp>& M ) override;
 #endif
 
     bool     data_sent;

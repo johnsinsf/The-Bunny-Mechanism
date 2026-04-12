@@ -213,7 +213,8 @@ class Mech : public BaseServer {
       localrecid      = 0;
       mylogctr = 0;
     }
-    ~Mech( void ) {
+
+    virtual ~Mech( void ) {
     }
 
     virtual int  main( DssObject& o ) { return 0;}
@@ -246,7 +247,7 @@ class Mech : public BaseServer {
 #endif
 
     virtual int  doCommand       ( commType& c );
-    virtual void setServer       ( Mech* i ) { _dpsServer = i; }
+    //void setServer       ( Mech* i ) { _dpsServer = i; }
 
     multimap<string, commType> localidComm;
     map<int, dataType> clientData;

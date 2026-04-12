@@ -1164,9 +1164,10 @@ SocketIO::write( int c ) {
         return false;
       rc = SSL_write( ssl, &c, 1 );
     }
-  } else
-    rc = ::write( fd, &c, 1 );
-
+  } else {
+    if( fd >= 0 )
+      rc = ::write( fd, &c, 1 );
+  }
   if( rc != 1 ) {
     int myerr = errno;
     logger.error( "bad write client:" + itoa(rc) + " err: " + itoa(myerr) + " " + itoa(useSSL));

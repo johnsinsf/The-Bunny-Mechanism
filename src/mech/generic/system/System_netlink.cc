@@ -9,7 +9,7 @@
 
 #include "System_netlink.h"
 
-#define _XOPEN_SOURCE 700
+//#define _XOPEN_SOURCE 700
 
 // set this to divide exit code by 256
 #define __EXITCODEFIX 1

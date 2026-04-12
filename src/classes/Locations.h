@@ -11,9 +11,7 @@
 #ifndef __Locations
 #define __Locations
 
-//#include <string>
 #include "dpsframework.h"
-//#include "Log4.h"
 #include "SBase.h"
 
 class Locations : public SBase {
@@ -30,15 +28,16 @@ class Locations : public SBase {
     Locations( unsigned int s ) : SBase() { 
       _dss_init();
     }
-    virtual ~Locations( void ) {
+    ~Locations( void ) {
     }
 
-    virtual void setSearch( int by );
-    virtual int  insert   ( int opt = 0 );
-    virtual void setId    ( unsigned int i ) { id = i; }
-    virtual void setStrings( void );
+    void setSearch( int by ) override;
+    int  insert   ( int opt = 0 ) override;
+    void setStrings( void ) override;
+
+    void setId    ( unsigned int i ) { id = i; }
 #ifdef _USELIBXML
-    virtual int  load( int nodeid, map<eKey, eData>::const_iterator& I, map<eKey, eData, class nodeCmp>& M );
+    int  load( int nodeid, map<eKey, eData>::const_iterator& I, map<eKey, eData, class nodeCmp>& M ) override;
 #endif
 
   private:

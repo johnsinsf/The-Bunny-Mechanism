@@ -78,6 +78,6 @@ extern unsigned int bunny_cache_semdata;
 extern unsigned int bunny_cache_size;
 extern bool  bunny_cache_enabled;
 
-static char *getExtension (const char *filename);
+//static char *getExtension (const char *filename);
 
 #endif /* _BUNNY_H_ */

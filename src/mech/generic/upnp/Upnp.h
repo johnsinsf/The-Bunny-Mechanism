@@ -8,10 +8,10 @@ class Upnp : public Mech {
   public:
     Upnp( void ) : Mech() { 
     }
-    ~Upnp( void ) {
+    virtual ~Upnp( void ) {
     };
 
-    virtual int  main( DssObject& o );
+    virtual int  main( DssObject& o ) override;
 
     static const  key_t  INITKEY2;
 

@@ -12,10 +12,10 @@ class System_skel : public System {
     ~System_skel( void ) {
     };
 
-    virtual int  main ( DssObject& o );
+    int  main ( DssObject& o ) override;
 
   private:
-    virtual void send_data( DssObject& o, string& msg );
+    void send_data( DssObject& o, string& msg );
 
     int msgid;
 };

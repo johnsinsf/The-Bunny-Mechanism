@@ -25,5 +25,8 @@ make install
 cd  ../upnp
 make
 make install
+cd ushare/src
+make
+make install
 
 echo "done!"

@@ -17,7 +17,7 @@ class System_netlink : public System {
     ~System_netlink( void ) {
     };
 
-    virtual int  main ( DssObject& o );
+    int  main ( DssObject& o ) override;
 
     typedef struct {
       string exe;
@@ -27,14 +27,14 @@ class System_netlink : public System {
     } procvaltype;
 
   private:
-    virtual int  nl_connect();
-    virtual int  run      ( int sock, DssObject& o );
-    virtual void send_data( DssObject& o, string& msg );
-    virtual procvaltype read_proc_entry( int pid );
+    int  run      ( int sock, DssObject& o ) override;
+    int  nl_connect();
+    void send_data( DssObject& o, string& msg );
+    procvaltype read_proc_entry( int pid );
 
-    virtual int set_proc_ev_listen( int sock, bool flag );
-    virtual void get_proc_vals  ( int ppid, int pid, string& msg, bool& sendData );
-    virtual int netlink_send( int s, struct cn_msg *msg );
+    int set_proc_ev_listen( int sock, bool flag );
+    void get_proc_vals  ( int ppid, int pid, string& msg, bool& sendData );
+    int netlink_send( int s, struct cn_msg *msg );
 
     char fbuf2[MAXFILENAME];
     char fbuf3[MAXFILENAME];

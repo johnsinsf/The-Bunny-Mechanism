@@ -21,15 +21,15 @@ class System_host : public System {
     ~System_host( void ) {
     };
 
-    virtual int  main ( DssObject& o );
+    int  main ( DssObject& o ) override;
 
   private:
-    virtual void load_config( DssObject& o );
-    virtual void run        ( DssObject& o );
-    virtual void send_data  ( DssObject& o, const string& msg );
-    virtual int read_proc_entry(int pid, int opt);
-    virtual void load_processes ( void );
-    virtual int check_process ( string p );
+    void run        ( DssObject& o ) override;
+    void load_config( DssObject& o );
+    void send_data  ( DssObject& o, const string& msg );
+    int read_proc_entry(int pid, int opt);
+    void load_processes ( void );
+    int check_process ( string p );
 
     int    msgid;
     int    load_warn;

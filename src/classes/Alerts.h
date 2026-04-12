@@ -11,9 +11,7 @@
 #ifndef __Alerts
 #define __Alerts
 
-//#include <string>
 #include "dpsframework.h"
-//#include "Log4.h"
 #include "SBase.h"
 
 class Alerts : public SBase {
@@ -28,21 +26,22 @@ class Alerts : public SBase {
     Alerts( unsigned int s ) : SBase() { 
       _dss_init();
     }
-    virtual ~Alerts( void ) {
+    ~Alerts( void ) {
     }
 
-    virtual void setSearch( int by );
-    virtual int  insert   ( int opt = 0 );
-    virtual void setStrings( void );
-    virtual void export_data_XML( string& s );
-    virtual void setAlertMsg( string s ) { alertmsg = s; }
-    virtual void setHostname( string s ) { hostname = s; }
-    virtual void setSource  ( string s ) { source = s; }
-    virtual void setList    ( string s ) { list = s; }
-    virtual void setPriority( int i )    { priority = i; }
-    virtual void setDateTime( time_t t ) { datetime = t; }
+    void setSearch( int by ) override;
+    int  insert   ( int opt = 0 ) override;
+    void setStrings( void ) override;
+
+    void export_data_XML( string& s );
+    void setAlertMsg( string s ) { alertmsg = s; }
+    void setHostname( string s ) { hostname = s; }
+    void setSource  ( string s ) { source = s; }
+    void setList    ( string s ) { list = s; }
+    void setPriority( int i )    { priority = i; }
+    void setDateTime( time_t t ) { datetime = t; }
 #ifdef _USELIBXML
-    virtual int  load( int nodeid, map<eKey, eData>::const_iterator& I, map<eKey, eData, class nodeCmp>& M );
+    int  load( int nodeid, map<eKey, eData>::const_iterator& I, map<eKey, eData, class nodeCmp>& M ) override;
 #endif
 
     bool     data_sent;

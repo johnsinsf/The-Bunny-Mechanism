@@ -11,10 +11,7 @@
 #ifndef __Logs
 #define __Logs
 
-//#include <string>
-//#include <stack>
 #include "dpsframework.h"
-//#include "Log4.h"
 #include "SBase.h"
 
 class Logs : public SBase {
@@ -38,32 +35,33 @@ class Logs : public SBase {
       _dss_init();
       id = i;
     }
-    virtual ~Logs( void ) {
+    ~Logs( void ) {
     }
 
-    virtual void setSearch ( int by );
-    virtual int  insert    ( int opt = 0 );
-    virtual void setId     ( unsigned int i ) { id = i; }
-    virtual int  saveData  ( dpsID* ptr, long id, string& s);
-    virtual void setStrings( void );
-    virtual void setData   ( string& s ) { data = s; }
-    virtual void setDpsId  ( string& s ) { dpsid = s; }
-    virtual void setHostname( string& s ) { myhostname = s; }
-    virtual void setType   ( int i ) { type = i; }
-    virtual int  setClean  ( void );
+    void setSearch ( int by ) override;
+    int  insert    ( int opt = 0 ) override;
+    void setStrings( void ) override;
 
-    virtual unsigned int getId       ( void ) { return id; }
-    virtual unsigned int getType     ( void ) { return type; }
-    virtual unsigned int getInterface( void ) { return interface; }
-    virtual string       getLocalId  ( void ) { return localid; }
-    virtual string       getChannel  ( void ) { return channel; }
-    virtual string       getHostname ( void ) { return myhostname; }
-    virtual string       getDpsId    ( void ) { return dpsid; }
-    virtual unsigned int isDirty     ( void ) { return ! syncIDs.empty(); }
-    virtual time_t       getDateTime ( void ) { return datetime; }
-    virtual string&      getData     ( void ) { return data; }
-    virtual void         serialOut   ( string& s );
-    virtual void         export_data_XML( string& s);
+    void setId     ( unsigned int i ) { id = i; }
+    int  saveData  ( dpsID* ptr, long id, string& s);
+    void setData   ( string& s ) { data = s; }
+    void setDpsId  ( string& s ) { dpsid = s; }
+    void setHostname( string& s ) { myhostname = s; }
+    void setType   ( int i ) { type = i; }
+    int  setClean  ( void );
+
+    unsigned int getId       ( void ) { return id; }
+    unsigned int getType     ( void ) { return type; }
+    unsigned int getInterface( void ) { return interface; }
+    string       getLocalId  ( void ) { return localid; }
+    string       getChannel  ( void ) { return channel; }
+    string       getHostname ( void ) { return myhostname; }
+    string       getDpsId    ( void ) { return dpsid; }
+    unsigned int isDirty     ( void ) { return ! syncIDs.empty(); }
+    time_t       getDateTime ( void ) { return datetime; }
+    string&      getData     ( void ) { return data; }
+    void         serialOut   ( string& s );
+    void         export_data_XML( string& s);
 
   private:
     unsigned int  id;

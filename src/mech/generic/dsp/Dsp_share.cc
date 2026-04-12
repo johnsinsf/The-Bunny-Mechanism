@@ -63,13 +63,13 @@ Dsp_share::share_main( DssObject& o ) {
 
   logger.error("share_main " + sharedir + req);
 
-  int cnt = 0;
+  //int cnt = 0;
 
   char logname[128];
   struct tm t;
   time_t now = time(NULL);
   localtime_r( &now, &t );
-  strftime( logname, sizeof(logname), "%Y%m%d%H%i%s", &t );
+  strftime( logname, sizeof(logname), "%Y%m%d%H%s", &t );
 
   i = o.server->configMap.find("installdir");
 
@@ -81,11 +81,16 @@ Dsp_share::share_main( DssObject& o ) {
 
   string fname = installdir + "/logfiles/" + logname;
 
-  int fd = open( fname.c_str(), O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU );
   int rc = -1;
+  int fd = open( fname.c_str(), O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU );
 
-  if( fd != -1 )
+  if( fd != -1 ) {
     rc = create_dirents_file( sharedir, fd );
+    if( rc != 1 ) {
+      logger.error("error in crate_dirents_file " + itoa(rc));
+      return -1;
+    }
+  }
 
   struct stat sb1, sb2;
   
@@ -192,7 +197,7 @@ Dsp_share::share_main( DssObject& o ) {
           if( g_Debugging )
             logger.error("pushing add dir entry " + s);
           string m;
-          for( int i = 0; i < x - dirs.size(); i++ ) m += " ";
+          for( int i = 0; i < x - (int)(dirs.size()); i++ ) m += " ";
           char buf[80 + s.size() * 2];
           memset(&buf, 0, sizeof(buf));
           dpsencode( s.c_str(), buf, s.size() );
@@ -440,7 +445,7 @@ Dsp_share::create_dirents_file( string dir_in, int fd ) {
   struct dirent **namelist;
   struct stat statbuf;
   int rc = 0;
-  int n;
+  //int n;
   int index = 0;
   int level = 0;
 
@@ -505,7 +510,7 @@ Dsp_share::mapdirs( string s, map<int, string> &m ) {
     y = x + 1;
     x = s.find('/', y);
   }
-  if( y < s.size() ) {
+  if( y < (int)(s.size()) ) {
     string s2 = s.substr(y, s.size() - y);
     m[idx] = s2;
   }
@@ -555,7 +560,7 @@ Dsp_share::get_dirents( string infilename, string sharedir, int maxResp, bool& m
       if( g_Debugging )
         logger.error("stripped s is " + s + " sharedir " + sharedir);
       int level = 0;
-      for( int i = sharedir.size(); i < strlen(line); i++ )
+      for( long unsigned int i = sharedir.size(); i < strlen(line); i++ )
         if( line[i] == '/' ) level++;
       int x = s.find_last_of("/");
       if( x > 0 ) {
@@ -610,7 +615,7 @@ Dsp_share::get_dirents( string infilename, string sharedir, int maxResp, bool& m
           if( g_Debugging )
             logger.error("currmap " + itoa(currmap.size()) + " s1 " + s1 + " s2 " + s2);
 
-          if( x < currmap.size() &&  s1 != s2 ) {
+          if( x < (int)(currmap.size()) &&  s1 != s2 ) {
             rc = stat( (sharedir + "/" + currdir).c_str(), &statbuf ); 
             if( g_Debugging )
               logger.error("statting dir " + sharedir + "/" + currdir + " rc " + itoa(rc));
@@ -637,12 +642,12 @@ Dsp_share::get_dirents( string infilename, string sharedir, int maxResp, bool& m
             }
           }
           x++;
-          if( x > currmap.size() ) done2 = true;
+          if( x > (int)(currmap.size()) ) done2 = true;
         }
         //logger.error("done");
         prevdir = currdir;
       }
-      if( ! infile.eof() && s.size() <= 255 && out.size() < maxResp ) {
+      if( ! infile.eof() && s.size() <= 255 && (int)(out.size()) < maxResp ) {
         index++;
         if( g_Debugging )
           logger.error("statting file " + string(line) + " s " + s);
@@ -670,7 +675,7 @@ Dsp_share::get_dirents( string infilename, string sharedir, int maxResp, bool& m
         }
       }
     }
-    if( out.size() >= maxResp ) {
+    if( (int)(out.size()) >= maxResp ) {
       done = true;
       end = line;
       moreData = true;
@@ -680,7 +685,7 @@ Dsp_share::get_dirents( string infilename, string sharedir, int maxResp, bool& m
   }
   map<int, string> currmap;
   mapdirs( currdir, currmap );
-  typedef map<int, string>::const_iterator I;
+  //typedef map<int, string>::const_iterator I;
   for( int i = currmap.size(); i > 0; i-- ) {
     string m;
     for( int j = 0; j <  i + 3; j++ ) m += " ";
@@ -727,7 +732,7 @@ Dsp_share::getFile( string &resp, string &respheader, string req, int maxResp, s
   resp = "";
   respheader = "";
   string type, op, which, localid, token, reqid, authcode; 
-  int offset = 0, maxlen = 0, stan = 0;
+  int offset = 0, maxlen = 0;
 
 #ifdef _USEJSON
   char* endptr = NULL;
@@ -762,9 +767,9 @@ Dsp_share::getFile( string &resp, string &respheader, string req, int maxResp, s
           //logger.error("number " + type + " " + to_string(n));
           if( type == "offset" )
             offset = n;
-          else
-          if( type == "stan" )
-            stan = n;
+          //else
+          //if( type == "stan" )
+            //stan = n;
           else
           if( type == "len" )
             maxlen = n;
@@ -819,20 +824,20 @@ Dsp_share::getFile( string &resp, string &respheader, string req, int maxResp, s
         rc2 = lseek( fd, off, SEEK_SET );
         if( g_Debugging )
           logger.error("seek " + filename + " " + to_string(rc2) + " max " + itoa(maxlen) + " maxResp " + itoa(maxResp));
-        if( rc2 == off ) {
+        if( rc2 == (int)off ) {
           s -= off;
         } else {
           logger.error("seek failed!");
           rc2 = -1;
         }
       }
-      if( s > maxResp ) s = maxResp;
+      if( (int)s > maxResp ) s = maxResp;
       if( rc2 >= 0 )
         //rc2 = read( fd, &buf, s );
         rc2 = read( fd, buf, s );
       //if( g_Debugging )
         logger.error("read " + filename + " " + to_string(rc2) + " " + to_string(s));
-      if( rc2 >= 0 && rc2 == s ) {
+      if( rc2 >= 0 && rc2 == (int)s ) {
         resp = string(buf, rc2);
         rc = 0;
       } else {

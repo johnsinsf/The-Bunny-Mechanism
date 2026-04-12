@@ -2,12 +2,6 @@
 #include "dpsframework.h"
 #include "Channel_types.h"
 
-int
-Channel_types::insert( void ) {
-
-  return 0;
-}
-
 void
 Channel_types::setSearch( int by ) {
   switch( by ) {

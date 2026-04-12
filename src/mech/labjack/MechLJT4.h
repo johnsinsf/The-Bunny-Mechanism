@@ -11,10 +11,10 @@ class MechLJT4 : public MechLJ {
   public:
     MechLJT4( void ) : MechLJ() { 
     }
-    ~MechLJT4( void ) {
+    virtual ~MechLJT4( void ) {
     };
 
-    virtual int  main ( DssObject& o );
+    int  main ( DssObject& o ) override;
 
   private:
     virtual int  readDeviceLoop ( int hDevice, DssObject& o );

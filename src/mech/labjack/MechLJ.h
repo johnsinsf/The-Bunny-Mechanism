@@ -10,7 +10,7 @@ class MechLJ : public Mech {
   public:
     MechLJ( void ) : Mech() { 
     }
-    ~MechLJ( void ) {
+    virtual ~MechLJ( void ) {
     };
 
     virtual void processDeviceData( DssObject& o, bool opt = true );

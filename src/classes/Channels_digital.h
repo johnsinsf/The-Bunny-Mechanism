@@ -11,9 +11,7 @@
 #ifndef __Channels_digital
 #define __Channels_digital
 
-//#include <string>
 #include "dpsframework.h"
-//#include "Log4.h"
 #include "Interfaces.h"
 #include "Channels.h"
 
@@ -36,29 +34,27 @@ class Channels_digital : public Channels {
       id = i;
       _dss_init();
     }
-    virtual ~Channels_digital( void ) {
+    ~Channels_digital( void ) {
     }
 
-    virtual void setSearch( int by );
-    virtual int  insert   ( int opt = 0 );
-    virtual void saveData ( dpsID* ptr, int i, Interfaces& f );
-    virtual void setId    ( unsigned int i ) { id = i; }
-    virtual void setStrings( void );
-    virtual void setStatus( int i ) {current_status = i;}
-#ifdef _USELIBXML
-    virtual int  load     ( int nodeid, map<eKey, eData>::const_iterator& I, map<eKey, eData, class nodeCmp>& M );
-#endif
-    virtual bool isDirty  ( void ) { return ! syncIDs.empty(); }
-    virtual int  setClean ( void );
-    virtual void export_data_XML( string& s );
+    void setSearch( int by ) override;
+    int  insert   ( int opt = 0 ) override;
+    void setStrings( void ) override;
 
-    virtual int  getId        ( void ) { return id; }
-    virtual int  getStatus    ( void ) { return current_status; }
-    virtual time_t        getUpdated   ( void ) { return updated; }
-    virtual time_t        getContacted ( void ) { return contacted; }
-    virtual unsigned int  getOpenCount ( void ) { return open_count; }
-    virtual unsigned int  getLastOpen  ( void ) { return last_open; }
-    virtual unsigned int  getLastClose ( void ) { return last_close; }
+    void saveData ( dpsID* ptr, int i, Interfaces& f ) override;
+
+    void setStatus( int i ) {current_status = i;}
+#ifdef _USELIBXML
+    int  load     ( int nodeid, map<eKey, eData>::const_iterator& I, map<eKey, eData, class nodeCmp>& M ) override;
+#endif
+    int  setClean ( void ) override;
+    void export_data_XML( string& s ) override;
+
+    int  getStatus    ( void ) { return current_status; }
+    time_t        getContacted ( void ) { return contacted; }
+    unsigned int  getOpenCount ( void ) { return open_count; }
+    unsigned int  getLastOpen  ( void ) { return last_open; }
+    unsigned int  getLastClose ( void ) { return last_close; }
 
   private:
     unsigned int  id;

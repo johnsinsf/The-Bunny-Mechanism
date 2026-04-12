@@ -11,9 +11,7 @@
 #ifndef __Channels
 #define __Channels
 
-//#include <string>
 #include "dpsframework.h"
-//#include "Log4.h"
 #include "SBase.h"
 #include "Interfaces.h"
 
@@ -49,8 +47,10 @@ class Channels : public SBase {
       int direction;
     } ctstruct;
 
-    virtual void setSearch( int by );
-    virtual int  insert   ( int opt = 0 );
+    virtual void setSearch( int by ) override;
+    virtual int  insert   ( int opt = 0 ) override;
+    virtual void setStrings( void ) override;
+
     virtual void saveData ( dpsID* ptr, int i, Interfaces& f );
     virtual void setId    ( unsigned int i ) { id = i; }
     virtual void setInterface( unsigned int i ) { interface = i; }
@@ -60,9 +60,8 @@ class Channels : public SBase {
     virtual void setType     ( int i )    { type = i; }
     virtual void setActive   ( int i )    { active = i; }
     virtual void setDirection( int i )    { direction = i; }
-    virtual void setStrings( void );
 #ifdef _USELIBXML
-    virtual int  load     ( int nodeid, map<eKey, eData>::const_iterator& I, map<eKey, eData, class nodeCmp>& M );
+    virtual int  load     ( int nodeid, map<eKey, eData>::const_iterator& I, map<eKey, eData, class nodeCmp>& M ) override;
 #endif
     virtual bool isDirty  ( void ) { return ! syncIDs.empty(); }
     virtual int  setClean ( void );

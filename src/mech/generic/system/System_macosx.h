@@ -98,15 +98,15 @@ class System_macosx : public System {
     ~System_macosx( void ) {
     };
 
-    virtual int  main ( DssObject& o );
+    int  main ( DssObject& o ) override;
 
   private:
-    virtual int  run      ( int sock, DssObject& o );
-    virtual void send_data( DssObject& o, string& msg );
-    virtual int  socketfilter_connect();
-    virtual string parse_buf( void );
+    int  run      ( int sock, DssObject& o ) override;
+    void send_data( DssObject& o, string& msg );
+    int  socketfilter_connect();
+    string parse_buf( void );
 
-    virtual void   get_hostname   ( void );
+    void   get_hostname   ( void );
 
     string hostname;
     int    msgid;

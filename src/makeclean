@@ -8,3 +8,10 @@ cd ../classes
 make clean
 cd ../mech
 make clean
+cd generic/system
+make clean
+cd ../upnp
+make clean
+cd ../dsp
+make clean
+

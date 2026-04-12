@@ -21,6 +21,7 @@
 
 class Site;
 class Device;
+class DssObject;
 
 class BaseServer {
 
@@ -107,10 +108,14 @@ class BaseServer {
     static void* runControlThread2( void* a );
     static void* runControlThread3( void* a );
 
-    virtual void run     ( int port, int port2, int port3, bool useSSL = false, bool certReq = false, int euid = 0, int egid = 0 ) {};
-    virtual void run     ( int port, int port2, bool useSSL = false, bool certReq = false, int euid = 0, int egid = 0 ) {};
+    //virtual void run     ( int port, int port2, int port3, bool useSSL = false, bool certReq = false, int euid = 0, int egid = 0 ) {};
+    //virtual void run     ( int port, int port2, bool useSSL = false, bool certReq = false, int euid = 0, int egid = 0 ) {};
     virtual void run     ( int fd, bool useSSL = false, bool certReq = false, int euid = 0, int egid = 0 );
+
     virtual void run     ( void );
+    virtual void run     ( DssObject& o ) {}
+    virtual int  run     ( int i, DssObject& o ) { return -1; }
+
     virtual void runTest ( void );
     virtual void setSeed ( int s ) { mySeed = s; };
     virtual void setTag  ( string s ) { tag = s; };

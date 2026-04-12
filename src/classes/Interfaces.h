@@ -11,10 +11,8 @@
 #ifndef __Interfaces
 #define __Interfaces
 
-//#include <string>
 #include <stack>
 #include "dpsframework.h"
-//#include "Log4.h"
 #include "SBase.h"
 
 class Interfaces : public SBase {
@@ -38,39 +36,40 @@ class Interfaces : public SBase {
       _dss_init();
       id = i;
     }
-    virtual ~Interfaces( void ) {
+    ~Interfaces( void ) {
     }
 
-    virtual void   setSearch ( int by );
-    virtual int    insert    ( int opt = 0 );
-    virtual void   setId     ( unsigned int i ) { id = i; }
-    virtual void   setStrings( void );
-    virtual void   setHostname( string s )  { hostname = s; }
-    virtual void   setDpsId   ( string s )  { dpsid = s; }
-    virtual void   setLocalID( string s )   { localid = s; }
-    virtual void   setContacted( time_t t ) { contacted = t; }
-    virtual void   setActive   ( int i )    { active = i; }
-    virtual void   setType     ( int i )    { type = i; }
+    void   setSearch ( int by ) override;
+    int    insert    ( int opt = 0 ) override;
+    void   setStrings( void ) override;
 
-    virtual unsigned int getId( void ) { return id; }
-    virtual string   getDescription( void ) { return description; }
-    virtual string   getSerialNo   ( void ) { return serialno; }
-    virtual unsigned int getType   ( void ) { return type; }
-    virtual time_t  getActive   ( void ) { return active; }
-    virtual time_t  getContacted( void ) { return contacted; }
-    virtual time_t  getDateTime( void ) { return updated; }
-    virtual time_t  getSynced  ( void ) { return synced; }
-    virtual string  getLocalId ( void ) { return localid; }
-    virtual string  getHostname( void ) { return hostname; }
-    virtual string  getDpsId   ( void ) { return dpsid; }
-    virtual bool    isDirty    ( void ) { return ! syncIDs.empty(); }
+    void   setId     ( unsigned int i ) { id = i; }
+    void   setHostname( string s )  { hostname = s; }
+    void   setDpsId   ( string s )  { dpsid = s; }
+    void   setLocalID( string s )   { localid = s; }
+    void   setContacted( time_t t ) { contacted = t; }
+    void   setActive   ( int i )    { active = i; }
+    void   setType     ( int i )    { type = i; }
+
+    unsigned int getId( void ) { return id; }
+    string   getDescription( void ) { return description; }
+    string   getSerialNo   ( void ) { return serialno; }
+    unsigned int getType   ( void ) { return type; }
+    time_t  getActive   ( void ) { return active; }
+    time_t  getContacted( void ) { return contacted; }
+    time_t  getDateTime( void ) { return updated; }
+    time_t  getSynced  ( void ) { return synced; }
+    string  getLocalId ( void ) { return localid; }
+    string  getHostname( void ) { return hostname; }
+    string  getDpsId   ( void ) { return dpsid; }
+    bool    isDirty    ( void ) { return ! syncIDs.empty(); }
 #ifdef _USELIBXML
-    virtual int     load( int nodeid, map<eKey,eData>::const_iterator& I, map<eKey, eData, class nodeCmp>& M );
+    int     load( int nodeid, map<eKey,eData>::const_iterator& I, map<eKey, eData, class nodeCmp>& M ) override;
 #endif
-    virtual int     markContacted( void );
-    virtual int     incrementErrors( void );
-    virtual int     setClean( void );
-    virtual void    export_data_XML( string& s );
+    int     markContacted( void );
+    int     incrementErrors( void );
+    int     setClean( void );
+    void    export_data_XML( string& s );
 
   private:
     unsigned int id;

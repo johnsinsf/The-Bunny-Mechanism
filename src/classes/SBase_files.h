@@ -56,15 +56,6 @@ class SBase {
       int length;
       unsigned char* ptr;
     };
-/*
-    struct tstruct tables[1] = { 
-      { "END", "" },
-    };
-
-    struct dstruct databases[1] = { 
-      { "END",    "", "", "", 0 },
-    };
-*/
 
     SBase( void ) { 
       searchBy    = 0;
@@ -79,19 +70,9 @@ class SBase {
       updated     = 0;
       updated_nsec= 0;
       _dps_initialized = false;
-      //mysql       = NULL;
-      //result      = NULL;
     };
 
     virtual ~SBase( void ) {
-/*
-      if( mysql ) { 
-        mysql_close(mysql);
-        mysql = NULL;
-      }
-*/
-      //if( result )
-        //mysql_free_result(result);
     }
 
     virtual int  open  ( bool reOpen = false, string in_db = "" );
@@ -111,16 +92,7 @@ class SBase {
     virtual bool getIsOpen  ( void ) { return isOpen; }
     virtual void setSynced  ( time_t t ) { synced = t; }
     virtual void setUpdated ( time_t t ) { updated = t; }
-    virtual void setUpdated ( void ) {
-/*
-      struct timespec tp;
-      int rc = clock_gettime(CLOCK_REALTIME, &tp);
-      if( rc == 0 ) {
-        updated = tp.tv_sec;
-        updated_nsec = tp.tv_nsec;
-      }
-*/
-    }
+    virtual void setUpdated ( void ) { }
     virtual void setReadMode( int i ) { readMode= i; }
 
     virtual int  serialIn   ( const string& s ) { return -1;}
@@ -163,11 +135,7 @@ class SBase {
     virtual void  dps_init  ( void );
     virtual void  setSearch  ( int inSearch ) {};
     virtual void  setResults( string& results ) { };
-    //virtual void  getResults(int num_fields, unsigned long* lengths, MYSQL_ROW& r, MYSQL_FIELD* f );
     virtual void  addResultVar(void* p, int& i);
-
-    //MYSQL*  mysql;
-    //MYSQL_RES *result;
 
     void*  result_var[MAXRESULTVARS];
     static BaseServer* _dpsServer;

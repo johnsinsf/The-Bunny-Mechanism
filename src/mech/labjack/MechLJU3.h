@@ -14,9 +14,9 @@ class MechLJU3 : public MechLJ {
     ~MechLJU3( void ) {
     };
 
-    virtual int  main ( DssObject& o );
+    int  main ( DssObject& o ) override;
 
   private:
-    virtual int  readDeviceLoop ( HANDLE hDevice, DssObject& o );
+    int  readDeviceLoop ( HANDLE hDevice, DssObject& o );
 };
 #endif

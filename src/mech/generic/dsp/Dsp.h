@@ -8,10 +8,10 @@ class Dsp : public Mech {
   public:
     Dsp( void ) : Mech() { 
     }
-    ~Dsp( void ) {
+    virtual ~Dsp( void ) {
     };
 
-    virtual int  main( DssObject& o );
+    virtual int  main( DssObject& o ) override;
 
     static const  key_t  INITKEY2;
 

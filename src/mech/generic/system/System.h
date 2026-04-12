@@ -8,10 +8,11 @@ class System : public Mech {
   public:
     System( void ) : Mech() { 
     }
-    ~System( void ) {
+    virtual ~System( void ) {
     };
 
-    virtual int  main( DssObject& o );
+    int  main( DssObject& o ) override;
+
     virtual int  doPoll ( int fd, int t );
 
     static const  key_t  INITKEY2;

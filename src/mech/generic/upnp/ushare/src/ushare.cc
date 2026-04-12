@@ -459,7 +459,7 @@ init_upnp (struct ushare_t *ut)
   }
 
   res = UpnpRegisterRootDevice2 (UPNPREG_BUF_DESC, description, 0, 1,
-                                 device_callback_event_handler,
+                                 (Upnp_FunPtr)device_callback_event_handler,
                                  NULL, &(ut->dev));
   if (res != UPNP_E_SUCCESS)
   {
@@ -477,7 +477,7 @@ init_upnp (struct ushare_t *ut)
   }
 
   res = UpnpRegisterRootDevice2 (UPNPREG_BUF_DESC, description, 0, 1,
-                                 device_callback_event_handler,
+                                 (Upnp_FunPtr)device_callback_event_handler,
                                  NULL, &(ut->dev));
   if (res != UPNP_E_SUCCESS)
   {

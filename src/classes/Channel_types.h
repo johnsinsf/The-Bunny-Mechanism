@@ -1,9 +1,7 @@
 #ifndef __Channel_types
 #define __Channel_types
 
-//#include <string>
 #include "dpsframework.h"
-//#include "Log4.h"
 #include "SBase.h"
 
 class Channel_types : public SBase {
@@ -21,16 +19,16 @@ class Channel_types : public SBase {
     Channel_types( unsigned int s ) : SBase() { 
       _dss_init();
     }
-    virtual ~Channel_types( void ) {
+    ~Channel_types( void ) {
     }
-    virtual void setSearch  ( int by );
-    virtual void setInterfacetype( int i ) { interfacetype = i; }
-    virtual int  insert     ( void );
-    virtual void setStrings ( void );
-    virtual string getChannel( void ) { return channel; }
-    virtual unsigned int getFio ( void ) { return fio; }
-    virtual unsigned int getType( void ) { return type; }
-    virtual unsigned int getDirection( void ) { return direction; }
+    void setSearch  ( int by ) override;
+    void setStrings ( void ) override;
+
+    void setInterfacetype( int i ) { interfacetype = i; }
+    string getChannel( void ) { return channel; }
+    unsigned int getFio ( void ) { return fio; }
+    unsigned int getType( void ) { return type; }
+    unsigned int getDirection( void ) { return direction; }
 
   private:
     unsigned int  fio;
