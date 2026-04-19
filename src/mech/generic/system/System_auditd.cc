@@ -471,12 +471,10 @@ System_auditd::parse_buf2( string buf, int msgid ) {
     }
     i = buf.find("exe=", e + 1);
     if( i >= 0 ) {
-      logger.error("TEST " + buf);
       e = buf.find(" ", i + 1);
       if( e > 0 ) {
         exe = buf.substr( i + 4, e - i - 4);
         datavals[msgid]["exe"] = exe;
-        logger.error("TEST2 " + exe);
       }
     }
     i = buf.find("key=", e + 1);
