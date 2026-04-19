@@ -95,42 +95,40 @@ set_info_file (UpnpFileInfo *info, const size_t length,
   UpnpFileInfo_set_ContentType(info, ixmlCloneDOMString (content_type));
 }
 
-/*
-  Flying Bunny Cache
-
-  After testing out the code I decided to add the cache.
-  You'll know if you need it if the music stops for no reason.
-  It turns out the turnaround time can be excessive with high bit rate music. (96k)
-  My test was receiver -> bunnymech -> internet -> bunnyfarm -> internet -> bunnymech ->internet -> bunnyfarm -> internet -> bunnymech ->receiver
-  With flac files the receiver couldn't get enough data to play the files, but cds were ok. I think the cut off is about 500ms.
-  It's best to have the cache off and just use the native cache in the receiver, but my Yamaha has a 1MB buffer
-  that can't be changed, so it's impossible for it to get data fast enough in all conditions, so the cache can be needed.
-  The problem of using the cache is if you change the stream you're playing a lot that flushs the cache, so it can slow things down. 
-*/
-
-bool bunny_cache_enabled = false;
-unsigned int bunny_cache_size = 40000000;
-unsigned int bunny_cache_fd = 0;
+bool bunny_dspcache_enabled = false;
+unsigned int bunny_dspcache_retain = 0;
+unsigned int bunny_cache_size = 20000000;
+unsigned int bunny_cache_fd = -1;
 unsigned int bunny_cache_sem = 0;
 unsigned int bunny_cache_seminit = 0;
 unsigned int bunny_cache_semdata = 0;
 
 unsigned long bunny_cache_starting_filepos = 0;
-unsigned long bunny_cache_ending_filepos = 0;
 unsigned long bunny_cache_filepos = 0;
 unsigned long bunny_cache_filesize = 0;
-
-unsigned char* bunny_cache = NULL;
-unsigned char* bunny_cache_bufptr = NULL;
-unsigned char* bunny_cache_ending_bufptr = NULL;
-unsigned char* bunny_cache_starting_filepos_bufptr = 0;
-unsigned char* bunny_cache_ending_filepos_bufptr = 0;
 
 SocketIO *bunny_cache_sock = NULL;
 
 string bunny_cache_servername;
 string bunny_cache_request;
+string bunny_cache_filename;
+string bunny_cache_directory;
+
 pthread_mutex_t bunny_cache_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+static char *
+getExtension (const char *filename) {
+  char *str = NULL;
+
+  str = strrchr ((char*)filename, '.');
+  if (str)
+    str++;
+
+  return str;
+}
+
+
+// file-based cache version
 
 void*
 bunny_cache_thread( void* a ) {
@@ -143,32 +141,18 @@ bunny_cache_thread( void* a ) {
     log_verbose("error getting init semaphore %d\n", errno);
     g_quit = true;
   }
-  if( bunny_cache != NULL )
-    free(bunny_cache);
-  if( bunny_cache_size < 5000000 )
-    bunny_cache_size = 5000000;
-
-  bunny_cache = (unsigned char*)malloc(bunny_cache_size);
-
-  if( ! bunny_cache ) {
-    log_verbose("failed to allocate cache\n");
-    g_quit = true;
-  }
-  
-  bunny_cache_bufptr = bunny_cache;
-  bunny_cache_ending_bufptr = bunny_cache + bunny_cache_size;
-  bunny_cache_ending_filepos_bufptr = bunny_cache;
-  bunny_cache_starting_filepos_bufptr = bunny_cache;
 
   if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
     log_verbose( "ERROR: failed to lock bunny_cache %d\n", errno );
     g_quit = true;
   }
-
+  extern struct ushare_t *ut;
   struct sembuf semOp;
   semOp.sem_num = 0;
   semOp.sem_op  = 1;
   semOp.sem_flg = 0;
+
+  bunny_cache_directory = ut->installdir + string("/cache/");
 
   if( semop( bunny_cache_seminit, &semOp, 1 ) < 0 ) {
     log_verbose("error signaling seminit %d\n", errno);
@@ -178,6 +162,18 @@ bunny_cache_thread( void* a ) {
   if( bunny_cache_sem < 0 ) {
     log_verbose("error getting cache semaphore %d\n", errno);
     g_quit = true;
+  }
+
+
+  if( ut->dssObj->server ) {
+    log_verbose("checking dspcachedir\n");
+    map<string,string>::const_iterator I = ut->dssObj->server->configMap.find("dspcachedir");
+    if( I != ut->dssObj->server->configMap.end() ) {
+      bunny_cache_directory = strdup(I->second.c_str());
+      if( bunny_cache_directory.substr(bunny_cache_directory.size() - 1, 1) != "/" )
+        bunny_cache_directory += "/";
+    }
+    log_verbose("checking dspcachedir %s\n", bunny_cache_directory.c_str());
   }
 
   while( ! g_quit ) {
@@ -191,68 +187,98 @@ bunny_cache_thread( void* a ) {
 
     int rc = semop( bunny_cache_sem, &semOp, 1 );
 
-    //log_verbose("cache thread rc %d\n", rc);
-
     if( rc == -1 )
       g_quit = true;
 
     if( rc == 0 ) {
-      //log_verbose("locking mutex\n");
       if( pthread_mutex_lock( &bunny_cache_mutex) != 0 ) {
         log_verbose( "ERROR: failed to lock bunny_cache %d\n", errno );
         g_quit = true;
       }
-      //log_verbose("locked mutex\n");
-      unsigned long t_size = bunny_cache_ending_filepos - bunny_cache_starting_filepos;
-      unsigned long t_pos = bunny_cache_ending_filepos;
+      if( bunny_cache_fd != -1 ) {
+        close(bunny_cache_fd);
+        bunny_cache_fd = -1;
+      }
+      if( bunny_cache_fd == -1 ) {
+        string cachefile = bunny_cache_directory + bunny_cache_filename;
+        //log_verbose("opening cache file %s\n", cachefile.c_str());
+        bunny_cache_fd = open( cachefile.c_str(), O_WRONLY|O_APPEND|O_CREAT, S_IRWXU);
+      }
+      struct stat st;
+
+      if( bunny_cache_fd != -1 ) {
+        rc = fstat( bunny_cache_fd, &st );
+        if( rc == 0 ) {
+          bunny_cache_starting_filepos = st.st_size;
+        } else {
+          g_quit = true;
+          log_verbose("bad file");
+        }
+      } else {
+        log_verbose("bad file");
+        g_quit = true;
+      }
       unsigned long t_filesize = bunny_cache_filesize;
+      unsigned long t_pos = bunny_cache_filepos;
 
       string t_request = bunny_cache_request;
       string t_servername = bunny_cache_servername;
 
+      char* file_ext = getExtension( bunny_cache_filename.c_str() );
+      bool do_flac = false;
+      bunny_cache_size = 5000000;
+      if( file_ext ) {
+        if( strcmp( file_ext, "flac" ) == 0 ) {
+          do_flac = true;
+          bunny_cache_size = 15000000;
+        }
+      }
       if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
         log_verbose( "ERROR: failed to unlock bunny_cache %d\n", errno );
         g_quit = true;
       }
 
-      log_verbose("cache thread pos %d, size %d, starting %d, ending %d, filesize %d\n", 
-       t_pos, t_size, bunny_cache_starting_filepos, bunny_cache_ending_filepos, bunny_cache_filesize);
+      //log_verbose("cache thread pos %d, starting %d, filesize %d\n", t_pos, bunny_cache_starting_filepos, t_filesize);
 
       if( t_pos >= t_filesize ) {
         log_verbose("bad pos %d %d\n", t_pos, t_filesize);
-        //g_quit = true;
       }
       else
-      if( t_size <= 15000000 && t_pos < t_filesize && ! g_quit ) {
-        //log_verbose("bunny_cache_thread getting some data %d\n", bunny_cache_size - t_size );
-
+      if( (bunny_cache_starting_filepos - t_pos) <= bunny_cache_size && bunny_cache_starting_filepos < t_filesize && ! g_quit ) {
         bool done = false;
         bool finished = false;
         LObj obj;
-        while( t_size <= 15000000 && ! finished && ! done && ! g_quit && t_pos < t_filesize ) {
+        while( (bunny_cache_starting_filepos - t_pos) <= bunny_cache_size && ! finished && ! done && ! g_quit && bunny_cache_starting_filepos < t_filesize ) {
 
           if( pthread_mutex_lock( &bunny_cache_mutex) != 0 ) {
             log_verbose( "ERROR: failed to lock bunny_cache %d\n", errno );
             g_quit = true;
           }
-          if( t_pos >= t_filesize ) {
-            finished = true;
+          string request;
+          int buflen = 1048576;
+          if( do_flac ) {
+            if( bunny_cache_filepos == 0  )
+              buflen = 10000000;
+            else
+              buflen = 2000000;
           }
-          string test;
-          int buflen = 5000000;
-          unsigned long remaining = bunny_cache_filesize - bunny_cache_ending_filepos;
+          unsigned long remaining = bunny_cache_filesize - bunny_cache_starting_filepos;
           if( remaining < buflen ) {
             buflen = remaining;
             finished = true;
           }
           if( t_servername != bunny_cache_servername || t_request != bunny_cache_request ) {
             done = true;
+            if( bunny_cache_fd != -1 ) {
+              close(bunny_cache_fd);
+              bunny_cache_fd = -1;
+            }
             log_verbose("changed cache request, exiting\n");
           }
           if( ! done ) {
-            test = "GET " + bunny_cache_request + " HTTP/1.0\n";
-            test += "host: " + bunny_cache_servername + "\n";
-            test += "range: bytes=" + to_string(bunny_cache_ending_filepos) + "-" + to_string(buflen) + "\n\n";
+            request = "GET " + bunny_cache_request + " HTTP/1.0\n";
+            request += "host: " + bunny_cache_servername + "\n";
+            request += "range: bytes=" + to_string(bunny_cache_starting_filepos) + "-" + to_string(buflen) + "\n\n";
 
             if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
               log_verbose( "ERROR: failed to unlock bunny_cache %d\n", errno );
@@ -273,17 +299,14 @@ bunny_cache_thread( void* a ) {
             }
             int bunny_server_port = 443;
    
-            //log_verbose("opening server %s\n", bunny_server);
-
             int fd = bunny_sock.openClient( bunny_server, bunny_server_port );
-   
-            log_verbose("sending %s %d\n", test.c_str(), fd );
 
             if( fd < 0 ) {
               log_verbose("bad socket\n");
               g_quit = true;
             } else {
-              bunny_sock.write(test.c_str(), test.size());
+              log_verbose("cache sending %s %d\n", request.c_str(), fd );
+              bunny_sock.write(request.c_str(), request.size());
 
               int rc2 = readHeader( &bunny_sock, obj );
               if( rc2 != 1 ) {
@@ -292,7 +315,6 @@ bunny_cache_thread( void* a ) {
               }
               bunny_sock.doClose();
             }
-            log_verbose("cache locking mutex\n");
             if( pthread_mutex_lock( &bunny_cache_mutex) != 0 ) {
               log_verbose( "ERROR: failed to lock bunny_cache %d\n", errno );
               g_quit = true;
@@ -300,27 +322,23 @@ bunny_cache_thread( void* a ) {
             }
           }
           if( ! done && ! g_quit ) {
-            if( bunny_cache_bufptr + obj.packet.size() <= bunny_cache_ending_bufptr ) {
-              memcpy( bunny_cache_bufptr, obj.packet.c_str(), obj.packet.size() );
-              bunny_cache_bufptr += obj.packet.size();
-            } else {
-              unsigned long len1 = bunny_cache_ending_bufptr - bunny_cache_bufptr;
-              unsigned long len2 = obj.packet.size() - len1;
-              if( len1 > 0 )
-                memcpy( bunny_cache_bufptr, obj.packet.substr(0,len1).c_str(), len1 );
-              memcpy( bunny_cache, obj.packet.substr(len1, len2).c_str(), len2 );
-              bunny_cache_bufptr = bunny_cache + len2;
+            if( bunny_cache_fd == -1 ) {
+              string cachefile = bunny_cache_directory + bunny_cache_filename;
+              bunny_cache_fd = open( cachefile.c_str(), O_WRONLY|O_APPEND|O_CREAT, S_IRWXU);
+            }
+            if( bunny_cache_fd != -1 ) {
+              write( bunny_cache_fd, obj.packet.c_str(), obj.packet.size() );
             }
 
-            bunny_cache_ending_filepos = bunny_cache_ending_filepos + obj.packet.size();
-            if( bunny_cache_ending_filepos > bunny_cache_filesize )
-              bunny_cache_ending_filepos = bunny_cache_filesize;
-            
-            bunny_cache_ending_filepos_bufptr = bunny_cache_bufptr;
+            struct stat st;
+            rc = fstat( bunny_cache_fd, &st );
 
-            //log_verbose("have starting/ending filepos %d/%d\n", bunny_cache_starting_filepos, bunny_cache_ending_filepos);
+            //bunny_cache_starting_filepos += obj.packet.size();
+            //log_verbose("starting filepos %d %d %d\n", bunny_cache_starting_filepos, st.st_size, rc);
 
-            t_size = bunny_cache_ending_filepos - bunny_cache_starting_filepos;
+            if( rc == 0 ) { 
+              bunny_cache_starting_filepos = st.st_size;
+            }
           }
           if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
             log_verbose( "ERROR: failed to unlock bunny_cache %d\n", errno );
@@ -337,7 +355,11 @@ bunny_cache_thread( void* a ) {
             log_verbose("error signaling semdata %d\n", errno);
             g_quit = true;
           }
-          //log_verbose("signaled data ready %d\n", t_size);
+          //log_verbose("signaled data ready %d\n", bunny_cache_starting_filepos);
+        }
+        if( bunny_cache_fd != -1 ) {
+          close(bunny_cache_fd);
+          bunny_cache_fd = -1;
         }
       } else {
         log_verbose( "buffer full\n" );
@@ -346,17 +368,6 @@ bunny_cache_thread( void* a ) {
   }
   int retVal;
   pthread_exit( (void*)&retVal );
-}
-
-static char *
-getExtension (const char *filename) {
-  char *str = NULL;
-
-  str = strrchr ((char*)filename, '.');
-  if (str)
-    str++;
-
-  return str;
 }
 
 int 
@@ -483,7 +494,7 @@ bunny_open (const char *filename, enum UpnpOpenFileMode mode,
   static string lastfile; // to remove duplicate entries to the playlog
 
   bunny_cache_starting_filepos = 0;
-  bunny_cache_ending_filepos = 0;
+  //bunny_cache_ending_filepos = 0;
 
   if (!filename)
     return NULL;
@@ -547,8 +558,6 @@ bunny_open (const char *filename, enum UpnpOpenFileMode mode,
    
     int fd = bunny_sock.openClient( bunny_server, bunny_server_port );
    
-    //log_verbose("have bunny_sock fd %d, %s, %d\n", fd, bunny_server, bunny_server_port);
-
     LObj obj;
    
     string fetch, id;
@@ -561,8 +570,6 @@ bunny_open (const char *filename, enum UpnpOpenFileMode mode,
       } else {
         id = t + ".info";
       }
-      //fetch = "GET /echo/bunnyman/" + id + "?hop=30 HTTP/1.0\n";
-      //fetch += "host: buuna.dwanta.com\n\n";
       fetch = "GET " + server_dir + "/" + id + "?hop=30 HTTP/1.0\n";
       fetch += "host: " + bunny_server + "\n\n";
     
@@ -632,34 +639,30 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
     log_verbose( "error mutex lock\n" );
     g_quit = true;
   }
-
   bunny_cache_filepos = file->pos;
-  bunny_cache_starting_filepos = file->pos;
-  if( file->pos == 0 ) bunny_cache_ending_filepos = 0;
+  if( file->pos == 0 )
+    bunny_cache_starting_filepos = file->pos;
 
   bunny_cache_sock = file->detail.local.bunny_sock;
-  bunny_cache_fd   = file->detail.local.fd;
   bunny_cache_filesize = file->detail.local.entry->size;
 
-  log_verbose("bunny_read2 starting %d, size %d, pos %d\n", buflen, bunny_cache_filesize, bunny_cache_filepos);
+  log_verbose("bunny_read2 starting buflen %d, size %d, pos %d\n", buflen, bunny_cache_filesize, bunny_cache_filepos);
 
   string serverdir = "/";
   string server = string(file->detail.local.entry->servername);
   string server2;
   
   int x = server.find_first_of("/");
-  //log_verbose("x = %d \n", x);
   if( x > 0 ) {
     server2 = server.substr(0,x);
-    //log_verbose("server %s\n", server.c_str());
     serverdir = server.substr(x, server.size() - x);
-    //log_verbose("serverdir %s\n", serverdir.c_str());
   } else {
     server2 = server;
   }
 
   bunny_cache_servername = server2;
   bunny_cache_request = serverdir + "/" + string(file->fullpath);
+  bunny_cache_filename = string(file->fullpath);
   
   if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
     log_verbose( "error mutex unlock\n" );
@@ -672,7 +675,6 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
     // check for prefetch config for cache control
     char* file_ext = getExtension( file->fullpath );
     if( file_ext ) {
-      log_verbose("file extension %s\n", file_ext);
       if( strcmp( file_ext, "flac" ) == 0 ) {
         log_verbose("flac processing\n");
         prefetch = 10000000;  // trying 3 packets or 10MB, will make it configurable
@@ -684,29 +686,25 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
   unsigned long len = 0;
   bool done = false;
 
+  semOp.sem_num = 0;
+  semOp.sem_op  = 1;
+  semOp.sem_flg = 0;
+
+  if( semop( bunny_cache_sem, &semOp, 1 ) < 0 ) {
+    log_verbose("error signaling cache sem %d\n", errno);
+    g_quit = true;
+  }
+ 
   while( ! done && ! g_quit ) {
 
-    semOp.sem_num = 0;
-    semOp.sem_op  = 1;
-    semOp.sem_flg = 0;
-
-    //log_verbose("signaling bunny cache %s, %d, %d, %d\n", bunny_cache_request, bunny_cache_filepos, bunny_cache_fd, bunny_cache_sock);
-
-    if( semop( bunny_cache_sem, &semOp, 1 ) < 0 ) {
-      log_verbose("error signaling cache sem %d\n", errno);
-      g_quit = true;
-    }
- 
-    //log_verbose("main locking mutex\n"); 
     if( pthread_mutex_lock( &bunny_cache_mutex) != 0 ) {
       log_verbose( "error mutex lock\n" );
       g_quit = true;
     }
-    //log_verbose("main locked mutex\n"); 
-    unsigned long remaining = bunny_cache_filesize - bunny_cache_ending_filepos;
+    unsigned long remaining = bunny_cache_filesize - bunny_cache_starting_filepos;
     if( remaining > buflen ) remaining = buflen;
   
-    if( bunny_cache_starting_filepos >= bunny_cache_filesize ) {
+    if( bunny_cache_filepos >= bunny_cache_filesize ) {
       log_verbose( "data done %d\n", bunny_cache_filesize  );
       done = true;
       if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
@@ -714,12 +712,12 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
       }
     }
     else
-    if( prefetch > 0 && (bunny_cache_ending_filepos - bunny_cache_starting_filepos) < prefetch ) {
+    if( prefetch > 0 && bunny_cache_starting_filepos < prefetch ) {
       if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
         log_verbose( "error mutex unlock\n" );
         g_quit = true;
       }
-      log_verbose("prefetch buffer, signaling and sleeping %d / %d \n", bunny_cache_ending_filepos - bunny_cache_starting_filepos, prefetch);
+      log_verbose("prefetch buffer, signaling and sleeping %d / %d \n", bunny_cache_starting_filepos, prefetch);
   
       semOp.sem_num = 0;
       semOp.sem_op  = 1;
@@ -737,16 +735,17 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
         log_verbose("bad semdata\n");
         done = true;
       } 
-      log_verbose("data signaled %d\n", rc);
+      log_verbose("prefetch data signaled %d\n", rc);
     }
     else
-    if( bunny_cache_starting_filepos >= bunny_cache_ending_filepos - remaining ) {
+    if( (bunny_cache_starting_filepos - bunny_cache_filepos) < buflen ) {
       if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
         log_verbose( "error mutex unlock\n" );
         g_quit = true;
       }
+      log_verbose("buffer empty, signaling and sleeping %d %d %d %d\n", 
+       bunny_cache_starting_filepos, bunny_cache_filepos, remaining, buflen );
       sleep(2);
-      log_verbose("buffer empty, signaling and sleeping\n");
   
       semOp.sem_num = 0;
       semOp.sem_op  = 1;
@@ -764,90 +763,27 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
         log_verbose("bad semdata\n");
         done = true;
       } 
-      log_verbose("data signaled %d\n", rc);
+      log_verbose("empty buffer data signaled %d\n", rc);
     } else {
       if( bunny_cache_filesize - bunny_cache_starting_filepos < buflen )
         len = bunny_cache_filesize - bunny_cache_starting_filepos;
   
-      if( bunny_cache_filepos >= bunny_cache_starting_filepos && bunny_cache_filepos <= bunny_cache_ending_filepos && (bunny_cache_ending_filepos - bunny_cache_starting_filepos >= buflen ) ) {
-  
-        unsigned long offset = bunny_cache_filepos - bunny_cache_starting_filepos;
-        unsigned long x = bunny_cache_ending_bufptr - bunny_cache_starting_filepos_bufptr - offset;
-  
-        int x2 = bunny_cache_size - ( bunny_cache_starting_filepos_bufptr - bunny_cache );
+      //log_verbose("checking data %d %d \n", bunny_cache_starting_filepos, bunny_cache_filesize);
 
-        log_verbose("checking data %d %d %d %d %d\n", bunny_cache_starting_filepos, bunny_cache_ending_filepos, x, bunny_cache_filesize - x, x2);
-
-        if(  bunny_cache_ending_filepos <= bunny_cache_starting_filepos ) {
-          if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
-            log_verbose( "error mutex unlock\n" );
-          }
-          log_verbose( "no data %d\n", bunny_cache_starting_filepos );
-          semOp.sem_num = 0;
-          semOp.sem_op  = 1;
-          semOp.sem_flg = 0;
-  
-          if( semop( bunny_cache_sem, &semOp, 1 ) < 0 ) {
-            log_verbose( "error semop\n" );
-            g_quit = true;
-          }
-          sleep(1);
-          semOp.sem_num = 0;
-          semOp.sem_op  = -1;
-          semOp.sem_flg = 0;
-          int rc = semop( bunny_cache_semdata, &semOp, 1 );
-          if( rc != 0 ) {
-            log_verbose("bad semdata\n");
-            done = true;
-          }
-          log_verbose("data signaled %d\n", rc);
-        }
-        else
-        if( x > buflen ) {
-          //log_verbose("x > buflen \n");
-          memcpy( buf, bunny_cache_starting_filepos_bufptr + offset, buflen );
-          bunny_cache_starting_filepos_bufptr += buflen;
-          int x = bunny_cache_starting_filepos_bufptr - bunny_cache;
-          log_verbose("2 cache buffer offset currently %d %d\n", x, bunny_cache_filepos);
-        } else {
-          //log_verbose("x < buflen \n");
-          unsigned long offset = bunny_cache_filepos - bunny_cache_starting_filepos;
-          unsigned long len2 = bunny_cache_ending_bufptr - bunny_cache_starting_filepos_bufptr - offset;
-
-          log_verbose("x2 check %d %d\n", x2, len2);
-          len2 = x2;
-  
-          //if( len2 > sizeof(buf) ) len2 = sizeof(buf);
-   
-          if( len2 <= 0 ) {
-            log_verbose("error in len %d %d %d\n", len2, bunny_cache_ending_bufptr, offset);
-            g_quit = true;
-            return -1;
-          } 
-          log_verbose("copy vals %d len2 %d %d %d\n", len, len2, len2 - len, buflen - len2);
-          memcpy( buf, bunny_cache_starting_filepos_bufptr + offset, len2 );
-          memcpy( buf + len2, bunny_cache, buflen - len2 );
-          bunny_cache_starting_filepos_bufptr = bunny_cache + (buflen - len2);
-
-          int x = bunny_cache_starting_filepos_bufptr - bunny_cache;
-          log_verbose("1 cache buffer offset currently %d %d\n", x, bunny_cache_filepos);
-
-          if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
-            log_verbose( "error mutex unlock\n" );
-          }
-        }
+      if(  bunny_cache_starting_filepos <= bunny_cache_filepos ) {
         if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
           log_verbose( "error mutex unlock\n" );
         }
-        log_verbose("copied data, unlocked mutex, done %d\n", buflen);
-        done = true;
-        file->pos += buflen;
-        return buflen;
-      } else {
-        log_verbose( "outside step %d %d %d %d\n", bunny_cache_filepos, bunny_cache_starting_filepos, bunny_cache_ending_filepos, buflen );
-        if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
-          log_verbose( "error mutex unlock\n" );
+        log_verbose( "no data %d\n", bunny_cache_starting_filepos );
+        semOp.sem_num = 0;
+        semOp.sem_op  = 1;
+        semOp.sem_flg = 0;
+
+        if( semop( bunny_cache_sem, &semOp, 1 ) < 0 ) {
+          log_verbose( "error semop\n" );
+          g_quit = true;
         }
+        sleep(1);
         semOp.sem_num = 0;
         semOp.sem_op  = -1;
         semOp.sem_flg = 0;
@@ -856,17 +792,42 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
           log_verbose("bad semdata\n");
           done = true;
         }
-        sleep(1);
+        log_verbose("no data signaled %d\n", rc);
       }
-      bunny_cache_starting_filepos += len;
-  
-      unsigned long t_size = bunny_cache_ending_filepos - bunny_cache_starting_filepos;
-  
-      //log_verbose( "main thread size %d, %d, %d\n", t_size, bunny_cache_starting_filepos, bunny_cache_ending_filepos );
+      if( bunny_cache_fd != -1 ) {
+        close(bunny_cache_fd);
+        bunny_cache_fd = -1;
+      }
+      if( bunny_cache_fd == -1 ) {
+        string cachefile = bunny_cache_directory + bunny_cache_filename;
+        bunny_cache_fd = open( cachefile.c_str(), O_RDONLY );
+        struct stat st;
+        int rc = fstat( bunny_cache_fd, &st);
+      }
+      if( bunny_cache_fd != -1 ) {
+        int rc = lseek( bunny_cache_fd, file->pos, SEEK_SET );
+        if( rc == file->pos ) {
+          rc = read( bunny_cache_fd, buf, buflen );
+          if( rc != buflen ) {
+            log_verbose("read error %d\n", rc);
+          }
+          file->pos += rc;
+          struct stat st;
+          rc = fstat( bunny_cache_fd, &st);
+          if( rc == 0 ) {
+            bunny_cache_starting_filepos = st.st_size;
+          }
+        }
+        close(bunny_cache_fd);
+        bunny_cache_fd = -1;
+      }
       if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
-        log_verbose("bad mutex\n");
-        g_quit = true;
+        log_verbose( "error mutex unlock\n" );
       }
+      //log_verbose("copied data, unlocked mutex, done %d %d\n", buflen, file->pos, bunny_cache_starting_filepos);
+      done = true;
+
+      return buflen;
     }
   }
   return 0;
@@ -879,13 +840,6 @@ bunny_read (UpnpWebFileHandle fh, char *buf, size_t buflen,
 
   struct web_file_t *file = (struct web_file_t *) fh;
   ssize_t len = -1;
-
-  // vars  cache, cachesize, cachestart, currentpos, fd, servername, request
-  // check cache first, if data, send that, signal cache thread about update
-  // if cache name different or data not sufficient write fd, pos, and len to global vars and signal cache thread
-  //   cache thread will get chunks in 5MB and try to fill 20MB cache
-  // wait for semaphore
-  // send data
 
   pid_t tid;
   tid = syscall(SYS_gettid);
@@ -905,16 +859,14 @@ bunny_read (UpnpWebFileHandle fh, char *buf, size_t buflen,
     return len;
   }
 
-  if( bunny_cache_enabled ) {
-    return bunny_read2( fh, buf, buflen, cookie, requestCookie );
-  }
+  if( bunny_dspcache_enabled ) {
 
-  //log_verbose ("bunny_fd is %d %d\n", file->detail.local.fd, tid );
-  //log_info("bunny_fd is %d %d : %s\n", file->detail.local.fd, tid, file->fullpath );
+    int rc = bunny_read2( fh, buf, buflen, cookie, requestCookie );
+    return rc;
+  }
 
   if (file->detail.local.fd <= 0 ) {
     bunny_server_connect(fh);
-    //log_verbose ("bunny_fd is now %d %d\n", file->detail.local.fd, tid);
     if (file->detail.local.fd <= 0) {
       log_verbose("bad bunny_server_connect\n");
       return 0;
@@ -925,28 +877,24 @@ bunny_read (UpnpWebFileHandle fh, char *buf, size_t buflen,
   string server2;
 
   int x = server.find_first_of("/");
-  //log_verbose("x = %d \n", x);
   if( x > 0 ) {
     server2 = server.substr(0,x);
-    //log_verbose("server %s\n", server.c_str());
     serverdir = server.substr(x, server.size() - x);
-    //log_verbose("serverdir %s\n", serverdir.c_str());
   } else {
     server2 = server;
   }
-  string test;
-  //test = "GET /echo/bunnycloud/" + string(file->fullpath) + " HTTP/1.0\n";
-  test = "GET " + serverdir + "/" + string(file->fullpath) + " HTTP/1.0\n";
+  string request;
+  request = "GET " + serverdir + "/" + string(file->fullpath) + " HTTP/1.0\n";
   if( file->detail.local.entry->servername != NULL )
-    test += "host: " + server2 + "\n";
+    request += "host: " + server2 + "\n";
   else
-    test += "host: buuna.dwanta.com\n";
+    request += "host: buuna.dwanta.com\n";
 
-  test += "range: bytes=" + to_string(file->pos) + "-" + to_string(buflen) + "\n\n";
+  request += "range: bytes=" + to_string(file->pos) + "-" + to_string(buflen) + "\n\n";
  
-  log_verbose("sending %s %d\n", test.c_str(), tid); 
+  log_verbose("sending %s %d\n", request.c_str(), tid); 
 
-  file->detail.local.bunny_sock->write(test.c_str(), test.size());
+  file->detail.local.bunny_sock->write(request.c_str(), request.size());
 
   LObj obj;
 
@@ -1092,6 +1040,42 @@ bunny_close (UpnpWebFileHandle fh,
   if(file)
     free (file);
 
+  if( bunny_cache_fd != -1 )
+    close(bunny_cache_fd);
+  bunny_cache_fd = -1;
+
+  if( bunny_dspcache_retain == 1 ) {
+    if( bunny_cache_filename != "" && bunny_cache_directory != "" ) {
+      log_verbose("keeping cache file %s/%s\n", bunny_cache_directory.c_str(), bunny_cache_filename.c_str()); 
+    }
+  }
+  else
+  if( bunny_cache_filename != "" && bunny_cache_directory != "" ) {
+    string cachefile = bunny_cache_directory + bunny_cache_filename;
+    if( bunny_dspcache_retain == 2 && bunny_cache_filesize > 10000000 ) {
+      log_verbose("truncating cache file %s\n", cachefile.c_str());
+      int fd = open( cachefile.c_str(), O_WRONLY, S_IRWXU);
+      if( fd >= 0 ) {
+        int rc = lseek( fd, 10000000, SEEK_SET);
+        if( rc == 0 ) {
+          write(fd, "", 0);
+        }
+        close(fd);
+      }
+    }
+    else
+    if( bunny_dspcache_retain == 0 ) {
+      int rc = unlink( cachefile.c_str() );
+      if( rc != 0 ) {
+        log_verbose("error removing cache file %s %d\n", cachefile.c_str(), errno);
+      }
+    }
+  }
+  bunny_cache_filepos = 0;
+  bunny_cache_filesize = 0;
+  bunny_cache_filename = "";
+  bunny_cache_starting_filepos = 0;
+
   log_verbose("bunny_close done\n");
 
   return 0;
@@ -1121,17 +1105,14 @@ readHeader( SocketIO* socket, LObj& lobj ) {
     timeout = 120;
 
   while( rc > 0 && ! done ) {
-    //log_verbose("about to read, timeout=%d %d %d\n", timeout, tid, socket->useSSL);
     memset( buf, 0, sizeof(buf) );
     rc = socket->doReadLine(buf, sizeof(buf), timeout);
     if( rc > 0 ) {
       int len = strlen(buf);
-      //log_verbose("readheader buf %s %d %d %d\n", buf, rc, len, tid);
       if( len == 0 ) { 
         done = true;
       } else {
         lobj.headers[i++] = buf;
-        //logger.error("added headers " + string(buf));
       }
     }
   }
@@ -1149,10 +1130,8 @@ readHeader( SocketIO* socket, LObj& lobj ) {
     return 0;
   }
   memset(buf2,0,lobj.content_length + 1);
-  //log_verbose("read content length %d %d %d\n", lobj.content_length, tid, socket->useSSL);
 
   rc = socket->doRead(buf2, lobj.content_length, 60);
-  //log_verbose("read buf2 %d %d\n", rc, tid);
 
   if( rc != lobj.content_length ) {
     log_verbose("bad header content length\n");
@@ -1177,15 +1156,11 @@ int parseHeader( SocketIO* socket, LObj& lobj ) {
   tid = syscall(SYS_gettid);
 
   int pos = lobj.headers[0].find(" ");
-  //log_verbose("header pos is %d\n", pos);
+
   if( pos > 0 ) {
     lobj.rc = atoi(lobj.headers[0].substr(pos + 1, 3).c_str()); 
     //log_verbose("header rc %d %d\n", lobj.rc, tid);
   } 
-
-  //typedef map<string,string>::const_iterator J;
-  //typedef multimap<string,string>::const_iterator J2;
-  //typedef map<string,int>::const_iterator J3;
 
   // check access and type of data request  
 
@@ -1204,14 +1179,11 @@ int parseHeader( SocketIO* socket, LObj& lobj ) {
       for (char& c : key ) {
         c = std::tolower(c);
       }
-
       lobj.header[key] = val;
-      //log_verbose("header test %s %s %d\n", key.c_str(), val.c_str(), tid);
       if( key == "content-length" ) {
         lobj.content_length = atoi(val.c_str());
       }
     }
   }
-  //log_verbose("header test done\n");
   return 0;
 }

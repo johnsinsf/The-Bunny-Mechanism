@@ -804,11 +804,20 @@ build_bunny_metadata_list (struct ushare_t *ut) {
       log_verbose("have bunny server port %s\n", I->second.c_str());
       bunny_server_port = atoi(I->second.c_str());
     }
-    I = configMap.find("bunny_cache_enabled");
+    I = configMap.find("bunny_dspcache_enabled");
     if( I != configMap.end() ) {
       log_verbose("have bunny cache enabled %s\n", I->second.c_str());
       if( I->second == "yes" )
-        bunny_cache_enabled = true;
+        bunny_dspcache_enabled = true;
+    }
+    I = configMap.find("bunny_dspcache_retain");
+    if( I != configMap.end() ) {
+      log_verbose("have bunny cache retain enabled %s\n", I->second.c_str());
+      if( I->second == "yes" )
+        bunny_dspcache_retain = 1;
+      else
+      if( I->second == "head" )
+        bunny_dspcache_retain = 2;
     }
     I = configMap.find("bunny_cache_size");
     if( I != configMap.end() ) {
@@ -851,12 +860,12 @@ build_bunny_metadata_list (struct ushare_t *ut) {
     log_verbose("have fd %d\n", fd);
 
     if( fd >= 0 ) {
-      string test;
-      test = "GET " + bunny_user + "?hop=30 HTTP/1.0\n";
-      test += "host: " + bunny_server + "\n\n";
+      string fetch;
+      fetch = "GET " + bunny_user + "?hop=30 HTTP/1.0\n";
+      fetch += "host: " + bunny_server + "\n\n";
   
-      log_verbose("using buf %s \n", test.c_str());
-      bunny_sock.write(test.c_str(), test.size());
+      log_verbose("using buf %s \n", fetch.c_str());
+      bunny_sock.write(fetch.c_str(), fetch.size());
 
       LObj obj;
 
@@ -864,7 +873,6 @@ build_bunny_metadata_list (struct ushare_t *ut) {
 
       bunny_sock.doClose();
 
-      //log_verbose("have %s\n", obj.packet.c_str());
       int rc = ixmlParseBufferEx(obj.packet.c_str(), &ut->xml_doc);
       log_info("ixml rc is %d\n", rc);
 
@@ -886,24 +894,6 @@ build_bunny_metadata_list (struct ushare_t *ut) {
       }
     }
   }
-/*
-  char* xmltext = "\
-<media>\
-  <header>\
-    <filetype>bunny-ushare</filetype>\
-    <version>000.000.001</version>\
-    <files>\
-      <filetype>directory</filetype>\
-      <filename>dir1</filename>\
-      <filesize>0</filesize>\
-      <bunnyname>e9WBvPedXB2R1teW6qfM0</bunnyname>\
-      <bunnyserver>buuna.dwanta.com</bunnyserver>\
-    </files>\
-  </header>\
-</media>\
-";
-  ut->xml_doc = ixmlParseBuffer(xmltext);
-*/
 
   /* content set from config should be bunnyname/title */
   /* load each contentlist content separately on each loop */
@@ -914,8 +904,7 @@ build_bunny_metadata_list (struct ushare_t *ut) {
     char *title = NULL;
     int size = 0;
 
-    log_info (_("Looking for files in content directory : %s\n"),
-              ut->contentlist->content[i]);
+    log_info (_("Looking for files in content directory : %s\n"), ut->contentlist->content[i]);
 
     size = strlen (ut->contentlist->content[i]);
     if (ut->contentlist->content[i][size - 1] == '/')
@@ -942,42 +931,6 @@ build_bunny_metadata_list (struct ushare_t *ut) {
 
   log_info (_("Found %d files and subdirectories.\n"), ut->nr_entries);
   ut->init = true;
-
-/*
-  // just some testing here
-  for( int ii = 100000; ii < 100003; ii++ ) {
-
-    struct upnp_entry_lookup_t *res, entry_lookup;
-  
-    log_verbose ("Bunny Looking for entry id %d\n", ii);
-    if (ii == 0) {
-      log_verbose ("Root at %d %s %s %s %d\n",
-                   ut->root_entry->id,
-                   ut->root_entry->fullpath,
-                   ut->root_entry->title,
-                   ut->root_entry->url,
-                   ut->root_entry->child_count
-      );
-    } else {
-      entry_lookup.id = ii;
-      res = (struct upnp_entry_lookup_t *)
-        rbfind ((void *) &entry_lookup, ut->rb);
-  
-      if (res) {
-        log_verbose ("Found at %p %d %d %s %s %s %s %d\n",
-                   ((struct upnp_entry_lookup_t *) res)->entry_ptr,
-                   ((struct upnp_entry_lookup_t *) res)->id,
-                   ((struct upnp_entry_lookup_t *) res)->entry_ptr->id,
-                   ((struct upnp_entry_lookup_t *) res)->entry_ptr->fullpath,
-                   ((struct upnp_entry_lookup_t *) res)->entry_ptr->title,
-                   ((struct upnp_entry_lookup_t *) res)->entry_ptr->url,
-                   ((struct upnp_entry_lookup_t *) res)->entry_ptr->servername,
-                   ((struct upnp_entry_lookup_t *) res)->entry_ptr->child_count
-        );
-      }
-    }
-  }
-*/
 }
 
 int

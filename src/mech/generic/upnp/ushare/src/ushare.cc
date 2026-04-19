@@ -948,6 +948,10 @@ main (int argc, char **argv) {
   }
   string p = ut->installdir + string("/conf/ushare.conf");
   ut->cfg_file = strdup (p.c_str());
+  if( ! ut->dssObj )
+    ut->dssObj = new DssObject();
+
+  ut->dssObj->server = o.server;
 #endif
   /* Parse args before cfg file, as we may override the default file */
   if (parse_command_line (ut) < 0)

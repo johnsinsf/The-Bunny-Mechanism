@@ -76,7 +76,8 @@ extern unsigned int bunny_cache_sem;
 extern unsigned int bunny_cache_seminit;
 extern unsigned int bunny_cache_semdata;
 extern unsigned int bunny_cache_size;
-extern bool  bunny_cache_enabled;
+extern unsigned int bunny_dspcache_retain;
+extern bool  bunny_dspcache_enabled;
 
 //static char *getExtension (const char *filename);
 
