@@ -710,6 +710,7 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
       if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
         log_verbose( "error mutex unlock\n" );
       }
+
     }
     else
     if( prefetch > 0 && bunny_cache_starting_filepos < prefetch ) {
@@ -826,7 +827,36 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
       }
       //log_verbose("copied data, unlocked mutex, done %d %d\n", buflen, file->pos, bunny_cache_starting_filepos);
       done = true;
-
+      if( file->pos >= bunny_cache_filesize ) {
+        log_verbose("done, checking cache file %d\n", bunny_dspcache_retain);
+        if( bunny_dspcache_retain == 1 ) {
+          if( bunny_cache_filename != "" && bunny_cache_directory != "" ) {
+            log_verbose("keeping cache file %s/%s\n", bunny_cache_directory.c_str(), bunny_cache_filename.c_str());
+          }
+        }
+        else
+        if( bunny_cache_filename != "" && bunny_cache_directory != "" ) {
+          string cachefile = bunny_cache_directory + bunny_cache_filename;
+          if( bunny_dspcache_retain == 2 && bunny_cache_filesize > 10000000 ) {
+            int fd = open( cachefile.c_str(), O_WRONLY|O_TRUNC, S_IRWXU);
+            if( fd >= 0 ) {
+              log_verbose("truncating cache file %s\n", cachefile.c_str());
+              int rc = ftruncate(fd, 10000000);
+              if( rc != 0 ) {
+                log_verbose("error truncating %s\n", bunny_cache_filename.c_str());
+              }
+              close(fd);
+            }
+          }
+          else 
+          if( bunny_dspcache_retain == 0 ) {
+            int rc = unlink( cachefile.c_str() );
+            if( rc != 0 ) {
+              log_verbose("error removing cache file %s %d\n", cachefile.c_str(), errno);
+            }
+          }
+        }
+      }
       return buflen;
     }
   }
@@ -1044,38 +1074,40 @@ bunny_close (UpnpWebFileHandle fh,
     close(bunny_cache_fd);
   bunny_cache_fd = -1;
 
-  if( bunny_dspcache_retain == 1 ) {
-    if( bunny_cache_filename != "" && bunny_cache_directory != "" ) {
-      log_verbose("keeping cache file %s/%s\n", bunny_cache_directory.c_str(), bunny_cache_filename.c_str()); 
-    }
-  }
-  else
-  if( bunny_cache_filename != "" && bunny_cache_directory != "" ) {
-    string cachefile = bunny_cache_directory + bunny_cache_filename;
-    if( bunny_dspcache_retain == 2 && bunny_cache_filesize > 10000000 ) {
-      int fd = open( cachefile.c_str(), O_WRONLY|O_TRUNC, S_IRWXU);
-      if( fd >= 0 ) {
-        log_verbose("truncating cache file %s\n", cachefile.c_str());
-        int rc = ftruncate(fd, 10000000);
-        if( rc != 0 ) {
-          log_verbose("error truncating %s\n", bunny_cache_filename.c_str());
-        }
-        close(fd);
+  if( file->pos < bunny_cache_filesize ) {
+    log_verbose("close check %d %d %d\n", file->pos, bunny_cache_filesize, bunny_dspcache_retain);
+    if( bunny_dspcache_retain == 1 ) {
+      if( bunny_cache_filename != "" && bunny_cache_directory != "" ) {
+        log_verbose("keeping cache file %s/%s\n", bunny_cache_directory.c_str(), bunny_cache_filename.c_str()); 
       }
     }
     else
-    if( bunny_dspcache_retain == 0 ) {
-      int rc = unlink( cachefile.c_str() );
-      if( rc != 0 ) {
-        log_verbose("error removing cache file %s %d\n", cachefile.c_str(), errno);
+    if( bunny_cache_filename != "" && bunny_cache_directory != "" ) {
+      string cachefile = bunny_cache_directory + bunny_cache_filename;
+      if( bunny_dspcache_retain == 2 && bunny_cache_filesize > 10000000 ) {
+        int fd = open( cachefile.c_str(), O_WRONLY|O_TRUNC, S_IRWXU);
+        if( fd >= 0 ) {
+          log_verbose("truncating cache file %s\n", cachefile.c_str());
+          int rc = ftruncate(fd, 10000000);
+          if( rc != 0 ) {
+            log_verbose("error truncating %s\n", bunny_cache_filename.c_str());
+          }
+          close(fd);
+        }
+      }
+      else
+      if( bunny_dspcache_retain == 0 ) {
+        int rc = unlink( cachefile.c_str() );
+        if( rc != 0 ) {
+          log_verbose("error removing cache file %s %d\n", cachefile.c_str(), errno);
+        }
       }
     }
+    //bunny_cache_filepos = 0;
+    //bunny_cache_filesize = 0;
+    //bunny_cache_filename = "";
+    //bunny_cache_starting_filepos = 0;
   }
-  bunny_cache_filepos = 0;
-  bunny_cache_filesize = 0;
-  bunny_cache_filename = "";
-  bunny_cache_starting_filepos = 0;
-
   log_verbose("bunny_close done\n");
 
   return 0;
