@@ -1055,10 +1055,10 @@ bunny_close (UpnpWebFileHandle fh,
     if( bunny_dspcache_retain == 2 && bunny_cache_filesize > 10000000 ) {
       int fd = open( cachefile.c_str(), O_WRONLY|O_TRUNC, S_IRWXU);
       if( fd >= 0 ) {
-        int rc = lseek( fd, 10000000, SEEK_SET);
-        if( rc == 10000000 ) {
-          log_verbose("truncating cache file %s\n", cachefile.c_str());
-          write(fd, "", 0);
+        log_verbose("truncating cache file %s\n", cachefile.c_str());
+        int rc = ftruncate(fd, 10000000);
+        if( rc != 0 ) {
+          log_verbose("error truncating %s\n", bunny_cache_filename.c_str());
         }
         close(fd);
       }
