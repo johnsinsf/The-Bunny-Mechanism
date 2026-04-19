@@ -1053,7 +1053,7 @@ bunny_close (UpnpWebFileHandle fh,
   if( bunny_cache_filename != "" && bunny_cache_directory != "" ) {
     string cachefile = bunny_cache_directory + bunny_cache_filename;
     if( bunny_dspcache_retain == 2 && bunny_cache_filesize > 10000000 ) {
-      int fd = open( cachefile.c_str(), O_WRONLY, S_IRWXU);
+      int fd = open( cachefile.c_str(), O_WRONLY|O_TRUNC, S_IRWXU);
       if( fd >= 0 ) {
         int rc = lseek( fd, 10000000, SEEK_SET);
         if( rc == 10000000 ) {
