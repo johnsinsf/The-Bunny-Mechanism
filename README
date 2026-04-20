@@ -1,6 +1,38 @@
 
 Video showing how to use the system: https://www.youtube.com/watch?v=hQRJb9WlUJk
 
+A new video on building the system: https://www.youtube.com/watch?v=zRFHsQ5JFnw
+
+Also, on the System_auditd module, they've split out the af_unix software into a separate package, 
+now audisp-plugins.
+
+My current af_unix.conf file (note the change in the directory on the args line):
+
+active = yes
+direction = out
+path = /usr/bin/audisp-af_unix
+type = always
+args = 0640 /run/audispd_events string
+format = string
+
+This is the prior version of af_unix.conf:
+
+active = yes
+direction = out
+path = builtin_af_unix
+type = builtin 
+args = 0640 /var/run/audispd_events
+format = string
+
+in auditd.conf be sure to have:
+
+log_format = raw
+distribute_network = yes
+
+should look like this:
+root       95161   95159  0 Apr14 ?        00:00:03 /sbin/audisp-af_unix 0640 /var/run/audispd_events
+
+
 This is the top level directory.
 
 To build the system:
