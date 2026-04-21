@@ -68,6 +68,8 @@ int bunny_close (UpnpWebFileHandle fh,
 
 int bunny_server_connect(UpnpWebFileHandle fh);
 
+string sendCommand(string req, string ip);
+
 int readHeader( SocketIO* socket, LObj& lobj );
 int parseHeader( SocketIO* socket, LObj& lobj );
 void* bunny_cache_thread( void* a );

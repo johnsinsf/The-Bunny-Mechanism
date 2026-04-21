@@ -113,6 +113,9 @@ string bunny_cache_servername;
 string bunny_cache_request;
 string bunny_cache_filename;
 string bunny_cache_directory;
+string bunny_avdevice;
+string bunny_avdevice_mode;
+bool   bunny_avdevice_flac_pause;
 
 pthread_mutex_t bunny_cache_mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -164,7 +167,7 @@ bunny_cache_thread( void* a ) {
     g_quit = true;
   }
 
-
+  string idx;
   if( ut->dssObj->server ) {
     log_verbose("checking dspcachedir\n");
     map<string,string>::const_iterator I = ut->dssObj->server->configMap.find("dspcachedir");
@@ -174,6 +177,27 @@ bunny_cache_thread( void* a ) {
         bunny_cache_directory += "/";
     }
     log_verbose("checking dspcachedir %s\n", bunny_cache_directory.c_str());
+    I = ut->dssObj->server->configMap.find("configidx");
+      
+    if( I != ut->dssObj->server->configMap.end() )
+      idx = I->second;
+
+    I = ut->dssObj->server->configMap.find("avdevice" + idx);
+  
+    if( I != ut->dssObj->server->configMap.end() )
+      bunny_avdevice = I->second;
+
+    I = ut->dssObj->server->configMap.find("avdevice_mode" + idx);
+  
+    if( I != ut->dssObj->server->configMap.end() )
+      bunny_avdevice_mode = I->second;
+
+    I = ut->dssObj->server->configMap.find("avdevice_flac_pause" + idx);
+  
+    if( I != ut->dssObj->server->configMap.end() ) {
+      if( I->second == "yes" )
+        bunny_avdevice_flac_pause = true;
+    }
   }
 
   while( ! g_quit ) {
@@ -752,7 +776,30 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
     log_verbose("error signaling cache sem %d\n", errno);
     g_quit = true;
   }
- 
+  if( bunny_cache_starting_filepos < prefetch && bunny_avdevice_flac_pause && bunny_avdevice_mode == "yxc" ) {
+    log_verbose("pausing %s for cache fill\n", bunny_avdevice.c_str());
+    sendCommand("/YamahaExtendedControl/v1/netusb/setPlayback?playback='pause_play'", bunny_avdevice);
+    bool pause_done = false;
+    int x = 0;
+    while( ! pause_done && ! g_quit ) {
+      if( pthread_mutex_lock( &bunny_cache_mutex) != 0 ) {
+        log_verbose( "error mutex lock\n" );
+        g_quit = true;
+      }
+      unsigned long int t_pos = bunny_cache_filepos;
+      if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
+        log_verbose( "error mutex unlock\n" );
+        g_quit = true;
+      }
+      if( t_pos >= prefetch || x++ > 5 ) {
+        pause_done = true;
+      } else {
+        sleep(1); 
+      }
+    }
+    log_verbose("start playing %s\n", bunny_avdevice.c_str());
+    sendCommand("/YamahaExtendedControl/v1/netusb/setPlayback?playback='play'", bunny_avdevice);
+  } 
   while( ! done && ! g_quit ) {
 
     if( pthread_mutex_lock( &bunny_cache_mutex) != 0 ) {
@@ -1276,4 +1323,35 @@ int parseHeader( SocketIO* socket, LObj& lobj ) {
     }
   }
   return 0;
+}
+
+string
+sendCommand( string req, string ip ) {
+
+  if( req.size() && ip.size() ) {
+    SocketIO bunny_sock;
+    bunny_sock.useSSL = false;
+
+    int fd = bunny_sock.openClient( ip, 80 );
+
+    LObj obj;
+    string fetch, id;
+
+    logger.error("sendCommand fd " + to_string(fd) + " req " + req);
+
+    if( fd >= 0 ) {
+      fetch = "GET " +  req + " HTTP/1.0\n";
+      fetch += "host: " + ip + "\n\n";
+    
+      logger.error("using buf " + fetch);
+      bunny_sock.write(fetch.c_str(), fetch.size());
+  
+      readHeader( &bunny_sock, obj );
+    }
+    if( obj.packet.size() > 0 ) {
+      logger.error("have packet " + obj.packet);
+      return obj.packet;
+    }
+  }
+  return "failed";
 }
