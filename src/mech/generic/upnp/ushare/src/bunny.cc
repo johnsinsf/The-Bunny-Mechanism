@@ -302,8 +302,12 @@ bunny_cache_thread( void* a ) {
             int fd = bunny_sock.openClient( bunny_server, bunny_server_port );
 
             if( fd < 0 ) {
-              log_verbose("bad socket\n");
-              g_quit = true;
+              log_verbose("connect failed, trying again %s, %d\n", bunny_server.c_str(), errno);
+              fd = bunny_sock.openClient( bunny_server, bunny_server_port );
+              if( fd < 0 ) {
+                done = true;
+                log_verbose("bad socket, exiting\n");
+              }
             } else {
               log_verbose("cache sending %s %d\n", request.c_str(), fd );
               bunny_sock.write(request.c_str(), request.size());
@@ -689,6 +693,21 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
   bunny_cache_request = serverdir + "/" + string(file->fullpath);
   bunny_cache_filename = string(file->fullpath);
   
+  string cachefile = bunny_cache_directory + bunny_cache_filename;
+  if( file->pos == 0 ) {
+    bunny_cache_fd = open( cachefile.c_str(), O_RDONLY );
+    if( bunny_cache_fd > 0 ) {
+      struct stat st;
+      int rc = fstat( bunny_cache_fd, &st);
+      if( rc == 0 ) {
+        bunny_cache_starting_filepos = st.st_size;
+        log_verbose("set starting pos = %d\n", bunny_cache_starting_filepos);
+      }
+      close(bunny_cache_fd);
+      bunny_cache_fd = -1;
+    }
+  }
+
   if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
     log_verbose( "error mutex unlock\n" );
     g_quit = true;
@@ -702,7 +721,7 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
     if( file_ext ) {
       if( strcmp( file_ext, "flac" ) == 0 ) {
         log_verbose("flac processing\n");
-        prefetch = 10000000;  // trying 3 packets or 10MB, will make it configurable
+        prefetch = 8000000;  // trying 2 packets or 8MB, will make it configurable
         if( prefetch > bunny_cache_filesize ) prefetch = bunny_cache_filesize;
       }
     }
@@ -785,7 +804,7 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
       }
       log_verbose("buffer empty, signaling and sleeping %d %d %d %d\n", 
        bunny_cache_starting_filepos, bunny_cache_filepos, remaining, buflen );
-      sleep(2);
+      //sleep(2);
   
       semOp.sem_num = 0;
       semOp.sem_op  = 1;
@@ -808,7 +827,7 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
       if( bunny_cache_filesize - bunny_cache_starting_filepos < buflen )
         len = bunny_cache_filesize - bunny_cache_starting_filepos;
   
-      //log_verbose("checking data %d %d \n", bunny_cache_starting_filepos, bunny_cache_filesize);
+      log_verbose("checking data %d %d \n", bunny_cache_starting_filepos, bunny_cache_filesize);
 
       if(  bunny_cache_starting_filepos <= bunny_cache_filepos ) {
         if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
@@ -841,8 +860,8 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
       if( bunny_cache_fd == -1 ) {
         string cachefile = bunny_cache_directory + bunny_cache_filename;
         bunny_cache_fd = open( cachefile.c_str(), O_RDONLY );
-        struct stat st;
-        int rc = fstat( bunny_cache_fd, &st);
+        //struct stat st;
+        //int rc = fstat( bunny_cache_fd, &st);
       }
       if( bunny_cache_fd != -1 ) {
         int rc = lseek( bunny_cache_fd, file->pos, SEEK_SET );
@@ -1142,10 +1161,10 @@ bunny_close (UpnpWebFileHandle fh,
         }
       }
     }
-    //bunny_cache_filepos = 0;
-    //bunny_cache_filesize = 0;
-    //bunny_cache_filename = "";
-    //bunny_cache_starting_filepos = 0;
+    bunny_cache_filepos = 0;
+    bunny_cache_filesize = 0;
+    bunny_cache_filename = "";
+    bunny_cache_starting_filepos = 0;
   }
   log_verbose("bunny_close done\n");
 
