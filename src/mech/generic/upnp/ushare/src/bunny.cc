@@ -258,7 +258,7 @@ bunny_cache_thread( void* a ) {
           int buflen = 1048576;
           if( do_flac ) {
             if( bunny_cache_filepos == 0  )
-              buflen = 10000000;
+              buflen = 4000000;
             else
               buflen = 2000000;
           }
@@ -362,7 +362,32 @@ bunny_cache_thread( void* a ) {
           bunny_cache_fd = -1;
         }
       } else {
-        log_verbose( "buffer full\n" );
+        log_verbose( "buffer full, signaling\n" );
+        struct sembuf semOp;
+        semOp.sem_num = 0;
+        semOp.sem_op  = 1;
+        semOp.sem_flg = 0;
+
+        if( semop( bunny_cache_semdata, &semOp, 1 ) < 0 ) {
+          log_verbose("error signaling semdata %d\n", errno);
+          g_quit = true;
+        }
+/*
+        union semun {
+          int val;
+          struct semid_ds *buf;
+          unsigned short *array;
+        } arg;
+        arg.val = 1;
+        struct sembuf sbuf;
+        sbuf.sem_num = 0;
+        sbuf.sem_op = 1; 
+        sbuf.sem_flg = 0;
+        if (semctl(bunny_cache_semdata, 0, SETVAL, arg) == -1 || semop(bunny_cache_semdata, &sbuf, 1) == -1) {
+          log_verbose("IPC error: semop"); 
+          g_quit = true;
+        }
+*/
       } 
     } 
   }
@@ -680,6 +705,20 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
         prefetch = 10000000;  // trying 3 packets or 10MB, will make it configurable
         if( prefetch > bunny_cache_filesize ) prefetch = bunny_cache_filesize;
       }
+    }
+    union semun {
+      int val;
+      struct semid_ds *buf;
+      unsigned short *array;
+    } arg;
+    arg.val = 0;
+    struct sembuf sbuf;
+    sbuf.sem_num = 0;
+    sbuf.sem_op = 0; 
+    sbuf.sem_flg = 0;
+    if (semctl(bunny_cache_semdata, 0, SETVAL, arg) == -1 || semop(bunny_cache_semdata, &sbuf, 1) == -1) {
+      log_verbose("IPC error: semop"); 
+      g_quit = true;
     }
   }
   struct sembuf semOp;
