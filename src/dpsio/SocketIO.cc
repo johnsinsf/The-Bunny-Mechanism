@@ -557,8 +557,8 @@ SocketIO::openClient( string serverName, int port, bool blocking, bool reopen ) 
       }
       logger.error( "connect trying again: " + serverName + ": " + itoa(port) + " err: " + itoa(err) );
       int x = 0;
-      while( x++ < 6 && ! g_quit )
-        sleep( 5 );
+      while( x++ < 5 && ! g_quit )
+        sleep( 1 );
     } else {
       connected = true;
       if( g_logLevel > 0 )

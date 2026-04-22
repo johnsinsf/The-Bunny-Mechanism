@@ -546,9 +546,6 @@ bunny_open (const char *filename, enum UpnpOpenFileMode mode,
   int fd, upnp_id = 0;
   static string lastfile; // to remove duplicate entries to the playlog
 
-  bunny_cache_starting_filepos = 0;
-  //bunny_cache_ending_filepos = 0;
-
   if (!filename)
     return NULL;
 
@@ -590,6 +587,22 @@ bunny_open (const char *filename, enum UpnpOpenFileMode mode,
   file->detail.local.fd = 0;
   file->detail.local.bunny_sock = NULL;
   file->detail.local.dssObj = ut->dssObj;
+
+  if( pthread_mutex_lock( &bunny_cache_mutex) != 0 ) {
+    log_verbose( "error mutex lock\n" );
+    g_quit = true;
+  }
+
+  bunny_cache_filepos = 0;
+  bunny_cache_starting_filepos = 0;
+  bunny_cache_filename = strdup (entry->fullpath);
+  bunny_cache_filesize = entry->size;
+
+  if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
+    log_verbose( "error mutex unlock\n" );
+    g_quit = true;
+  }
+
 
   if( lastfile != string(filename) ) {
 
@@ -778,7 +791,7 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
   }
   if( bunny_cache_starting_filepos < prefetch && bunny_avdevice_flac_pause && bunny_avdevice_mode == "yxc" ) {
     log_verbose("pausing %s for cache fill\n", bunny_avdevice.c_str());
-    sendCommand("/YamahaExtendedControl/v1/netusb/setPlayback?playback='pause_play'", bunny_avdevice);
+    sendCommand("/YamahaExtendedControl/v1/netusb/setPlayback?playback=pause", bunny_avdevice);
     bool pause_done = false;
     int x = 0;
     while( ! pause_done && ! g_quit ) {
@@ -798,7 +811,7 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
       }
     }
     log_verbose("start playing %s\n", bunny_avdevice.c_str());
-    sendCommand("/YamahaExtendedControl/v1/netusb/setPlayback?playback='play'", bunny_avdevice);
+    sendCommand("/YamahaExtendedControl/v1/netusb/setPlayback?playback=play", bunny_avdevice);
   } 
   while( ! done && ! g_quit ) {
 
@@ -1328,28 +1341,31 @@ int parseHeader( SocketIO* socket, LObj& lobj ) {
 string
 sendCommand( string req, string ip ) {
 
+  log_verbose("sendCommand %s %s\n", req.c_str(), ip.c_str());
   if( req.size() && ip.size() ) {
     SocketIO bunny_sock;
     bunny_sock.useSSL = false;
 
-    int fd = bunny_sock.openClient( ip, 80 );
+    log_verbose("opening device\n");
+    g_logLevel = 5;
+    int fd = bunny_sock.openClient( ip, 80, false, false );
 
     LObj obj;
     string fetch, id;
 
-    logger.error("sendCommand fd " + to_string(fd) + " req " + req);
+    log_verbose("sendCommand fd %d, %s\n ", fd, req.c_str());
 
     if( fd >= 0 ) {
       fetch = "GET " +  req + " HTTP/1.0\n";
       fetch += "host: " + ip + "\n\n";
     
-      logger.error("using buf " + fetch);
+      log_verbose("using buf %s\n", fetch.c_str());
       bunny_sock.write(fetch.c_str(), fetch.size());
   
       readHeader( &bunny_sock, obj );
     }
     if( obj.packet.size() > 0 ) {
-      logger.error("have packet " + obj.packet);
+      log_verbose("have output packet %s\n", obj.packet.c_str());
       return obj.packet;
     }
   }
