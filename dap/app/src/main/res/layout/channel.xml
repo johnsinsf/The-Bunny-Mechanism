@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+    <LinearLayout
+        android:layout_width="match_parent" 
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+       <TextView
+            android:id="@+id/channelId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dip"
+            android:text=""
+        />
+       <TextView
+            android:id="@+id/channelName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dip"
+            android:text=""
+        />
+       <TextView
+            android:id="@+id/channelType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dip"
+            android:text=""
+        />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent" 
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+       <TextView
+            android:id="@+id/changeStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dip"
+            android:text="New Value"
+        />
+
+        <EditText android:layout_height="wrap_content"
+                 android:layout_width="match_parent"
+                 android:layout_weight="1"
+                 android:id="@+id/channelStatus"/>
+
+        <Button
+            android:id="@+id/channel_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="100dip"
+            android:text="@string/qty_ok_button"
+            android:onClick="checkChannel" 
+        />
+
+    </LinearLayout>
+</LinearLayout>
+

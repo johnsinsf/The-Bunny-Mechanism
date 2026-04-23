@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+	<TextView
+            android:id="@+id/PRICEtextViewProgressID"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="Volume"
+            android:textAppearance="?android:attr/textAppearanceLarge" >
+        </TextView>
+
+        <SeekBar
+            android:id="@+id/PRICEseekBarID"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginTop="26dp"
+            android:max="150" >
+        </SeekBar>
+
+        <TextView
+            android:id="@+id/PRICEinitialvaluetextID"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/PRICEseekBarID"
+            android:text="min" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/PRICEinitialvaluetextID2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/PRICEseekBarID"
+            android:text="max" />
+
+          <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1">
+
+        <LinearLayout
+            android:id="@+id/mainframe2"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingTop="5dip"
+            android:paddingBottom="13dip"
+            android:paddingLeft="20dip"
+            android:paddingRight="20dip">
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>
