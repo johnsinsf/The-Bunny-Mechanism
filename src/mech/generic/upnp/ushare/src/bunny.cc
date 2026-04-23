@@ -146,7 +146,7 @@ bunny_cache_thread( void* a ) {
   }
 
   if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
-    log_verbose( "ERROR: failed to lock bunny_cache %d\n", errno );
+    log_verbose( "ERROR: failed to unlock bunny_cache %d\n", errno );
     g_quit = true;
   }
   extern struct ushare_t *ut;
@@ -211,6 +211,8 @@ bunny_cache_thread( void* a ) {
 
     int rc = semop( bunny_cache_sem, &semOp, 1 );
 
+    string cachefile = "";
+
     if( rc == -1 )
       g_quit = true;
 
@@ -224,51 +226,62 @@ bunny_cache_thread( void* a ) {
         bunny_cache_fd = -1;
       }
       if( bunny_cache_fd == -1 ) {
-        string cachefile = bunny_cache_directory + bunny_cache_filename;
+        cachefile = bunny_cache_directory + bunny_cache_filename;
         //log_verbose("opening cache file %s\n", cachefile.c_str());
         bunny_cache_fd = open( cachefile.c_str(), O_WRONLY|O_APPEND|O_CREAT, S_IRWXU);
       }
       struct stat st;
+      bool fileok = false;
+      bool do_flac = false;
 
       if( bunny_cache_fd != -1 ) {
         rc = fstat( bunny_cache_fd, &st );
         if( rc == 0 ) {
           bunny_cache_starting_filepos = st.st_size;
+          fileok = true;
         } else {
-          g_quit = true;
-          log_verbose("bad file");
+          log_verbose("bad file %s\n", cachefile.c_str());
         }
       } else {
-        log_verbose("bad file");
-        g_quit = true;
+        log_verbose("bad file %s\n", cachefile.c_str());
       }
-      unsigned long t_filesize = bunny_cache_filesize;
-      unsigned long t_pos = bunny_cache_filepos;
+      unsigned long t_filesize = 0;
+      unsigned long t_pos = 0;
+      string t_request, t_servername;
 
-      string t_request = bunny_cache_request;
-      string t_servername = bunny_cache_servername;
+      if( fileok ) { 
+        t_filesize = bunny_cache_filesize;
+        t_pos = bunny_cache_filepos;
 
-      char* file_ext = getExtension( bunny_cache_filename.c_str() );
-      bool do_flac = false;
-      bunny_cache_size = 5000000;
-      if( file_ext ) {
-        if( strcmp( file_ext, "flac" ) == 0 ) {
-          do_flac = true;
-          bunny_cache_size = 15000000;
+        t_request = bunny_cache_request;
+        t_servername = bunny_cache_servername;
+
+        char* file_ext = getExtension( bunny_cache_filename.c_str() );
+        do_flac = false;
+        bunny_cache_size = 5000000;
+        if( file_ext ) {
+          if( strcmp( file_ext, "flac" ) == 0 ) {
+            do_flac = true;
+            bunny_cache_size = 15000000;
+          }
         }
-      }
-      if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
-        log_verbose( "ERROR: failed to unlock bunny_cache %d\n", errno );
-        g_quit = true;
+        if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
+          log_verbose( "ERROR: failed to unlock bunny_cache %d\n", errno );
+          g_quit = true;
+        }
       }
 
       //log_verbose("cache thread pos %d, starting %d, filesize %d\n", t_pos, bunny_cache_starting_filepos, t_filesize);
 
+      if( ! fileok ) {
+        log_verbose("cache thread sleeping, bad file found\n");
+        sleep(1);
+      }
       if( t_pos >= t_filesize ) {
         log_verbose("bad pos %d %d\n", t_pos, t_filesize);
       }
       else
-      if( (bunny_cache_starting_filepos - t_pos) <= bunny_cache_size && bunny_cache_starting_filepos < t_filesize && ! g_quit ) {
+      if( (bunny_cache_starting_filepos - t_pos) <= bunny_cache_size && bunny_cache_starting_filepos < t_filesize && ! g_quit && fileok ) {
         bool done = false;
         bool finished = false;
         LObj obj;
@@ -385,9 +398,17 @@ bunny_cache_thread( void* a ) {
           }
           //log_verbose("signaled data ready %d\n", bunny_cache_starting_filepos);
         }
+        if( pthread_mutex_lock( &bunny_cache_mutex) != 0 ) {
+          log_verbose( "ERROR: failed to lock bunny_cache %d\n", errno );
+          g_quit = true;
+        }
         if( bunny_cache_fd != -1 ) {
           close(bunny_cache_fd);
           bunny_cache_fd = -1;
+        }
+        if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
+          log_verbose( "ERROR: failed to unlock bunny_cache %d\n", errno );
+          g_quit = true;
         }
       } else {
         log_verbose( "buffer full, signaling\n" );
@@ -400,22 +421,6 @@ bunny_cache_thread( void* a ) {
           log_verbose("error signaling semdata %d\n", errno);
           g_quit = true;
         }
-/*
-        union semun {
-          int val;
-          struct semid_ds *buf;
-          unsigned short *array;
-        } arg;
-        arg.val = 1;
-        struct sembuf sbuf;
-        sbuf.sem_num = 0;
-        sbuf.sem_op = 1; 
-        sbuf.sem_flg = 0;
-        if (semctl(bunny_cache_semdata, 0, SETVAL, arg) == -1 || semop(bunny_cache_semdata, &sbuf, 1) == -1) {
-          log_verbose("IPC error: semop"); 
-          g_quit = true;
-        }
-*/
       } 
     } 
   }
@@ -429,7 +434,6 @@ bunny_get_info (const char *filename, UpnpFileInfo *info,
                    const void** requestCookie __attribute__((unused))) {
   extern struct ushare_t *ut;
   struct upnp_entry_t *entry = NULL;
-  //struct stat st;
   int upnp_id = 0;
   char *content_type = NULL;
   char *protocol = NULL;
@@ -758,7 +762,7 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
     if( file_ext ) {
       if( strcmp( file_ext, "flac" ) == 0 ) {
         log_verbose("flac processing\n");
-        prefetch = 8000000;  // trying 2 packets or 8MB, will make it configurable
+        prefetch = 12000000;  // trying 3 packets or 12MB, will make it configurable
         if( prefetch > bunny_cache_filesize ) prefetch = bunny_cache_filesize;
       }
     }
@@ -804,7 +808,7 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
         log_verbose( "error mutex unlock\n" );
         g_quit = true;
       }
-      if( t_pos >= prefetch || x++ > 5 ) {
+      if( t_pos >= prefetch || x++ > 10 ) {
         pause_done = true;
       } else {
         sleep(1); 
@@ -945,6 +949,11 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
       }
       //log_verbose("copied data, unlocked mutex, done %d %d\n", buflen, file->pos, bunny_cache_starting_filepos);
       done = true;
+/*
+      if( pthread_mutex_lock( &bunny_cache_mutex) != 0 ) {
+        log_verbose( "ERROR: failed to lock bunny_cache %d\n", errno );
+        g_quit = true;
+      }
       if( file->pos >= bunny_cache_filesize ) {
         log_verbose("done, checking cache file %d\n", bunny_dspcache_retain);
         if( bunny_dspcache_retain == 1 ) {
@@ -975,6 +984,11 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
           }
         }
       }
+      if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
+        log_verbose( "ERROR: failed to unlock bunny_cache %d\n", errno );
+        g_quit = true;
+      }
+*/
       return buflen;
     }
   }
@@ -1010,6 +1024,7 @@ bunny_read (UpnpWebFileHandle fh, char *buf, size_t buflen,
   if( bunny_dspcache_enabled ) {
 
     int rc = bunny_read2( fh, buf, buflen, cookie, requestCookie );
+    log_verbose("read2 rc %d %d\n", rc, buflen);
     return rc;
   }
 
@@ -1188,43 +1203,51 @@ bunny_close (UpnpWebFileHandle fh,
   if(file)
     free (file);
 
+  if( pthread_mutex_lock( &bunny_cache_mutex) != 0 ) {
+    log_verbose( "ERROR: failed to lock bunny_cache %d\n", errno );
+    g_quit = true;
+  }
+  log_verbose("close check %d %d\n", bunny_cache_filesize, bunny_dspcache_retain);
+
   if( bunny_cache_fd != -1 )
     close(bunny_cache_fd);
   bunny_cache_fd = -1;
 
-  if( file->pos < bunny_cache_filesize ) {
-    log_verbose("close check %d %d %d\n", file->pos, bunny_cache_filesize, bunny_dspcache_retain);
-    if( bunny_dspcache_retain == 1 ) {
-      if( bunny_cache_filename != "" && bunny_cache_directory != "" ) {
-        log_verbose("keeping cache file %s/%s\n", bunny_cache_directory.c_str(), bunny_cache_filename.c_str()); 
+  if( bunny_dspcache_retain == 1 ) {
+    if( bunny_cache_filename != "" && bunny_cache_directory != "" ) {
+      log_verbose("keeping cache file %s/%s\n", bunny_cache_directory.c_str(), bunny_cache_filename.c_str()); 
+    }
+  }
+  else
+  if( bunny_cache_filename != "" && bunny_cache_directory != "" ) {
+    string cachefile = bunny_cache_directory + bunny_cache_filename;
+    if( bunny_dspcache_retain == 2 && bunny_cache_filesize > 10000000 ) {
+      int fd = open( cachefile.c_str(), O_WRONLY|O_TRUNC, S_IRWXU);
+      if( fd >= 0 ) {
+        log_verbose("truncating cache file %s\n", cachefile.c_str());
+        int rc = ftruncate(fd, 10000000);
+        if( rc != 0 ) {
+          log_verbose("error truncating %s\n", bunny_cache_filename.c_str());
+        }
+        close(fd);
       }
     }
     else
-    if( bunny_cache_filename != "" && bunny_cache_directory != "" ) {
-      string cachefile = bunny_cache_directory + bunny_cache_filename;
-      if( bunny_dspcache_retain == 2 && bunny_cache_filesize > 10000000 ) {
-        int fd = open( cachefile.c_str(), O_WRONLY|O_TRUNC, S_IRWXU);
-        if( fd >= 0 ) {
-          log_verbose("truncating cache file %s\n", cachefile.c_str());
-          int rc = ftruncate(fd, 10000000);
-          if( rc != 0 ) {
-            log_verbose("error truncating %s\n", bunny_cache_filename.c_str());
-          }
-          close(fd);
-        }
-      }
-      else
-      if( bunny_dspcache_retain == 0 ) {
-        int rc = unlink( cachefile.c_str() );
-        if( rc != 0 ) {
-          log_verbose("error removing cache file %s %d\n", cachefile.c_str(), errno);
-        }
+    if( bunny_dspcache_retain == 0 ) {
+      int rc = unlink( cachefile.c_str() );
+      if( rc != 0 ) {
+        log_verbose("error removing cache file %s %d\n", cachefile.c_str(), errno);
       }
     }
-    bunny_cache_filepos = 0;
-    bunny_cache_filesize = 0;
-    bunny_cache_filename = "";
-    bunny_cache_starting_filepos = 0;
+  }
+  bunny_cache_filepos = 0;
+  bunny_cache_filesize = 0;
+  bunny_cache_filename = "";
+  bunny_cache_starting_filepos = 0;
+
+  if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
+    log_verbose( "ERROR: failed to lock bunny_cache %d\n", errno );
+    g_quit = true;
   }
   log_verbose("bunny_close done\n");
 
