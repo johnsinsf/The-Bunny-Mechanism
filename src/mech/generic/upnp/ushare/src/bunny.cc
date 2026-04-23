@@ -200,6 +200,9 @@ bunny_cache_thread( void* a ) {
     }
   }
 
+
+  int connect_errors = 0;
+
   while( ! g_quit ) {
     struct sembuf semOp;
     semOp.sem_num = 0;
@@ -342,13 +345,19 @@ bunny_cache_thread( void* a ) {
               log_verbose("connect failed, trying again %s, %d\n", bunny_server.c_str(), errno);
               fd = bunny_sock.openClient( bunny_server, bunny_server_port );
               if( fd < 0 ) {
-                done = true;
-                log_verbose("bad socket, exiting\n");
+                if( connect_errors++ > 10 ) {
+                  done = true;
+                  log_verbose("bad socket, sleeping\n");
+                  sleep(60);
+                } else { 
+                  log_verbose("bad socket, retrying\n");
+                  sleep(5);
+                }
               }
             } else {
               log_verbose("cache sending %s %d\n", request.c_str(), fd );
               bunny_sock.write(request.c_str(), request.size());
-
+              connect_errors = 0;
               int rc2 = readHeader( &bunny_sock, obj );
               if( rc2 != 1 ) {
                 done = true;
@@ -762,7 +771,7 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
     if( file_ext ) {
       if( strcmp( file_ext, "flac" ) == 0 ) {
         log_verbose("flac processing\n");
-        prefetch = 12000000;  // trying 3 packets or 12MB, will make it configurable
+        prefetch = 10000000;  // trying 3 packets or 12MB, will make it configurable
         if( prefetch > bunny_cache_filesize ) prefetch = bunny_cache_filesize;
       }
     }
@@ -808,7 +817,7 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
         log_verbose( "error mutex unlock\n" );
         g_quit = true;
       }
-      if( t_pos >= prefetch || x++ > 10 ) {
+      if( t_pos >= prefetch || x++ > 8 ) {
         pause_done = true;
       } else {
         sleep(1); 
