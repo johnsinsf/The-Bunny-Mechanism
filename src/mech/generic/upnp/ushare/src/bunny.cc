@@ -265,10 +265,10 @@ bunny_cache_thread( void* a ) {
             bunny_cache_size = 15000000;
           }
         }
-        if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
-          log_verbose( "ERROR: failed to unlock bunny_cache %d\n", errno );
-          g_quit = true;
-        }
+      }
+      if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
+        log_verbose( "ERROR: failed to unlock bunny_cache %d\n", errno );
+        g_quit = true;
       }
 
       //log_verbose("cache thread pos %d, starting %d, filesize %d\n", t_pos, bunny_cache_starting_filepos, t_filesize);
