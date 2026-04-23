@@ -817,7 +817,7 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
         log_verbose( "error mutex unlock\n" );
         g_quit = true;
       }
-      if( t_pos >= prefetch || x++ > 8 ) {
+      if( t_pos >= prefetch || x++ > 6 ) {
         pause_done = true;
       } else {
         sleep(1); 
@@ -974,12 +974,15 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
         if( bunny_cache_filename != "" && bunny_cache_directory != "" ) {
           string cachefile = bunny_cache_directory + bunny_cache_filename;
           if( bunny_dspcache_retain == 2 && bunny_cache_filesize > 10000000 ) {
-            int fd = open( cachefile.c_str(), O_WRONLY|O_TRUNC, S_IRWXU);
+            int fd = open( cachefile.c_str(), O_WRONLY, S_IRWXU);
             if( fd >= 0 ) {
               log_verbose("truncating cache file %s\n", cachefile.c_str());
-              int rc = ftruncate(fd, 10000000);
-              if( rc != 0 ) {
-                log_verbose("error truncating %s\n", bunny_cache_filename.c_str());
+              int rc = lseek(fd, 10000000, SEEK_SET);
+              if( rc == 10000000 ) {
+                rc = ftruncate(fd, 10000000);
+                if( rc != 0 ) {
+                  log_verbose("error truncating %s\n", bunny_cache_filename.c_str());
+                }
               }
               close(fd);
             }
@@ -1231,12 +1234,15 @@ bunny_close (UpnpWebFileHandle fh,
   if( bunny_cache_filename != "" && bunny_cache_directory != "" ) {
     string cachefile = bunny_cache_directory + bunny_cache_filename;
     if( bunny_dspcache_retain == 2 && bunny_cache_filesize > 10000000 ) {
-      int fd = open( cachefile.c_str(), O_WRONLY|O_TRUNC, S_IRWXU);
+      int fd = open( cachefile.c_str(), O_WRONLY, S_IRWXU);
       if( fd >= 0 ) {
         log_verbose("truncating cache file %s\n", cachefile.c_str());
-        int rc = ftruncate(fd, 10000000);
-        if( rc != 0 ) {
-          log_verbose("error truncating %s\n", bunny_cache_filename.c_str());
+        int rc = lseek(fd, 10000000, SEEK_SET);
+        if( rc == 10000000 ) {
+          int rc = ftruncate(fd, 10000000);
+          if( rc != 0 ) {
+            log_verbose("error truncating %s\n", bunny_cache_filename.c_str());
+          }
         }
         close(fd);
       }
