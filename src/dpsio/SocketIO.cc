@@ -150,7 +150,9 @@ SocketIO::initServerSSL( void ) {
         return -1;
       }
     }
-    serverCerts[I2->first] = s_ctx;
+    map<string, SSL_CTX*>::iterator I = serverCerts.find(I2->first);
+    if( I == serverCerts.end() || I->second == NULL )
+      serverCerts[I2->first] = s_ctx;
   }
   //if( !debug_out ) {
     //logger.error( "SSL unable to open /var/tmp/ssl_debug" );

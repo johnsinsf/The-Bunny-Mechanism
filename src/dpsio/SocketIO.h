@@ -65,6 +65,14 @@ class SocketIO {
         if( s_ctx )
           SSL_CTX_free( s_ctx );
         s_ctx = NULL;
+        map<string, SSL_CTX*>::iterator I = serverCerts.begin();
+        while( I != serverCerts.end() ) {
+          if( I->second ) {
+            SSL_CTX_free( I->second );
+            I->second = NULL;
+          }
+          ++I;
+        }
       }
     };
 
