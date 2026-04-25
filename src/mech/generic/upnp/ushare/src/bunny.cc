@@ -372,22 +372,38 @@ bunny_cache_thread( void* a ) {
             }
           }
           if( ! done && ! g_quit ) {
-            if( bunny_cache_fd == -1 ) {
-              string cachefile = bunny_cache_directory + bunny_cache_filename;
-              bunny_cache_fd = open( cachefile.c_str(), O_WRONLY|O_APPEND|O_CREAT, S_IRWXU);
-            }
-            if( bunny_cache_fd != -1 ) {
-              write( bunny_cache_fd, obj.packet.c_str(), obj.packet.size() );
-            }
-
-            struct stat st;
-            rc = fstat( bunny_cache_fd, &st );
-
-            //bunny_cache_starting_filepos += obj.packet.size();
-            //log_verbose("starting filepos %d %d %d\n", bunny_cache_starting_filepos, st.st_size, rc);
-
-            if( rc == 0 ) { 
-              bunny_cache_starting_filepos = st.st_size;
+            if( t_servername != bunny_cache_servername || t_request != bunny_cache_request ) {
+              done = true;
+              if( bunny_cache_fd != -1 ) {
+                close(bunny_cache_fd);
+                bunny_cache_fd = -1;
+              }
+              log_verbose("changed cache request, exiting\n");
+            } 
+            else {
+              if( bunny_cache_fd == -1 ) {
+                string cachefile = bunny_cache_directory + bunny_cache_filename;
+                bunny_cache_fd = open( cachefile.c_str(), O_WRONLY|O_APPEND|O_CREAT, S_IRWXU);
+              }
+              if( bunny_cache_fd != -1 ) {
+                rc = write( bunny_cache_fd, obj.packet.c_str(), obj.packet.size() );
+                if( rc != obj.packet.size() ) {
+                  log_verbose("bad cache write %s %d\n", bunny_cache_filename.c_str(), errno);
+                }
+              }
+              struct stat st;
+              rc = fstat( bunny_cache_fd, &st );
+              if( rc == 0 ) {
+                unsigned long int t = bunny_cache_starting_filepos + obj.packet.size();
+                if( t != st.st_size ) {
+                  log_verbose("cache consistency error, filepos %d %d %d\n", bunny_cache_starting_filepos, st.st_size, t);
+                }
+                bunny_cache_starting_filepos = st.st_size;
+              } else {
+                log_verbose("stat error, exiting\n");
+                bunny_cache_starting_filepos += obj.packet.size();
+                done = true;
+              }
             }
           }
           if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
@@ -817,7 +833,7 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
         log_verbose( "error mutex unlock\n" );
         g_quit = true;
       }
-      if( t_pos >= prefetch || x++ > 6 ) {
+      if( t_pos >= prefetch || x++ > 5 ) {
         pause_done = true;
       } else {
         sleep(1); 
