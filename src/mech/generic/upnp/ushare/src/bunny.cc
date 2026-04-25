@@ -390,17 +390,20 @@ bunny_cache_thread( void* a ) {
                 if( rc != obj.packet.size() ) {
                   log_verbose("bad cache write %s %d\n", bunny_cache_filename.c_str(), errno);
                 }
-              }
-              struct stat st;
-              rc = fstat( bunny_cache_fd, &st );
-              if( rc == 0 ) {
-                unsigned long int t = bunny_cache_starting_filepos + obj.packet.size();
-                if( t != st.st_size ) {
-                  log_verbose("cache consistency error, filepos %d %d %d\n", bunny_cache_starting_filepos, st.st_size, t);
+                struct stat st;
+                rc = fstat( bunny_cache_fd, &st );
+                if( rc == 0 ) {
+                  unsigned long int t = bunny_cache_starting_filepos + obj.packet.size();
+                  if( t != st.st_size ) {
+                    log_verbose("cache consistency error, filepos %d %d %d\n", bunny_cache_starting_filepos, st.st_size, t);
+                  }
+                  bunny_cache_starting_filepos = st.st_size;
+                } else {
+                  log_verbose("stat error %s, %d\n", bunny_cache_filename.c_str(), bunny_cache_fd);
+                  bunny_cache_starting_filepos += obj.packet.size();
                 }
-                bunny_cache_starting_filepos = st.st_size;
               } else {
-                log_verbose("stat error, exiting\n");
+                log_verbose("cache error\n");
                 bunny_cache_starting_filepos += obj.packet.size();
                 done = true;
               }
@@ -446,8 +449,45 @@ bunny_cache_thread( void* a ) {
           log_verbose("error signaling semdata %d\n", errno);
           g_quit = true;
         }
+        if( do_flac ) {
+          if( bunny_cache_filepos <= 12582913 ) {
+            // see if it's stuck and send the playnext command
+            string resp = sendCommand("/YamahaExtendedControl/v1/netusb/getPlayInfo", bunny_avdevice);
+            // "play_time":19,
+            int x = resp.find("play_time\":0,");
+            log_verbose("have resp %s, x=%d, pos=%d\n", resp.c_str(), x, bunny_cache_filepos);
+            if( x > 0 ) {
+              sendCommand("/YamahaExtendedControl/v1/netusb/setPlayback?playback=next", bunny_avdevice);
+            }
+          }
+        }
       } 
     } 
+  }
+  if( bunny_cache_filename != "" && bunny_cache_directory != "" ) {
+    string cachefile = bunny_cache_directory + bunny_cache_filename;
+    if( bunny_dspcache_retain == 2 && bunny_cache_filesize > 10000000 ) {
+      int fd = open( cachefile.c_str(), O_WRONLY, S_IRWXU);
+      if( fd >= 0 ) {
+        log_verbose("truncating cache file %s\n", cachefile.c_str());
+        int rc = lseek(fd, 10000000, SEEK_SET);
+        if( rc == 10000000 ) {
+          rc = ftruncate(fd, 10000000);
+          if( rc != 0 ) {
+            log_verbose("error truncating %s\n", bunny_cache_filename.c_str());
+          }
+        }
+        close(fd);
+      }
+    }
+  }
+  else 
+  if( bunny_dspcache_retain == 0 ) {
+    string cachefile = bunny_cache_directory + bunny_cache_filename;
+    int rc = unlink( cachefile.c_str() );
+    if( rc != 0 ) {
+      log_verbose("error removing cache file %s %d\n", cachefile.c_str(), errno);
+    }
   }
   int retVal;
   pthread_exit( (void*)&retVal );
@@ -974,7 +1014,7 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
       }
       //log_verbose("copied data, unlocked mutex, done %d %d\n", buflen, file->pos, bunny_cache_starting_filepos);
       done = true;
-/*
+
       if( pthread_mutex_lock( &bunny_cache_mutex) != 0 ) {
         log_verbose( "ERROR: failed to lock bunny_cache %d\n", errno );
         g_quit = true;
@@ -1016,7 +1056,6 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
         log_verbose( "ERROR: failed to unlock bunny_cache %d\n", errno );
         g_quit = true;
       }
-*/
       return buflen;
     }
   }
@@ -1241,6 +1280,7 @@ bunny_close (UpnpWebFileHandle fh,
     close(bunny_cache_fd);
   bunny_cache_fd = -1;
 
+/*
   if( bunny_dspcache_retain == 1 ) {
     if( bunny_cache_filename != "" && bunny_cache_directory != "" ) {
       log_verbose("keeping cache file %s/%s\n", bunny_cache_directory.c_str(), bunny_cache_filename.c_str()); 
@@ -1271,6 +1311,7 @@ bunny_close (UpnpWebFileHandle fh,
       }
     }
   }
+*/
   bunny_cache_filepos = 0;
   bunny_cache_filesize = 0;
   bunny_cache_filename = "";
