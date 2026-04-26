@@ -113,6 +113,7 @@ string bunny_cache_servername;
 string bunny_cache_request;
 string bunny_cache_filename;
 string bunny_cache_directory;
+string bunny_cache_previous;
 string bunny_avdevice;
 string bunny_avdevice_mode;
 bool   bunny_avdevice_flac_pause;
@@ -451,13 +452,16 @@ bunny_cache_thread( void* a ) {
         }
         if( do_flac ) {
           if( bunny_cache_filepos <= 12582913 ) {
-            // see if it's stuck and send the playnext command
-            string resp = sendCommand("/YamahaExtendedControl/v1/netusb/getPlayInfo", bunny_avdevice);
-            // "play_time":19,
-            int x = resp.find("play_time\":0,");
-            log_verbose("have resp %s, x=%d, pos=%d\n", resp.c_str(), x, bunny_cache_filepos);
-            if( x > 0 ) {
-              sendCommand("/YamahaExtendedControl/v1/netusb/setPlayback?playback=next", bunny_avdevice);
+            if( bunny_cache_previous != bunny_cache_filename ) {
+              bunny_cache_previous = bunny_cache_filename;
+              // see if it's stuck and send the playnext command
+              string resp = sendCommand("/YamahaExtendedControl/v1/netusb/getPlayInfo", bunny_avdevice);
+              // "play_time":19,
+              int x = resp.find("play_time\":0,");
+              log_verbose("have resp %s, x=%d, pos=%d\n", resp.c_str(), x, bunny_cache_filepos);
+              if( x > 0 ) {
+                sendCommand("/YamahaExtendedControl/v1/netusb/setPlayback?playback=next", bunny_avdevice);
+              }
             }
           }
         }
@@ -660,6 +664,37 @@ bunny_open (const char *filename, enum UpnpOpenFileMode mode,
   if( pthread_mutex_lock( &bunny_cache_mutex) != 0 ) {
     log_verbose( "error mutex lock\n" );
     g_quit = true;
+  }
+
+  if( bunny_dspcache_retain == 1 ) {
+    if( bunny_cache_filename != "" && bunny_cache_directory != "" ) {
+      log_verbose("keeping cache file %s/%s\n", bunny_cache_directory.c_str(), bunny_cache_filename.c_str()); 
+    }
+  }
+  else
+  if( bunny_cache_filename != "" && bunny_cache_directory != "" ) {
+    string cachefile = bunny_cache_directory + bunny_cache_filename;
+    if( bunny_dspcache_retain == 2 && bunny_cache_filesize > 10000000 ) {
+      int fd = open( cachefile.c_str(), O_WRONLY, S_IRWXU);
+      if( fd >= 0 ) {
+        log_verbose("truncating cache file %s\n", cachefile.c_str());
+        int rc = lseek(fd, 10000000, SEEK_SET);
+        if( rc == 10000000 ) {
+          int rc = ftruncate(fd, 10000000);
+          if( rc != 0 ) {
+            log_verbose("error truncating %s\n", bunny_cache_filename.c_str());
+          }
+        }
+        close(fd);
+      }
+    }
+    else
+    if( bunny_dspcache_retain == 0 ) {
+      int rc = unlink( cachefile.c_str() );
+      if( rc != 0 ) {
+        log_verbose("error removing cache file %s %d\n", cachefile.c_str(), errno);
+      }
+    }
   }
 
   bunny_cache_filepos = 0;
@@ -986,27 +1021,46 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
         close(bunny_cache_fd);
         bunny_cache_fd = -1;
       }
+      string cachefile;
       if( bunny_cache_fd == -1 ) {
-        string cachefile = bunny_cache_directory + bunny_cache_filename;
+        cachefile = bunny_cache_directory + bunny_cache_filename;
         bunny_cache_fd = open( cachefile.c_str(), O_RDONLY );
-        //struct stat st;
-        //int rc = fstat( bunny_cache_fd, &st);
+        if( bunny_cache_fd != -1 ) {
+          struct stat st;
+          int rc = fstat( bunny_cache_fd, &st);
+          if( rc == 0 ) {
+            log_verbose("opened %s size %d\n", cachefile.c_str(), st.st_size);
+            if( file->pos > st.st_size ) {
+              log_verbose("bad size %d %d\n", file->pos, st.st_size);
+            }
+          }
+        } else {
+          log_verbose("bad file %s\n", cachefile.c_str());
+        }
       }
       if( bunny_cache_fd != -1 ) {
         int rc = lseek( bunny_cache_fd, file->pos, SEEK_SET );
         if( rc == file->pos ) {
           rc = read( bunny_cache_fd, buf, buflen );
           if( rc != buflen ) {
-            log_verbose("read error %d\n", rc);
-          }
-          file->pos += rc;
-          struct stat st;
-          rc = fstat( bunny_cache_fd, &st);
-          if( rc == 0 ) {
-            bunny_cache_starting_filepos = st.st_size;
+            log_verbose("read error %d, %d %s\n", rc, bunny_cache_fd, cachefile.c_str());
+            sleep(1);
+            rc = read( bunny_cache_fd, buf, buflen );
+            if( rc != buflen ) {
+              log_verbose("read error2 %d, %d %s\n", rc, bunny_cache_fd, cachefile.c_str());
+            } 
+          } 
+          if( rc == buflen ) {
+            file->pos += rc;
+            struct stat st;
+            rc = fstat( bunny_cache_fd, &st);
+            if( rc == 0 ) {
+              bunny_cache_starting_filepos = st.st_size;
+            }
           }
         }
-        close(bunny_cache_fd);
+	if( bunny_cache_fd != -1 )
+          close(bunny_cache_fd);
         bunny_cache_fd = -1;
       }
       if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
