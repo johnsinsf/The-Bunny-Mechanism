@@ -298,7 +298,7 @@ bunny_cache_thread( void* a ) {
           string request;
           int buflen = 1048576;
           if( do_flac ) {
-            if( bunny_cache_filepos == 0  )
+            if( bunny_cache_filepos == 0 && bunny_cache_starting_filepos <= 8000000 )
               buflen = 4000000;
             else
               buflen = 2000000;
@@ -468,6 +468,7 @@ bunny_cache_thread( void* a ) {
       } 
     } 
   }
+/*
   if( bunny_cache_filename != "" && bunny_cache_directory != "" ) {
     string cachefile = bunny_cache_directory + bunny_cache_filename;
     if( bunny_dspcache_retain == 2 && bunny_cache_filesize > 10000000 ) {
@@ -493,6 +494,7 @@ bunny_cache_thread( void* a ) {
       log_verbose("error removing cache file %s %d\n", cachefile.c_str(), errno);
     }
   }
+  */
   int retVal;
   pthread_exit( (void*)&retVal );
 }

@@ -577,7 +577,8 @@ System_auditd_macosx::parse_buf2( const char* bufptr, int len, int msgid, bool& 
       cnt++;
       cnt++;
       string t;
-      while( *(bufptr+cnt) != 0 && cnt < len ) {
+      //while( *(bufptr+cnt) != 0 && cnt < len ) {
+      while( cnt < len && *(bufptr+cnt) != 0 ) {
         t += *(bufptr+cnt++);
       }
       if( g_logLevel > 2 )
@@ -596,11 +597,11 @@ System_auditd_macosx::parse_buf2( const char* bufptr, int len, int msgid, bool& 
       unsigned int x = *(bufptr + cnt);
       cnt++;
  
-      //logger.error("have type 60 arg cnt " + itoa(x));
+      logger.error("have type 60 arg cnt " + itoa(x));
       string t;
       while( x-- > 0 ) {
         //string t;
-        while( *(bufptr+cnt) != 0 && cnt < len ) {
+        while( cnt < len && *(bufptr+cnt) != 0 ) {
           t += *(bufptr+cnt++);
         }
         if( x > 0 ) t += " ";
