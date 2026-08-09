@@ -3,6 +3,7 @@ package com.dwanta.android.dap.client;
 
 import android.app.Activity;
 import android.os.Handler;
+import android.os.Environment;
 import android.util.Log;
 import android.os.Message;
 import android.os.SystemClock;
@@ -11,6 +12,7 @@ import android.os.Build;
 import android.content.Intent;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
+import android.provider.MediaStore;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,8 +71,8 @@ public class dpsio {
   private DapActivity mDapActivity = null;
 
   private static final String TAG = "dpsio";
-  public  static final String CERTFILENAME = "mycertm.p12";
-  public  static final String CERTPASSNAME = "mycertm.pass";
+  public  static final String CERTFILENAME = "mycertn.p12";
+  public  static final String CERTPASSNAME = "mycertn.pass";
 
   public  static final int SIGNON_STATE = 1;
   public  static final int END_STATE    = 2;
@@ -123,7 +125,7 @@ public class dpsio {
     mUsername = username;
     mPassword = password;
 
-    Log.d(TAG, "doSignon " + option);
+    Log.d(TAG, "dpsio doSignon " + option);
 
     if( msg == null )
       return END_STATE;
@@ -179,7 +181,7 @@ public class dpsio {
       return IOERROR_STATE;
     }
     mAuthToken = new String(msg.get(dpsmsg.additionalData));
-    //Log.d(TAG, "got authToken " + mAuthToken); 
+    Log.d(TAG, "got authToken " + mAuthToken + " ac " + actionCode + " opt " + option); 
 
     if( option == 0 ) {
       Log.d(TAG, "actioncode " + actionCode);
@@ -199,7 +201,7 @@ public class dpsio {
       else if( actionCode == dpsmsg.certinit ) {
         int len = msg.getInt(dpsmsg.recordNumber);
         byte[] pass = msg.get(dpsmsg.userData);
-        //Log.d(TAG, "initialize certificate " + len + " " + new String(pass) + " len " + pass.length);
+        Log.d(TAG, "initialize certificate " + len + " " + new String(pass) + " len " + pass.length);
         boolean rc = false;
         try {
           rc = msg.readExtendedData(len);
@@ -207,12 +209,13 @@ public class dpsio {
           Log.d(TAG, "readExtended failed " + rc);
           e.printStackTrace();
         }
-        //Log.d(TAG, "readExtended " + rc);
+        Log.d(TAG, "readExtended " + rc + " " + CERTFILENAME);
         if( rc ) {
           try {
             FileOutputStream fos = ctx.openFileOutput(CERTFILENAME, Context.MODE_PRIVATE);
             try {
               byte[] b = msg.getOutbuf();
+              // can cause errors in out of bounds!
               //Log.d(TAG, "writing outbuf size " + b.length + " " + b[0] + " " + b[1] + " " + b[2] + " " + b[3]);
               fos.write(b, 0, b.length);
               fos.close();
@@ -225,10 +228,47 @@ public class dpsio {
             Log.d(TAG, "mycert not found for writing");
             rc = false;
           }
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.MediaColumns.DISPLAY_NAME, "my_document.pdf");
+            values.put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf");
+
+            // 2. Insert into the public MediaStore collection
+            Uri collectionUri = MediaStore.Downloads.EXTERNAL_CONTENT_URI;
+            Uri fileUri = ctx.getContentResolver().insert(collectionUri, values);
+
+            if (fileUri != null) {
+                // 3. Open the output stream via ContentResolver
+                try (OutputStream outputStream = ctx.getContentResolver().openOutputStream(fileUri)) {
+                    //byte[] data = "Your file content here".getBytes();
+                    byte[] data = msg.getOutbuf();
+                    outputStream.write(data);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+          }
+
+          try {
+            File publicFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "dapfile.txt");
+            FileOutputStream fos = new FileOutputStream(publicFile); // Fails on Android 10+ without special flags
+            try {
+              byte[] b = msg.getOutbuf();
+              fos.write(b, 0, b.length);
+              fos.close();
+            } catch( IOException e ) {
+              Log.d(TAG, "error writing public file");
+              e.printStackTrace();
+            }
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+
           if( rc ) {
             try {
               FileOutputStream fos = ctx.openFileOutput(CERTPASSNAME, Context.MODE_PRIVATE);
               try {
+                Log.d(TAG, "writing pass size " + pass.length + " " + pass + " " + CERTPASSNAME );
                 fos.write(pass, 0, pass.length);
                 fos.close();
               } catch( IOException e ) {
@@ -886,6 +926,7 @@ public class dpsio {
   }
 
   public int writeACK() {
+    Log.d(TAG, "chat calling writePassChar");
     return writePasschar(ACK);
   }
 
@@ -1006,6 +1047,8 @@ public class dpsio {
   }
 
   public int writePasschar(int b) {
+    Log.d(TAG, "chat writePassChar");
+
     int state = READ_STATE;
 
     if( msg == null )

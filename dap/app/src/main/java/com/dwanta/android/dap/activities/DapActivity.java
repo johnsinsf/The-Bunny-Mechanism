@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Binder;
 import android.os.Handler;
+import android.os.Build;
 import android.os.Message;
 import android.os.Parcelable;
 import android.os.Parcel;
@@ -125,6 +126,8 @@ public class DapActivity extends Activity
       mUsername = extras.getString("username");
       Log.d(TAG, "username was sent " + mUsername);
     }
+    Log.d(TAG, "XXXXXX onCreate " + mUsername);
+
     if( mIntent.hasExtra("devname") ) 
       mDevname = extras.getString("devname");
     if( mIntent.hasExtra("password") ) 
@@ -141,24 +144,26 @@ public class DapActivity extends Activity
     } else {
 */
 
-/*
+
    Intent intent = new Intent();
    String packageName = ctx.getPackageName();
-   //PowerManager pm = ctx.getSystemService(PowerManager.class);
    PowerManager pm = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
+/*
    PowerManager.WakeLock wl = pm.newWakeLock(
                                       PowerManager.FULL_WAKE_LOCK,
                                       TAG);
-   //wl.acquire();
-
-   if (pm.isIgnoringBatteryOptimizations(packageName))
-     intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
-   else {
-     intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-     intent.setData(Uri.parse("package:" + packageName));
-   }
-   ctx.startActivity(intent);
+   wl.acquire();
 */
+
+   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+     if (pm.isIgnoringBatteryOptimizations(packageName))
+       intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+     else {
+       intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+       intent.setData(Uri.parse("package:" + packageName));
+     }
+     ctx.startActivity(intent);
+   }
 
    mDapActivity = this;
 
@@ -185,6 +190,9 @@ public class DapActivity extends Activity
         startService(mStartIntent);
         doBindService();
       }
+
+      //long t = SystemClock.uptimeMillis();
+      //mHandler.sendEmptyMessageAtTime(ClientService.WAKEUP, t + LOOP_TIME);
 
       if( mBoundService != null && mBoundService.getSignedOn() )
         toggleState = true;
@@ -785,6 +793,7 @@ public class DapActivity extends Activity
     outState.putString("username", mUsername);
     outState.putString("devname", mDevname);
     outState.putString("password", mPassword);
+    Log.d(TAG, "saveMyState " + mUsername);
   }
 }
 

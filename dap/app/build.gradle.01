@@ -9,12 +9,15 @@ configurations.all {
 }
 
 android {
-    compileSdk 35
+    #compileSdk 35
+    compileSdk 22
 
     defaultConfig {
         applicationId "com.dwanta.android.dap"
-        minSdk 21
-        targetSdk 33
+        #minSdk 28
+        #targetSdk 33
+        minSdk 22
+        targetSdk 22
         versionCode 1
         versionName "1.0"
 
@@ -31,7 +34,8 @@ android {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
-    compileSdkVersion 34
+    #compileSdkVersion 34
+    compileSdkVersion 22
 
     namespace 'com.dwanta.android.dap'
 }

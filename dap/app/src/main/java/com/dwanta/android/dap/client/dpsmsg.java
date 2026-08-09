@@ -918,7 +918,7 @@ public class dpsmsg {
     if( len < 1 )
       return false;
 
-    //Log.d(TAG, "readExtended len " + len);
+    Log.d(TAG, "readExtended len " + len);
     outbuf = ByteBuffer.allocate(len);
     int read = inputstream.read(outbuf.array(), 0, len);
     if( read == len ) {
@@ -1006,7 +1006,7 @@ public class dpsmsg {
   }
 
   public void writePasschar(byte c) throws Exception {
-    //Log.d(TAG, "passchar is: " + c);
+    Log.d(TAG, "passchar is: " + c);
 
     outputstream.write(c);
   }
