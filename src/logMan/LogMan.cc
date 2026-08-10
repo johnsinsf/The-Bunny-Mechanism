@@ -61,7 +61,6 @@ LogMan::init( void ) {
   return;
 }
 
-
 int
 LogMan::doControl3( pid_t& inThreadID ) {
 
@@ -82,19 +81,14 @@ LogMan::doControl3( pid_t& inThreadID ) {
   socket->isConnected = true;
   socket->startUpSSL();
 
-  socket->isConnected = true;
-
-  bool done = false;
-
   string packetin, packetout;
   char buf[MAXBUFSIZE];
   memset( buf, 0, sizeof(buf));
 
   int rc = 0;
+  bool done = false;
 
   while( ! done && ! g_quit ) {
-
-    logger.error( "logMan reading");
 
     rc = socket->doReadLine( buf, sizeof(buf), 330 );
     if( rc > 0 ) {
@@ -122,7 +116,6 @@ LogMan::run( void ) {
 
   SocketIO socket;
   socket.useSSL = true;
-  //socket.useSSL = false;
   socket._certRequired = false;
 
   int _socket = socket.openServer( 22222 );
@@ -135,19 +128,14 @@ LogMan::run( void ) {
     int clientFD = socket.accept( _socket );
     if( clientFD > 0 ) {
         pushClientFD( clientFD, 2 );
-        logger.error( "logman accepted:" + itoa(clientFD) );
-        if( clientFD <= 0 ) {
-          logger.error( "error accepting" );
-          g_quit = true;
-        } else {
-          // 
-          startThread( true, 6 );
-          sleep(5);  // testing
-        }
+        startThread( true, 6 );
+        sleep(5);  // testing
+    } else {
+      logger.error( "error accepting" );
+      g_quit = true;
     }
   }
   logger.error("done with logman");
 
   return;
 }
-
