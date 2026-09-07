@@ -11,6 +11,7 @@
 #ifndef __Mech
 #define __Mech
 
+#include <malloc.h>
 #include "dpsframework.h"
 #include "BaseServer.h"
 #include "Icomm.h"
@@ -116,6 +117,7 @@ class DssObject {
       localstorage = true;
       databuf = (char*)malloc(MAXDATASIZE);
       memset(databuf,0,MAXDATASIZE);
+      logger.error("created databuf");
     }
     ~DssObject( void ) {
       if(databuf)
@@ -241,6 +243,7 @@ class Mech : public BaseServer {
     virtual int  exportClientDataXML( string& out, DssObject& o );
     virtual int  getClientDataIndex ( void ) { return clientDataIndex++; }
     virtual void startThread       (bool detach, int type);
+    void mallinfo( string s );
 
 #ifdef _USELIBXML
     virtual int  processTable    ( int nodeid, string& tablename, DssSaxParser& parser );

@@ -611,7 +611,8 @@ Mech::doWork( int& threadID, SocketIO* socket ) {
         rc = send( socket, hostOut );
         if( g_logLevel > 0 )
           logger.error("XXXXsendclientdata send1 rc " + itoa(rc));
-        step = READCLIENT;
+        //step = READCLIENT;
+        step = PROCESSCLIENT;
         if( ! rc ) {
           step = reconnectHost(socket, host, port);
         } else {
@@ -661,7 +662,7 @@ Mech::doWork( int& threadID, SocketIO* socket ) {
         break;
 
       case SENDEOT:  
-        logger.info( "sending EOT" );
+        logger.error( "sending EOT" );
         if( socket->isOpen() )
            rc = socket->write( EOT );
         step = ATEND;
@@ -1339,6 +1340,8 @@ Mech::processHostMsg( Icomm& hostIn, DssObject& o ) {
       string s(o.databuf);
       return processHostData(s, o);
     }
+  } else {
+    logger.error("not reading data, bad len " + itoa(len) );
   }
   logger.error("returning SENDACK");
 
@@ -1626,12 +1629,12 @@ Mech::exportClientDataXML( string& out, DssObject& o ) {
     for( I = localData.begin(); ! done && I != localData.end(); ++I ) {
       recs++;
       if( g_logLevel > 0 )
-        logger.error("done " + itoa(I->second.done) + " " + itoa(I->second.data.size()));
+        logger.error("done " + itoa(I->second.done) + " " + itoa(I->second.data.size()) + " outsize " + to_string(out.size()));
       if( I->second.done == 0 ) {
+        I->second.done = 1;
         if( out.size() + I->second.data.size() < MAXDATASIZE ) {
           out += I->second.data;
           I->second.recs ? found += I->second.recs : found++;
-          I->second.done = 1;
         } 
         else 
         if( I->second.data.size() > MAXDATASIZE ) {
@@ -1642,11 +1645,37 @@ Mech::exportClientDataXML( string& out, DssObject& o ) {
         }
       }
     }
+    logger.error("recs " + to_string(recs) + " " + to_string(localData.size()) );
     if( recs == (int)localData.size() ) {
       localData.clear();
       if( g_logLevel > 0 )
         logger.error("cleared localData");
       localrecid = 0;
+    } else {
+/*
+      int e = 0;
+      for( I = localData.begin(); I != localData.end(); ++I ) {
+        if( I->second.done == 1 ) {
+          localData.erase(I);
+          e++;
+        }
+      }
+*/
+      int e = 0;
+      map<int, localDataType> localData_t;
+      for( I = localData.begin(); I != localData.end(); ++I ) {
+        if( I->second.done == 0 ) {
+          localDataType t;
+          t.data = I->second.data;
+          t.done = 0;
+          t.recs = I->second.recs; 
+          logger.error("copying size " + to_string(t.data.size()));
+          localData_t[I->first] = t;
+          e++;
+        }
+      }
+      localData = localData_t;
+      logger.error("cleared empties, localData size now " + to_string(localData.size()) + " e " + to_string(e) );
     }
   }
   if( pthread_mutex_unlock( &controlMutex ) != 0 ) {
@@ -1899,6 +1928,8 @@ Mech::processLocalMsg( Icomm& localIn, DssObject& o ) {
   if( localIn.test(Icomm::dataLength) )
     len = localIn.getInt(Icomm::dataLength);
 
+  mallinfo("processLocalMsg");
+
   if( g_logLevel > 0 )
     logger.error("processLocalMsg type " + itoa(msgType) + " ac " + itoa(actionCode) + " len " + itoa(len) + " " + itoa(o.signon_status));
 
@@ -1934,11 +1965,11 @@ Mech::processLocalMsg( Icomm& localIn, DssObject& o ) {
         return SENDACK;
       }
     } else {
-      logger.error("bad action code in process local msg " + itoa(actionCode) + " " + itoa(len));
+      logger.error("bad action code/len in process local msg " + itoa(actionCode) + " " + itoa(len) + " MAX " + to_string(MAXDATASIZE));
 
       //return ATEND;
       return SENDACK;
-    }
+    } 
   } else {
     logger.error("bad action code in process local msg " + itoa(actionCode) + " " + itoa(len));
 
@@ -1987,6 +2018,11 @@ Mech::add_client_data( DssObject& o, dataType& d ) {
 void
 Mech::add_client_data( DssObject& o, string databuf ) {
 
+  if( databuf.size() > MAXDATASIZE ) {
+    logger.error( "ERROR: client data too large "  + to_string(databuf.size()) + " max is " + to_string(MAXDATASIZE));
+    return;
+  }
+
   if( pthread_mutex_lock( &controlMutex ) != 0 ) {
     logger.error( "ERROR: failed to lock mutex" );
     g_quit = true;
@@ -2017,4 +2053,12 @@ Mech::add_client_data( DssObject& o, string databuf ) {
 #endif 
 
   return;  
+}
+
+void
+Mech::mallinfo( string s ) {
+  struct mallinfo mi;
+  mi = ::mallinfo();
+  logger.error("mallinfo " + s + " " + itoa(mi.uordblks));
+  return;
 }

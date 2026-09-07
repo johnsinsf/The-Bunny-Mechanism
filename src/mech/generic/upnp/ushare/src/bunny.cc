@@ -319,7 +319,7 @@ bunny_cache_thread( void* a ) {
           if( ! done ) {
             request = "GET " + bunny_cache_request + " HTTP/1.0\n";
             request += "host: " + bunny_cache_servername + "\n";
-            request += "range: bytes=" + to_string(bunny_cache_starting_filepos) + "-" + to_string(buflen) + "\n\n";
+            request += "range: bytes=" + to_string(bunny_cache_starting_filepos) + "-" + to_string(bunny_cache_starting_filepos + buflen - 1) + "\n\n";
 
             if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
               log_verbose( "ERROR: failed to unlock bunny_cache %d\n", errno );
@@ -818,7 +818,9 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
   bunny_cache_sock = file->detail.local.bunny_sock;
   bunny_cache_filesize = file->detail.local.entry->size;
 
-  log_verbose("bunny_read2 starting buflen %d, size %d, pos %d\n", buflen, bunny_cache_filesize, bunny_cache_filepos);
+  time_t now = time(NULL);
+
+  log_verbose("bunny_read2 starting buflen %d, size %ld, pos %d timestamp %ld\n", buflen, bunny_cache_filesize, bunny_cache_filepos, now);
 
   string serverdir = "/";
   string server = string(file->detail.local.entry->servername);
@@ -993,7 +995,8 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
       if( bunny_cache_filesize - bunny_cache_starting_filepos < buflen )
         len = bunny_cache_filesize - bunny_cache_starting_filepos;
   
-      log_verbose("checking data %d %d \n", bunny_cache_starting_filepos, bunny_cache_filesize);
+      time_t now = time(NULL);
+      log_verbose("checking data %d %d %ld\n", bunny_cache_starting_filepos, bunny_cache_filesize, now);
 
       if(  bunny_cache_starting_filepos <= bunny_cache_filepos ) {
         if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
@@ -1068,7 +1071,9 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
       if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
         log_verbose( "error mutex unlock\n" );
       }
-      //log_verbose("copied data, unlocked mutex, done %d %d\n", buflen, file->pos, bunny_cache_starting_filepos);
+      now = time(NULL); 
+      log_verbose("copied data, unlocked mutex, done %d %d %d ts %ld\n", buflen, file->pos, bunny_cache_starting_filepos, now);
+      
       done = true;
 
       if( pthread_mutex_lock( &bunny_cache_mutex) != 0 ) {
@@ -1147,7 +1152,9 @@ bunny_read (UpnpWebFileHandle fh, char *buf, size_t buflen,
   if( bunny_dspcache_enabled ) {
 
     int rc = bunny_read2( fh, buf, buflen, cookie, requestCookie );
-    log_verbose("read2 rc %d %d\n", rc, buflen);
+    gettimeofday( &tv, NULL );
+    log_verbose("read2 rc %d %d %d %d\n", rc, buflen, tv.tv_sec, tv.tv_usec);
+
     return rc;
   }
 
@@ -1176,9 +1183,10 @@ bunny_read (UpnpWebFileHandle fh, char *buf, size_t buflen,
   else
     request += "host: buuna.dwanta.com\n";
 
-  request += "range: bytes=" + to_string(file->pos) + "-" + to_string(buflen) + "\n\n";
+  request += "range: bytes=" + to_string(file->pos) + "-" + to_string(file->pos + buflen - 1) + "\n\n";
  
-  log_verbose("sending %s %d\n", request.c_str(), tid); 
+  gettimeofday( &tv, NULL );
+  log_verbose("sending %s %d ts %d %d\n", request.c_str(), tid, tv.tv_sec, tv.tv_usec); 
 
   file->detail.local.bunny_sock->write(request.c_str(), request.size());
 
@@ -1196,7 +1204,8 @@ bunny_read (UpnpWebFileHandle fh, char *buf, size_t buflen,
   if( i>= 0 )
     file->pos += i;
 
-  log_verbose ("Read %d bytes %d.\n", i, tid);
+  gettimeofday( &tv, NULL );
+  log_verbose ("Read %d bytes %d %d %d.\n", i, tid, tv.tv_sec, tv.tv_usec);
 
   if( i > 0 )
     memcpy( buf, obj.packet.c_str(), i );
