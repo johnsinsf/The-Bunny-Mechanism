@@ -411,7 +411,9 @@ bunny_upnp_get_entry (struct ushare_t *ut, int id)
           log_info("cache ixml rc is %d\n", rc);
           if( rc == 0 )
             cacheOK = true;
-        } 
+        } else {
+          close(fd2);
+        }
       }
       if( ! cacheOK ) {
         SocketIO bunny_sock;
@@ -849,7 +851,9 @@ build_bunny_metadata_list (struct ushare_t *ut) {
       log_info("cache ixml rc is %d\n", rc);
       if( rc == 0 )
         cacheOK = true;
-    } 
+    } else {
+      close(fd2);
+    }
   }
   if( ! cacheOK ) {
     SocketIO bunny_sock;

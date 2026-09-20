@@ -461,6 +461,12 @@ bunny_cache_thread( void* a ) {
               log_verbose("have resp %s, x=%d, pos=%d\n", resp.c_str(), x, bunny_cache_filepos);
               if( x > 0 ) {
                 sendCommand("/YamahaExtendedControl/v1/netusb/setPlayback?playback=next", bunny_avdevice);
+              } else {
+                int x = resp.find("play_time\":199,");
+                log_verbose("have resp %s, x=%d, pos=%d\n", resp.c_str(), x, bunny_cache_filepos);
+                if( x > 0 ) {
+                  sendCommand("/YamahaExtendedControl/v1/netusb/setPlayback?playback=next", bunny_avdevice);
+                }
               }
             }
           }
@@ -1037,6 +1043,7 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
             log_verbose("opened %s size %d\n", cachefile.c_str(), st.st_size);
             if( file->pos > st.st_size ) {
               log_verbose("bad size %d %d\n", file->pos, st.st_size);
+              done = true;
             }
           }
         } else {
@@ -1056,6 +1063,22 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
             } 
           } 
           if( rc == buflen ) {
+            if( file->pos == 0 ) {
+              log_verbose("read checking cache for nulls\n");
+              int nulls = 0;
+              if( rc > 10 ) {
+                for( int i = 0; i < 10; i++ )
+                  if( buf[i] == 0 ) nulls++;
+              }
+              log_verbose("cache found %d nulls\n", nulls);
+              if( nulls == 10 ) {
+                log_verbose("cache deleting BAD cache file %s\n", cachefile.c_str());
+	        if( bunny_cache_fd != -1 )
+                  close(bunny_cache_fd);
+                bunny_cache_fd = -1;
+                unlink( cachefile.c_str() );
+              }
+            }
             file->pos += rc;
             struct stat st;
             rc = fstat( bunny_cache_fd, &st);
