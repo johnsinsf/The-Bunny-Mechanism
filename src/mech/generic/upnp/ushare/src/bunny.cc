@@ -913,14 +913,15 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
         log_verbose( "error mutex lock\n" );
         g_quit = true;
       }
-      unsigned long int t_pos = bunny_cache_filepos;
+      unsigned long int t_pos = bunny_cache_starting_filepos;
       if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
         log_verbose( "error mutex unlock\n" );
         g_quit = true;
       }
-      if( t_pos >= prefetch || x++ > 5 ) {
+      if( t_pos >= prefetch || x++ > 300 ) {
         pause_done = true;
       } else {
+        log_verbose( "waiting %d / %d\n", t_pos, bunny_cache_starting_filepos );
         sleep(1); 
       }
     }
