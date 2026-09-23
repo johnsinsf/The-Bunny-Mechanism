@@ -755,6 +755,7 @@ bunny_open (const char *filename, enum UpnpOpenFileMode mode,
       bunny_sock.write(fetch.c_str(), fetch.size());
   
       readHeader( &bunny_sock, obj );
+      bunny_sock.doClose();
     }
     if( obj.packet.size() > 0 ) {
       string logname = ut->installdir + string("/cache/playlog");
@@ -1547,6 +1548,7 @@ sendCommand( string req, string ip ) {
       bunny_sock.write(fetch.c_str(), fetch.size());
   
       readHeader( &bunny_sock, obj );
+      bunny_sock.doClose();
     }
     if( obj.packet.size() > 0 ) {
       log_verbose("have output packet %s\n", obj.packet.c_str());
