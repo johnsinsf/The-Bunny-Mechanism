@@ -593,7 +593,8 @@ bunny_get_info (const char *filename, UpnpFileInfo *info,
   free (protocol);
 
   if (content_type) {
-    UpnpFileInfo_set_ContentType(info, ixmlCloneDOMString (content_type));
+    //UpnpFileInfo_set_ContentType(info, ixmlCloneDOMString (content_type));
+    UpnpFileInfo_set_ContentType(info, content_type);
     free (content_type);
   }
   else
@@ -707,7 +708,7 @@ bunny_open (const char *filename, enum UpnpOpenFileMode mode,
 
   bunny_cache_filepos = 0;
   bunny_cache_starting_filepos = 0;
-  bunny_cache_filename = strdup (entry->fullpath);
+  bunny_cache_filename = entry->fullpath;
   bunny_cache_filesize = entry->size;
 
   if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
@@ -726,7 +727,7 @@ bunny_open (const char *filename, enum UpnpOpenFileMode mode,
     string bunny_server, server_dir;
     int x = fullserver.find_first_of("/");
     if( x > 0 ) {
-      bunny_server = fullserver.substr(0, x - 1);
+     bunny_server = fullserver.substr(0, x - 1);
       server_dir = fullserver.substr(x + 1, fullserver.size() - x - 1 );
     } else {
       bunny_server = fullserver;
@@ -1414,6 +1415,7 @@ bunny_close (UpnpWebFileHandle fh,
     log_verbose( "ERROR: failed to lock bunny_cache %d\n", errno );
     g_quit = true;
   }
+
   log_verbose("bunny_close done\n");
 
   return 0;
