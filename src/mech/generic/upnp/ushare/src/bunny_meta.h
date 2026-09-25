@@ -60,10 +60,11 @@ typedef struct xml_convert_s {
 void free_bunny_metadata_list (struct ushare_t *ut);
 void build_bunny_metadata_list (struct ushare_t *ut);
 struct upnp_entry_t *bunny_upnp_get_entry (struct ushare_t *ut, int id);
-void upnp_entry_free (struct ushare_t *ut, struct upnp_entry_t *entry);
+void bunny_entry_free (struct ushare_t *ut, struct upnp_entry_t *entry);
 int bunny_rb_compare (const void *pa, const void *pb, const void *config);
 
 static void metadata_add_container (struct ushare_t *ut,
                         struct upnp_entry_t *entry, const char *container);
+
 
 #endif /* _BMETADATA_H_ */

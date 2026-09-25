@@ -176,6 +176,13 @@ ushare_free (struct ushare_t *ut)
 #endif /* HAVE_DLNA */
   if (ut->cfg_file)
     free (ut->cfg_file);
+#ifdef USE_BUNNY
+  if (ut->dssObj) {
+    if(ut->dssObj->databuf)
+      free(ut->dssObj->databuf);
+    free (ut->dssObj);
+  }
+#endif /* USE_BUNNY */
 
   pthread_cond_destroy (&ut->termination_cond);
   pthread_mutex_destroy (&ut->termination_mutex);
@@ -948,10 +955,9 @@ main (int argc, char **argv) {
   }
   string p = ut->installdir + string("/conf/ushare.conf");
   ut->cfg_file = strdup (p.c_str());
-  if( ! ut->dssObj )
-    ut->dssObj = new DssObject();
+  //if( ! ut->dssObj )
+    //ut->dssObj = new DssObject();
 
-  ut->dssObj->server = o.server;
 #endif
   /* Parse args before cfg file, as we may override the default file */
   if (parse_command_line (ut) < 0)
@@ -974,6 +980,7 @@ main (int argc, char **argv) {
   ut->xbox360 = true;
   ut->dssObj = &o;
   ut->use_cache = true;
+  ut->dssObj->server = o.server;
 #endif
 
   if (ut->daemon)
@@ -1092,7 +1099,19 @@ main (int argc, char **argv) {
   if (ut->use_telnet)
     ctrl_telnet_stop ();
   finish_upnp (ut);
+
+#ifndef USE_BUNNY
   free_metadata_list (ut);
+#endif
+
+#ifdef USE_BUNNY
+  free_bunny_metadata_list (ut);
+  if (ut->dssObj) {
+    if(ut->dssObj->databuf)
+      free(ut->dssObj->databuf);
+    free (ut->dssObj);
+  }
+#endif
   ushare_free (ut);
   finish_iconv ();
   return EXIT_SUCCESS;

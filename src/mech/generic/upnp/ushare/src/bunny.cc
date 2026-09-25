@@ -173,7 +173,7 @@ bunny_cache_thread( void* a ) {
     log_verbose("checking dspcachedir\n");
     map<string,string>::const_iterator I = ut->dssObj->server->configMap.find("dspcachedir");
     if( I != ut->dssObj->server->configMap.end() ) {
-      bunny_cache_directory = strdup(I->second.c_str());
+      bunny_cache_directory = I->second.c_str();
       if( bunny_cache_directory.substr(bunny_cache_directory.size() - 1, 1) != "/" )
         bunny_cache_directory += "/";
     }
@@ -1046,13 +1046,16 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
             if( file->pos > st.st_size ) {
               log_verbose("bad size %d %d\n", file->pos, st.st_size);
               done = true;
+              close(bunny_cache_fd);
+              unlink(cachefile.c_str());
+              bunny_cache_fd = -1;
             }
           }
         } else {
           log_verbose("bad file %s\n", cachefile.c_str());
         }
       }
-      if( bunny_cache_fd != -1 ) {
+      if( bunny_cache_fd != -1 && ! done ) {
         int rc = lseek( bunny_cache_fd, file->pos, SEEK_SET );
         if( rc == file->pos ) {
           rc = read( bunny_cache_fd, buf, buflen );

@@ -224,7 +224,7 @@ upnp_entry_new (struct ushare_t *ut, const char *name, const char *fullpath, con
       struct mime_type_t *mime = getMimeType (getExtension (fullpath));
       if (!mime) {
         --ut->nr_entries; 
-        upnp_entry_free (ut, entry);
+        bunny_entry_free (ut, entry);
         log_error ("Invalid Mime type for %s, entry ignored", fullpath);
         return NULL;
       }
@@ -259,7 +259,7 @@ upnp_entry_new (struct ushare_t *ut, const char *name, const char *fullpath, con
       title_or_name = strdup (name);
       log_error ("Entry invalid name id=%d [%s]\n", entry->id, name);
     } else {
-      upnp_entry_free (ut, entry);
+      bunny_entry_free (ut, entry);
       log_error ("Freeing entry invalid name id=%d [%s]\n", entry->id, name);
       return NULL;
     }
@@ -745,8 +745,17 @@ metadata_add_container (struct ushare_t *ut,
       metadata_add_file (ut, entry, namelist[i]->d_alias, namelist[i]->d_name, namelist[i]->d_size );
     }
 
-    if( namelist[i] )
+    if( namelist[i] ) {
+      if( namelist[i]->d_server)
+        free (namelist[i]->d_server);
+      if( namelist[i]->d_size)
+        free (namelist[i]->d_size);
+      if( namelist[i]->d_name )
+        free (namelist[i]->d_name);
+      if( namelist[i]->d_alias)
+        free (namelist[i]->d_alias);
       free (namelist[i]);
+    }
     if( fullpath )
       free (fullpath);
     namelist[i] = NULL;
@@ -760,7 +769,7 @@ void
 free_bunny_metadata_list (struct ushare_t *ut) {
   ut->init = false;
   if (ut->root_entry)
-    upnp_entry_free (ut, ut->root_entry);
+    bunny_entry_free (ut, ut->root_entry);
   ut->root_entry = NULL;
   ut->nr_entries = 0;
 
@@ -952,4 +961,85 @@ bunny_rb_compare (const void *pa, const void *pb,
     return 1;
 
   return 0;
+}
+
+/* Seperate recursive free() function in order to avoid freeing off
+ * the parents child list within the freeing of the first child, as
+ * the only entry which is not part of a childs list is the root entry
+ */
+static void
+_bunny_entry_free (struct upnp_entry_t *entry)
+{
+  struct upnp_entry_t **childs;
+
+  if (!entry)
+    return;
+
+  if (entry->fullpath)
+    free (entry->fullpath);
+  if (entry->title)
+    free (entry->title);
+  if (entry->url)
+    free (entry->url);
+  if (entry->servername)
+    free (entry->servername);
+#ifdef HAVE_DLNA
+  if (entry->dlna_profile)
+    entry->dlna_profile = NULL;
+#endif /* HAVE_DLNA */
+
+  for (childs = entry->childs; *childs; childs++)
+    _bunny_entry_free (*childs);
+  free (entry->childs);
+}
+
+void
+bunny_entry_free (struct ushare_t *ut, struct upnp_entry_t *entry)
+{
+  if (!ut || !entry)
+    return;
+
+  /* Free all entries (i.e. children) */
+  if (entry == ut->root_entry)
+  {
+    struct upnp_entry_t *entry_found = NULL;
+    struct upnp_entry_lookup_t *lk = NULL;
+    RBLIST *rblist;
+    int i = 0;
+
+    rblist = rbopenlist (ut->rb);
+    lk = (struct upnp_entry_lookup_t *) rbreadlist (rblist);
+
+    while (lk)
+    {
+      entry_found = lk->entry_ptr;
+      if (entry_found)
+      {
+ 	if (entry_found->fullpath)
+ 	  free (entry_found->fullpath);
+ 	if (entry_found->title)
+ 	  free (entry_found->title);
+ 	if (entry_found->url)
+ 	  free (entry_found->url);
+ 	if (entry_found->servername)
+ 	  free (entry_found->servername);
+
+	free (entry_found);
+ 	i++;
+      }
+
+      free (lk); /* delete the lookup */
+      lk = (struct upnp_entry_lookup_t *) rbreadlist (rblist);
+    }
+
+    rbcloselist (rblist);
+    rbdestroy (ut->rb);
+    ut->rb = NULL;
+
+    log_verbose ("Freed [%d] entries\n", i);
+  }
+  else
+    _bunny_entry_free (entry);
+
+  free (entry);
 }

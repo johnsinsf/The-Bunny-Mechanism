@@ -366,6 +366,7 @@ BaseServer::runThread( void* a ) {
     p->doWork( threadID, socket );
     if( socket != NULL ) {
       p->doFinish( threadID, socket );
+      delete( socket );
     }
   }
   int retVal = 0;
