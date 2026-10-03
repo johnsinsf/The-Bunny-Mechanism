@@ -206,9 +206,13 @@ upnp_entry_new (struct ushare_t *ut, const char *name, const char *fullpath, con
   entry->parent = parent;
   entry->child_count =  dir ? 0 : -1;
   entry->title = NULL;
+  entry->servername = servername ? strdup (servername) : NULL;
+/*
   if( servername != NULL )
     entry->servername = strdup( servername );
-
+  else
+    entry->servername = NULL;
+*/
   entry->childs = (struct upnp_entry_t **)
     malloc (sizeof (struct upnp_entry_t *));
   *(entry->childs) = NULL;

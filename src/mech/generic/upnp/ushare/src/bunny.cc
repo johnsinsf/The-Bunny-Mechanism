@@ -344,6 +344,7 @@ bunny_cache_thread( void* a ) {
 
             if( fd < 0 ) {
               log_verbose("connect failed, trying again %s, %d\n", bunny_server.c_str(), errno);
+              bunny_sock.doClose();
               fd = bunny_sock.openClient( bunny_server, bunny_server_port );
               if( fd < 0 ) {
                 if( connect_errors++ > 10 ) {
@@ -756,8 +757,8 @@ bunny_open (const char *filename, enum UpnpOpenFileMode mode,
       bunny_sock.write(fetch.c_str(), fetch.size());
   
       readHeader( &bunny_sock, obj );
-      bunny_sock.doClose();
     }
+    bunny_sock.doClose();
     if( obj.packet.size() > 0 ) {
       string logname = ut->installdir + string("/cache/playlog");
       log_verbose("writing to cache/playlog %s\n", logname.c_str());
@@ -923,7 +924,7 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
       if( t_pos >= prefetch || x++ > 300 ) {
         pause_done = true;
       } else {
-        log_verbose( "waiting %d / %d\n", t_pos, bunny_cache_starting_filepos );
+        log_verbose( "waiting %d / %d\n", t_pos, prefetch );
         sleep(1); 
       }
     }
@@ -979,7 +980,7 @@ bunny_read2 (UpnpWebFileHandle fh, char *buf, size_t buflen,
         log_verbose( "error mutex unlock\n" );
         g_quit = true;
       }
-      log_verbose("buffer empty, signaling and sleeping %d %d %d %d\n", 
+      log_verbose("buffer empty, signaling and waiting %d %d %d %d\n", 
        bunny_cache_starting_filepos, bunny_cache_filepos, remaining, buflen );
       //sleep(2);
   

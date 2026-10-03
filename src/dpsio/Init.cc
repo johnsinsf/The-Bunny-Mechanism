@@ -132,6 +132,7 @@ void dpsInit( int argc, char **argv ) {
       break;
     switch( c ) {
       case 'f':
+        //configFile = strdup(optarg);
         configFile = optarg;
         break;
       case 'n':

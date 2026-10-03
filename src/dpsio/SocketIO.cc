@@ -537,6 +537,7 @@ SocketIO::openClient( string serverName, int port, bool blocking, bool reopen ) 
       }
       memcpy( &addr.sin_addr, hp->h_addr, hp->h_length );
       endhostent();
+      if(hp) free(hp);
       //logger.error("converted server to IP address " + string(*hp->h_addr));
       if( g_logLevel > 0 )
         logger.error("converted server to IP address");
