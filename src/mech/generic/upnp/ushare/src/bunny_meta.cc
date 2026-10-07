@@ -423,7 +423,45 @@ bunny_upnp_get_entry (struct ushare_t *ut, int id)
         SocketIO bunny_sock;
         bunny_sock.useSSL = true;
   
-        string bunny_server = ((struct upnp_entry_lookup_t *) res)->entry_ptr->servername;
+        string bunny_user, bunny_server, companyid, dpsid, siteid, password_encrypted, certfile, certpass, finger; 
+        bunny_server = ((struct upnp_entry_lookup_t *) res)->entry_ptr->servername;
+
+        map<string,string> configMap;
+        configMap = ut->dssObj->server->getConfigMap( );
+        if( configMap.size() > 0 ) {
+          map<string,string>::iterator I = configMap.find("bunny_user");
+          I = configMap.find("companyid");
+          if( I != configMap.end() ) {
+            log_verbose("have bunny company %s\n", I->second.c_str());
+            companyid = I->second;
+          }
+          I = configMap.find("dpsid");
+          if( I != configMap.end() ) {
+            log_verbose("have bunny dps id %s\n", I->second.c_str());
+            dpsid = I->second;
+          }
+          I = configMap.find("siteid");
+          if( I != configMap.end() ) {
+            log_verbose("have bunny site %s\n", I->second.c_str());
+            siteid = I->second;
+          }
+          I = configMap.find("certfile");
+          if( I != configMap.end() ) {
+            log_verbose("have bunny cert file %s\n", I->second.c_str());
+            certfile = I->second;
+          }
+          I = configMap.find("certpass");
+          if( I != configMap.end() ) {
+            log_verbose("have bunny cert pass %s\n", I->second.c_str());
+            certpass = I->second;
+          }
+          I = configMap.find("password_encrypted");
+          if( I != configMap.end() ) {
+            log_verbose("have bunny password %s\n", I->second.c_str());
+            password_encrypted = I->second;
+          }
+        }
+
         int bunny_server_port = 443;
         int x = bunny_server.find("/");
         string server, serverdir;
@@ -437,17 +475,24 @@ bunny_upnp_get_entry (struct ushare_t *ut, int id)
  
         log_verbose("have server %s -  %s\n", server.c_str(), serverdir.c_str());
 
+        finger = bunny_sock.getCertificateFingerprint(certfile, certpass);
+
         int fd = bunny_sock.openClient( server, bunny_server_port );
   
         log_verbose("have fd %d\n", fd);
   
         if( fd >= 0 ) {
-          string test;
-          test = "GET " + serverdir + "/" + string(((struct upnp_entry_lookup_t *) res)->entry_ptr->fullpath) + "?hop=30 HTTP/1.0\n";
-          test += "host: " + server + "\n\n";
+          string fetch;
+          fetch = "GET " + serverdir + "/" + string(((struct upnp_entry_lookup_t *) res)->entry_ptr->fullpath) + "?hop=30 HTTP/1.0\n";
+          fetch += "pass: " + password_encrypted + "\n";
+          fetch += "companyid: " + companyid + "\n";
+          fetch += "siteid: " + siteid + "\n";
+          fetch += "dpsid: " + dpsid + "\n";
+          fetch += "finger: " + finger + "\n";
+          fetch += "host: " + server + "\n\n";
     
-          log_verbose("using buf %s \n", test.c_str());
-          bunny_sock.write(test.c_str(), test.size());
+          log_verbose("using buf %s \n", fetch.c_str());
+          bunny_sock.write(fetch.c_str(), fetch.size());
   
           LObj obj;
   
@@ -800,7 +845,7 @@ build_bunny_metadata_list (struct ushare_t *ut) {
 
   map<string,string> configMap;
   configMap = ut->dssObj->server->getConfigMap( );
-  string bunny_user, bunny_server; 
+  string bunny_user, bunny_server, companyid, dpsid, siteid, password_encrypted, certfile, certpass, finger; 
   int bunny_server_port = 443;
 
   if( configMap.size() > 0 ) {
@@ -839,6 +884,36 @@ build_bunny_metadata_list (struct ushare_t *ut) {
       log_verbose("have bunny cache size %s\n", I->second.c_str());
       bunny_cache_size = atoi(I->second.c_str());
     }
+    I = configMap.find("companyid");
+    if( I != configMap.end() ) {
+      log_verbose("have bunny company %s\n", I->second.c_str());
+      companyid = I->second;
+    }
+    I = configMap.find("dpsid");
+    if( I != configMap.end() ) {
+      log_verbose("have bunny dps id %s\n", I->second.c_str());
+      dpsid = I->second;
+    }
+    I = configMap.find("siteid");
+    if( I != configMap.end() ) {
+      log_verbose("have bunny site %s\n", I->second.c_str());
+      siteid = I->second;
+    }
+    I = configMap.find("certfile");
+    if( I != configMap.end() ) {
+      log_verbose("have bunny cert file %s\n", I->second.c_str());
+      certfile = I->second;
+    }
+    I = configMap.find("certpass");
+    if( I != configMap.end() ) {
+      log_verbose("have bunny cert pass %s\n", I->second.c_str());
+      certpass = I->second;
+    }
+    I = configMap.find("password_encrypted");
+    if( I != configMap.end() ) {
+      log_verbose("have bunny password %s\n", I->second.c_str());
+      password_encrypted = I->second;
+    }
   }
   bool cacheOK = false;
 
@@ -872,6 +947,8 @@ build_bunny_metadata_list (struct ushare_t *ut) {
     SocketIO bunny_sock;
     bunny_sock.useSSL = true;
 
+    finger = bunny_sock.getCertificateFingerprint(certfile, certpass);
+
     int fd = bunny_sock.openClient( bunny_server, bunny_server_port );
 
     log_verbose("have fd %d\n", fd);
@@ -879,6 +956,11 @@ build_bunny_metadata_list (struct ushare_t *ut) {
     if( fd >= 0 ) {
       string fetch;
       fetch = "GET " + bunny_user + "?hop=30 HTTP/1.0\n";
+      fetch += "pass: " + password_encrypted + "\n";
+      fetch += "companyid: " + companyid + "\n";
+      fetch += "dpsid: " + dpsid + "\n";
+      fetch += "siteid: " + siteid + "\n";
+      fetch += "finger: " + finger + "\n";
       fetch += "host: " + bunny_server + "\n\n";
   
       log_verbose("using buf %s \n", fetch.c_str());

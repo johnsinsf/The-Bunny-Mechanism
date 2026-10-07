@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <sys/syscall.h>
 #include "SocketIO.h"
+#include <openssl/pem.h>
+#include <iomanip>
 
 SSL_CTX* SocketIO::s_ctx           = NULL;
 
@@ -1551,3 +1553,42 @@ SocketIO::doFinish( void ) {
   return;
 }
 
+string 
+SocketIO::getCertificateFingerprint(const string& filename, const string& password ) {
+
+  BIO* bio = BIO_new_file(filename.c_str(), "r");
+  if (!bio) {
+    logger.error("Error: Cannot open fingerprint file: " + filename);
+    return "";
+  }
+
+  X509* cert = PEM_read_bio_X509(bio, NULL, NULL, (void*)password.c_str());
+  BIO_free(bio);
+
+  if (!cert) {
+    logger.error("Error: Cannot parse fingerprint file: " + filename);
+    return "";
+  }
+
+  const EVP_MD* md = EVP_sha256();
+  unsigned char md_value[EVP_MAX_MD_SIZE];
+  unsigned int md_len = 0;
+
+  int rc = X509_digest(cert, md, md_value, &md_len);
+  X509_free(cert);
+
+  if (rc != 1) {
+    logger.error("Error: Failed to generate fingerprint: " + filename);
+    return "";
+  }
+
+  std::stringstream ss;
+  ss << std::hex << std::setfill('0');
+  for( unsigned int i = 0; i < md_len; ++i ) {
+    ss << std::setw(2) << static_cast<int>(md_value[i]);
+    if( i < md_len - 1 ) {
+      ss << ":";
+    }
+  }
+  return ss.str();
+}

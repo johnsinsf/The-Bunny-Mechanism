@@ -87,6 +87,7 @@ class SocketIO {
     virtual void  setCertName   ( string s ) { CertFile = s; }
     virtual void  setCertPass   ( string s ) { CertPass = s; }
     virtual void  setCertCAName ( string s ) { CertCAFile = s; }
+    virtual string getCertificateFingerprint(const string& filename, const string& password );
     virtual bool  write         ( int c );
     virtual bool  write         ( const char* c );
     virtual bool  writePacket   ( const char* c );

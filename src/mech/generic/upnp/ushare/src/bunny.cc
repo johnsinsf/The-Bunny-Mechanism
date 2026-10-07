@@ -168,9 +168,11 @@ bunny_cache_thread( void* a ) {
     g_quit = true;
   }
 
-  string idx;
+  string idx, dpsid, password_encrypted, companyid, siteid, finger, certfile, certpass;
+
   if( ut->dssObj->server ) {
     log_verbose("checking dspcachedir\n");
+
     map<string,string>::const_iterator I = ut->dssObj->server->configMap.find("dspcachedir");
     if( I != ut->dssObj->server->configMap.end() ) {
       bunny_cache_directory = I->second.c_str();
@@ -178,29 +180,59 @@ bunny_cache_thread( void* a ) {
         bunny_cache_directory += "/";
     }
     log_verbose("checking dspcachedir %s\n", bunny_cache_directory.c_str());
-    I = ut->dssObj->server->configMap.find("configidx");
-      
-    if( I != ut->dssObj->server->configMap.end() )
+
+    map<string,string> configMap;
+    configMap = ut->dssObj->server->getConfigMap( );
+
+    I = configMap.find("configidx");
+    if( I != configMap.end() )
       idx = I->second;
 
-    I = ut->dssObj->server->configMap.find("avdevice" + idx);
-  
-    if( I != ut->dssObj->server->configMap.end() )
+    I = configMap.find("avdevice" + idx);
+    if( I != configMap.end() )
       bunny_avdevice = I->second;
 
-    I = ut->dssObj->server->configMap.find("avdevice_mode" + idx);
-  
-    if( I != ut->dssObj->server->configMap.end() )
+    I = configMap.find("avdevice_mode" + idx);
+    if( I != configMap.end() )
       bunny_avdevice_mode = I->second;
 
-    I = ut->dssObj->server->configMap.find("avdevice_flac_pause" + idx);
-  
-    if( I != ut->dssObj->server->configMap.end() ) {
+    I = configMap.find("avdevice_flac_pause" + idx);
+    if( I != configMap.end() ) {
       if( I->second == "yes" )
         bunny_avdevice_flac_pause = true;
     }
-  }
 
+    I = configMap.find("companyid");
+    if( I != configMap.end() ) {
+      log_verbose("have bunny company %s\n", I->second.c_str());
+      companyid = I->second;
+    }
+    I = configMap.find("dpsid");
+    if( I != configMap.end() ) {
+      log_verbose("have bunny dps id %s\n", I->second.c_str());
+      dpsid = I->second;
+    }
+    I = configMap.find("siteid");
+    if( I != configMap.end() ) {
+      log_verbose("have bunny site %s\n", I->second.c_str());
+      siteid = I->second;
+    }
+    I = configMap.find("certfile");
+    if( I != configMap.end() ) {
+      log_verbose("have bunny cert file %s\n", I->second.c_str());
+      certfile = I->second;
+    }
+    I = configMap.find("certpass");
+    if( I != configMap.end() ) {
+      log_verbose("have bunny cert pass %s\n", I->second.c_str());
+      certpass = I->second;
+    }
+    I = configMap.find("password_encrypted");
+    if( I != configMap.end() ) {
+      log_verbose("have bunny password %s\n", I->second.c_str());
+      password_encrypted = I->second;
+    }
+  }
 
   int connect_errors = 0;
 
@@ -318,6 +350,11 @@ bunny_cache_thread( void* a ) {
           }
           if( ! done ) {
             request = "GET " + bunny_cache_request + " HTTP/1.0\n";
+            request += "pass: " + password_encrypted + "\n";
+            request += "companyid: " + companyid + "\n";
+            request += "siteid: " + siteid + "\n";
+            request += "dpsid: " + dpsid + "\n";
+            request += "finger: " + finger + "\n";
             request += "host: " + bunny_cache_servername + "\n";
             request += "range: bytes=" + to_string(bunny_cache_starting_filepos) + "-" + to_string(bunny_cache_starting_filepos + buflen - 1) + "\n\n";
 
@@ -339,7 +376,8 @@ bunny_cache_thread( void* a ) {
               server_dir = "/";
             }
             int bunny_server_port = 443;
-   
+            finger = bunny_sock.getCertificateFingerprint(certfile, certpass);
+
             int fd = bunny_sock.openClient( bunny_server, bunny_server_port );
 
             if( fd < 0 ) {
