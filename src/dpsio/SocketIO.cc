@@ -491,7 +491,7 @@ SocketIO::accept( int _fd ) {
 int
 SocketIO::openClient( string serverName, int port, bool blocking, bool reopen ) {
   struct  sockaddr_in    addr;
-  struct  hostent *hp;
+  struct  hostent *hp = NULL;
   u_long  in_addr;
   bool    connected = false;
   isConnected = false;
@@ -539,7 +539,10 @@ SocketIO::openClient( string serverName, int port, bool blocking, bool reopen ) 
       }
       memcpy( &addr.sin_addr, hp->h_addr, hp->h_length );
       endhostent();
-      if(hp) free(hp);
+      //if( hp ) {
+        //free(hp);
+        //hp = NULL;
+      //}
       //logger.error("converted server to IP address " + string(*hp->h_addr));
       if( g_logLevel > 0 )
         logger.error("converted server to IP address");
@@ -570,6 +573,7 @@ SocketIO::openClient( string serverName, int port, bool blocking, bool reopen ) 
         logger.error("connected!");
     }
   }
+  //if(hp) free(hp);
   if( useSSL ) {
     if( g_logLevel > 0 )
       logger.error("starting ssl");

@@ -349,14 +349,6 @@ bunny_cache_thread( void* a ) {
             log_verbose("changed cache request, exiting\n");
           }
           if( ! done ) {
-            request = "GET " + bunny_cache_request + " HTTP/1.0\n";
-            request += "pass: " + password_encrypted + "\n";
-            request += "companyid: " + companyid + "\n";
-            request += "siteid: " + siteid + "\n";
-            request += "dpsid: " + dpsid + "\n";
-            request += "finger: " + finger + "\n";
-            request += "host: " + bunny_cache_servername + "\n";
-            request += "range: bytes=" + to_string(bunny_cache_starting_filepos) + "-" + to_string(bunny_cache_starting_filepos + buflen - 1) + "\n\n";
 
             if( pthread_mutex_unlock( &bunny_cache_mutex) != 0 ) {
               log_verbose( "ERROR: failed to unlock bunny_cache %d\n", errno );
@@ -377,6 +369,15 @@ bunny_cache_thread( void* a ) {
             }
             int bunny_server_port = 443;
             finger = bunny_sock.getCertificateFingerprint(certfile, certpass);
+
+            request = "GET " + bunny_cache_request + " HTTP/1.0\n";
+            request += "pass: " + password_encrypted + "\n";
+            request += "companyid: " + companyid + "\n";
+            request += "siteid: " + siteid + "\n";
+            request += "dpsid: " + dpsid + "\n";
+            request += "finger: " + finger + "\n";
+            request += "host: " + bunny_cache_servername + "\n";
+            request += "range: bytes=" + to_string(bunny_cache_starting_filepos) + "-" + to_string(bunny_cache_starting_filepos + buflen - 1) + "\n\n";
 
             int fd = bunny_sock.openClient( bunny_server, bunny_server_port );
 
